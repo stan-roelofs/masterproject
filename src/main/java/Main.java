@@ -3,15 +3,16 @@ import org.apache.commons.cli.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         CommandLineParser parser = new DefaultParser();
 
+        // Create options
         Options options = new Options();
-        Option file = Option.builder("i").longOpt("input").hasArg().desc("File name of input file").argName("file").required().build();
-
-        options.addOption(file);
+        options.addOption(Option.builder("i").longOpt("input").hasArg().desc("File name of input file").argName("file").required().build());
 
         try {
             // parse the command line arguments
@@ -22,17 +23,15 @@ public class Main {
 
                 // Read file
                 try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-                    StringBuilder sb = new StringBuilder();
-                    String line = br.readLine();
+                    List<String> input = new ArrayList<>();
 
+                    String line = br.readLine();
                     while (line != null) {
-                        sb.append(line);
-                        sb.append(System.lineSeparator());
+                        input.add(line);
                         line = br.readLine();
                     }
-                    String everything = sb.toString();
 
-                    System.out.println(everything);
+                    InputParser.parse(input);
                 }
             }
         }

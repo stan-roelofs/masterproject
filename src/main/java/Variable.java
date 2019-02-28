@@ -1,0 +1,3 @@
+class Variable {
+    Sort sort;
+}

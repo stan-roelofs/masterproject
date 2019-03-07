@@ -11,11 +11,19 @@ class Equation {
         this.right = r;
     }
 
-    public Term getLeft() {
+    Term getLeft() {
         return this.left;
     }
 
-    public Term getRight() {
+    Term getRight() {
         return this.right;
+    }
+
+    public Sort getSort() {
+        return left.sort;
+    }
+
+    Equation substitute(Variable var, Term sub) {
+        return new Equation(left.substitute(var, sub), right.substitute(var, sub));
     }
 }

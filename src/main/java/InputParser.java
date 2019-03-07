@@ -3,11 +3,24 @@ import java.util.Collection;
 class InputParser {
     static void parse(Collection<String> input) {
 
+        parseC(input);
+
         for (String line : input) {
+
             if (line.contains("=")) {
-                parseEquation(line);
+                Equation eq = parseEquation(line);
             }
         }
+    }
+
+    private static void parseC(Collection<String> input) {
+
+    }
+
+    private static Function parseFunction(String term) throws IllegalArgumentException {
+        // TODO: check parameter
+
+        return null;
     }
 
     private static Equation parseEquation(String line) throws IllegalArgumentException {
@@ -40,6 +53,7 @@ class InputParser {
         if (line == null) {
             throw new IllegalArgumentException("line must not be null");
         }
-        return null; //TODO
+
+        return null;
     }
 }

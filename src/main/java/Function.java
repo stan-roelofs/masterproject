@@ -5,10 +5,22 @@ import java.util.List;
 class Function {
     List<Sort> inputSorts = new ArrayList<>();
     Sort outputSort;
-    List<Variable> variables = new ArrayList<>();
+    private String name;
 
-    Term apply(Collection<Term> inputTerms) {
+    Function(Sort sort) {
+
+    }
+
+    Function(Collection<Sort> sorts) {
+
+    }
+
+    FunctionTerm apply(Collection<FunctionTerm> inputTerms) {
 
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 }

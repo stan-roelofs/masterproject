@@ -26,4 +26,9 @@ class Equation {
     Equation substitute(Variable var, Term sub) {
         return new Equation(left.substitute(var, sub), right.substitute(var, sub));
     }
+
+    @Override
+    public String toString() {
+        return left.toString() + " = " + right.toString();
+    }
 }

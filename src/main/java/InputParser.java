@@ -49,7 +49,7 @@ class InputParser {
         return new Equation(left, right);
     }
 
-    private static Term parseTerm(String line) {
+    private static FunctionTerm parseTerm(String line) {
         if (line == null) {
             throw new IllegalArgumentException("line must not be null");
         }

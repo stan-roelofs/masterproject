@@ -16,7 +16,11 @@ class Variable extends Term {
 
     @Override
     public Term substitute(Variable var, Term substitute) {
-        return substitute;
+        if (var.equals(this)) {
+            return substitute;
+        } else {
+            return this;
+        }
     }
 
     @Override

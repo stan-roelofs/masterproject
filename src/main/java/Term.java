@@ -10,6 +10,7 @@ abstract class Term {
     public abstract Term substitute(Variable var, Term substitute);
     public abstract Collection<Variable> getVariables();
     public abstract String toString();
+    public abstract boolean equals(Object o);
 
     public Sort getSort() {
         return sort;

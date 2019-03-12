@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 class Variable extends Term {
     private String name;
@@ -28,5 +29,19 @@ class Variable extends Term {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Variable)) {
+            return false;
+        }
+
+        Variable var = (Variable) o;
+        return Objects.equals(this.sort, var.getSort()) && Objects.equals(this.name, var.getName());
     }
 }

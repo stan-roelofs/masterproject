@@ -15,12 +15,12 @@ public class Prover {
                 Collection<Equation> hypotheses = new ArrayList<>();
 
                 // Add hypotheses
-                for (Sort s : function.inputSorts) {
-                    Function constant = new Function(s);
-                    FunctionTerm a = new FunctionTerm(s, constant, null);
+                for (Sort s : function.getInputSorts()) {
+                    Function constant = new Function("0", s); //TODO: a1, a2
+                    FunctionTerm a = new FunctionTerm(constant, new ArrayList<>());
                     newConstants.add(a);
 
-                    if (s == function.outputSort) {
+                    if (s == function.getOutputSort()) {
                         Equation hypothesis = goal.substitute(inductionVar, a);
                         hypotheses.add(hypothesis);
                     }

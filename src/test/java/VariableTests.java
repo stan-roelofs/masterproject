@@ -10,9 +10,15 @@ public class VariableTests {
         Sort s = new Sort();
         Variable v = new Variable(s, "x");
         Variable v2 = new Variable(s, "y");
-        v.substitute(v, v2);
-        System.out.println(v.substitute(v, v2));
-        // TODO
+        Assert.assertEquals("y", v.substitute(v, v2).toString());
+    }
+
+    @Test
+    public void testSubstituteDifferentVariable() {
+        Sort s = new Sort();
+        Variable v = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        Assert.assertEquals("x", v.substitute(v2, v2).toString());
     }
 
     @Test
@@ -41,8 +47,7 @@ public class VariableTests {
         // Substitute x with f(0)
         Term newt = term.substitute(v, f0);
 
-        System.out.println(newt.toString());
-        // TODO: assert f(0)
+        Assert.assertEquals("f(0)", newt.toString());
     }
 
     @Test
@@ -54,13 +59,13 @@ public class VariableTests {
     @Test
     public void testEqualsNull() {
         Variable v = new Variable(new Sort(), "x");
-        Assert.assertFalse(v.equals(null));
+        Assert.assertNotEquals(null, v);
     }
 
     @Test
     public void testEqualsReflexivity() {
         Variable v = new Variable(new Sort(), "x");
-        Assert.assertTrue(v.equals(v));
+        Assert.assertEquals(v, v);
     }
 
     @Test
@@ -68,7 +73,7 @@ public class VariableTests {
         Sort s = new Sort();
         Variable v = new Variable(s, "x");
         Variable v2 = new Variable(s, "x");
-        Assert.assertTrue(v.equals(v2));
+        Assert.assertEquals(v, v2);
     }
 
     @Test
@@ -77,7 +82,7 @@ public class VariableTests {
         Variable v = new Variable(s, "x");
         Sort s2 = new Sort();
         Variable v2 = new Variable(s2, "x");
-        Assert.assertFalse(v.equals(v2));
+        Assert.assertNotEquals(v, v2);
     }
 
     @Test
@@ -85,7 +90,7 @@ public class VariableTests {
         Sort s = new Sort();
         Variable v = new Variable(s, "x");
         Variable v2 = new Variable(s, "y");
-        Assert.assertFalse(v.equals(v2));
+        Assert.assertNotEquals(v, v2);
     }
 
     @Test
@@ -94,6 +99,6 @@ public class VariableTests {
         Variable v = new Variable(s, "x");
         Sort s2 = new Sort();
         Variable v2 = new Variable(s2, "y");
-        Assert.assertFalse(v.equals(v2));
+        Assert.assertNotEquals(v, v2);
     }
 }

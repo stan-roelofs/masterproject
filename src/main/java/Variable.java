@@ -7,6 +7,10 @@ class Variable extends Term {
 
     Variable(Sort sort, String name) {
         super(sort);
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Name should not be empty");
+        }
         this.name = name;
     }
 

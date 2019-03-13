@@ -4,6 +4,9 @@ abstract class Term {
     protected Sort sort;
 
     Term(Sort sort) {
+        if (sort == null) {
+            throw new IllegalArgumentException("Sort must not be null");
+        }
         this.sort = sort;
     }
 

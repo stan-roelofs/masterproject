@@ -8,6 +8,10 @@ class Function {
     private String name;
 
     Function(String name, Sort sort) {
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Name should not be empty");
+        }
+
         this.name = name;
         this.outputSort = sort;
         this.inputSorts = new ArrayList<>();

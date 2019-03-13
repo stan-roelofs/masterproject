@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 class Equation {
     private Term left;
     private Term right;
@@ -30,5 +32,20 @@ class Equation {
     @Override
     public String toString() {
         return left.toString() + " = " + right.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Equation)) {
+            return false;
+        }
+
+        Equation eq = (Equation) o;
+
+        return Objects.equals(left, eq.getLeft()) && Objects.equals(right, eq.getRight());
     }
 }

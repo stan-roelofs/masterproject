@@ -21,6 +21,9 @@ class Variable extends Term {
     @Override
     public Term substitute(Variable var, Term substitute) {
         if (var.equals(this)) {
+            if (this.sort != substitute.getSort()) {
+                throw new IllegalArgumentException("Sorts of variable and substitute do not match");
+            }
             return substitute;
         } else {
             return this;

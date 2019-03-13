@@ -23,6 +23,8 @@ class FunctionTerm extends Term {
             throw new IllegalArgumentException("Number of arguments does not match the number of function inputs");
         }
 
+        // TODO: check sort of function matches sort of subterms
+
         this.subterms.addAll(subTerms);
     }
 

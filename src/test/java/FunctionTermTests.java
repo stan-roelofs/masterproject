@@ -11,34 +11,34 @@ public class FunctionTermTests {
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionException() {
         Collection<Sort> inputs = new ArrayList<>();
-        inputs.add(new Sort());
-        inputs.add(new Sort());
-        Function f = new Function("f", inputs, new Sort());
+        inputs.add(new Sort("x"));
+        inputs.add(new Sort("y"));
+        Function f = new Function("f", inputs, new Sort("z"));
         Term t = new FunctionTerm(f);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionTermsNullException() {
         Collection<Sort> inputs = new ArrayList<>();
-        inputs.add(new Sort());
-        inputs.add(new Sort());
-        Function f = new Function("f", inputs, new Sort());
+        inputs.add(new Sort("x"));
+        inputs.add(new Sort("y"));
+        Function f = new Function("f", inputs, new Sort("z"));
         Term t = new FunctionTerm(f, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionTermsSizeException() {
         Collection<Sort> inputs = new ArrayList<>();
-        inputs.add(new Sort());
-        inputs.add(new Sort());
-        Function f = new Function("f", inputs, new Sort());
+        inputs.add(new Sort("x"));
+        inputs.add(new Sort("z"));
+        Function f = new Function("f", inputs, new Sort("x"));
         Term t = new FunctionTerm(f, new ArrayList<>());
     }
 
     @Test
     public void testSubstituteEqual() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
         Collection<Term> subterms = new ArrayList<>();
@@ -51,7 +51,7 @@ public class FunctionTermTests {
     @Test
     public void testSubstituteSimple() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
         Collection<Term> subterms = new ArrayList<>();
@@ -64,7 +64,7 @@ public class FunctionTermTests {
     @Test
     public void testSubstituteDeep() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
         Collection<Term> subterms = new ArrayList<>();
@@ -77,7 +77,7 @@ public class FunctionTermTests {
 
     @Test
     public void testGetVariablesNone() {
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         Function f = new Function("f", s);
         Term t = new FunctionTerm(f);
         Set<Variable> vs = new HashSet<>();
@@ -87,7 +87,7 @@ public class FunctionTermTests {
     @Test
     public void testGetVariablesSimple() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
         Collection<Term> subterms = new ArrayList<>();
@@ -102,7 +102,7 @@ public class FunctionTermTests {
     @Test
     public void testGetVariablesDeep() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
         Collection<Term> subterms = new ArrayList<>();
@@ -120,7 +120,7 @@ public class FunctionTermTests {
     @Test
     public void testGetVariablesDeepMultiple() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         inputs.add(s);
         Function f = new Function("f", inputs, s);
@@ -142,7 +142,7 @@ public class FunctionTermTests {
 
     @Test
     public void testToStringConstant() {
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         Function f = new Function("f", s);
         Term t = new FunctionTerm(f);
         Assert.assertEquals("f", t.toString());
@@ -151,7 +151,7 @@ public class FunctionTermTests {
     @Test
     public void testToStringFunctionSimple() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
         Collection<Term> subterms = new ArrayList<>();
@@ -164,7 +164,7 @@ public class FunctionTermTests {
     @Test
     public void testToStringFunctionDeep() {
         Collection<Sort> inputs = new ArrayList<>();
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
         Collection<Term> subterms = new ArrayList<>();
@@ -177,7 +177,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsNull() {
-        Function f = new Function("f", new Sort());
+        Function f = new Function("f", new Sort("x"));
         FunctionTerm ft = new FunctionTerm(f);
 
         Assert.assertNotEquals(null, ft);
@@ -185,7 +185,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsReflexivity() {
-        Function f = new Function("f", new Sort());
+        Function f = new Function("f", new Sort("x"));
         FunctionTerm ft = new FunctionTerm(f);
 
         Assert.assertEquals(ft, ft);
@@ -193,7 +193,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsCopy() {
-        Function f = new Function("f", new Sort());
+        Function f = new Function("f", new Sort("x"));
         FunctionTerm ft = new FunctionTerm(f);
         FunctionTerm ft2 = new FunctionTerm(f);
 
@@ -202,7 +202,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsCopy2() {
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         Collection<Sort> sorts = new ArrayList<>();
         sorts.add(s);
         Function f = new Function("f", sorts, s);
@@ -219,10 +219,10 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsSortDifference() {
-        Function f = new Function("f", new Sort());
+        Function f = new Function("f", new Sort("x"));
         FunctionTerm ft = new FunctionTerm(f);
 
-        Function f2 = new Function("g", new Sort());
+        Function f2 = new Function("g", new Sort("x"));
         FunctionTerm ft2 = new FunctionTerm(f2);
 
         Assert.assertNotEquals(ft2, ft);
@@ -230,7 +230,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsFunctionDifference() {
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         Function f = new Function("f", s);
         FunctionTerm ft = new FunctionTerm(f);
 
@@ -242,7 +242,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsSubtermsDifference() {
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         Collection<Sort> sorts = new ArrayList<>();
         sorts.add(s);
         Function f = new Function("f", sorts, s);
@@ -259,7 +259,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsSubtermsSizeDifference() {
-        Sort s = new Sort();
+        Sort s = new Sort("x");
         Collection<Sort> sorts = new ArrayList<>();
         sorts.add(s);
         Function f = new Function("f", sorts, s);

@@ -7,7 +7,7 @@ public class ProverTests {
 
     @Test
     public void testInduction() {
-        Sort nat = new Sort();
+        Sort nat = new Sort("nat");
         Function zero = new Function("0", nat);
 
         Collection<Sort> inputs = new ArrayList<>();

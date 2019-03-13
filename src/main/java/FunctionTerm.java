@@ -1,10 +1,7 @@
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 class FunctionTerm extends Term {
-    private Collection<Term> subterms;
+    private List<Term> subterms;
     private Function function;
 
     FunctionTerm(Function function) {
@@ -47,8 +44,8 @@ class FunctionTerm extends Term {
     }
 
     @Override
-    public Collection<Variable> getVariables() {
-        Collection<Variable> result = new ArrayList<>(this.subterms.size());
+    public Set<Variable> getVariables() {
+        Set<Variable> result = new HashSet<>(this.subterms.size());
         for (Term term : subterms) {
             result.addAll(term.getVariables());
         }

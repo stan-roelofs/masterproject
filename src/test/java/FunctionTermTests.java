@@ -3,8 +3,177 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FunctionTermTests {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorFunctionException() {
+        Collection<Sort> inputs = new ArrayList<>();
+        inputs.add(new Sort());
+        inputs.add(new Sort());
+        Function f = new Function("f", inputs, new Sort());
+        Term t = new FunctionTerm(f);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorFunctionTermsNullException() {
+        Collection<Sort> inputs = new ArrayList<>();
+        inputs.add(new Sort());
+        inputs.add(new Sort());
+        Function f = new Function("f", inputs, new Sort());
+        Term t = new FunctionTerm(f, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorFunctionTermsSizeException() {
+        Collection<Sort> inputs = new ArrayList<>();
+        inputs.add(new Sort());
+        inputs.add(new Sort());
+        Function f = new Function("f", inputs, new Sort());
+        Term t = new FunctionTerm(f, new ArrayList<>());
+    }
+
+    @Test
+    public void testSubstituteEqual() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Assert.assertEquals(t.toString(), t.substitute(new Variable(s, "y"), t).toString());
+    }
+
+    @Test
+    public void testSubstituteSimple() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Assert.assertEquals("f(f(x))", t.substitute(x, t).toString());
+    }
+
+    @Test
+    public void testSubstituteDeep() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Term t2 = t.substitute(x, t);
+        Assert.assertEquals("f(f(f(x)))", t2.substitute(x, t).toString());
+    }
+
+    @Test
+    public void testGetVariablesNone() {
+        Sort s = new Sort();
+        Function f = new Function("f", s);
+        Term t = new FunctionTerm(f);
+        Set<Variable> vs = new HashSet<>();
+        Assert.assertEquals(vs, t.getVariables());
+    }
+
+    @Test
+    public void testGetVariablesSimple() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Set<Variable> vs = new HashSet<>();
+        vs.add(x);
+        Assert.assertEquals(vs, t.getVariables());
+    }
+
+    @Test
+    public void testGetVariablesDeep() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Term t2 = t.substitute(x, t);
+
+        Set<Variable> vs = new HashSet<>();
+        vs.add(x);
+
+        Assert.assertEquals(vs, t2.getVariables());
+    }
+
+    @Test
+    public void testGetVariablesDeepMultiple() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        Variable y = new Variable(s, "y");
+        subterms.add(x);
+        subterms.add(y);
+        Term t = new FunctionTerm(f, subterms);
+        Term t2 = t.substitute(x, t);
+        Term t3 = t2.substitute(y, t);
+
+        Set<Variable> vs = new HashSet<>();
+        vs.add(x);
+        vs.add(y);
+
+        Assert.assertEquals(vs, t3.getVariables());
+    }
+
+    @Test
+    public void testToStringConstant() {
+        Sort s = new Sort();
+        Function f = new Function("f", s);
+        Term t = new FunctionTerm(f);
+        Assert.assertEquals("f", t.toString());
+    }
+
+    @Test
+    public void testToStringFunctionSimple() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Assert.assertEquals("f(x)", t.toString());
+    }
+
+    @Test
+    public void testToStringFunctionDeep() {
+        Collection<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort();
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Collection<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Term t2 = t.substitute(x, t);
+        Assert.assertEquals("f(f(x))", t2.toString());
+    }
 
     @Test
     public void testEqualsNull() {

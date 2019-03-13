@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 class Function {
-    private Collection<Sort> inputSorts;
+    private List<Sort> inputSorts;
     private Sort outputSort;
     private String name;
 

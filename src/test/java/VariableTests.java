@@ -5,6 +5,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class VariableTests {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor() {
+        Variable v = new Variable(new Sort(), "");
+    }
+
+    @Test
+    public void testGetName() {
+        Variable v = new Variable(new Sort(), "x");
+        Assert.assertEquals("x", v.getName());
+    }
+
+    @Test
+    public void testGetVariables() {
+        Variable v = new Variable(new Sort(), "x");
+        Collection<Variable> vs = new ArrayList<>();
+        vs.add(v);
+        Assert.assertEquals(vs, v.getVariables());
+    }
+
     @Test
     public void testSubstituteVariable() {
         Sort s = new Sort();
@@ -18,7 +38,7 @@ public class VariableTests {
         Sort s = new Sort();
         Variable v = new Variable(s, "x");
         Variable v2 = new Variable(s, "y");
-        Assert.assertEquals("x", v.substitute(v2, v2).toString());
+        Assert.assertEquals(v.toString(), v.substitute(v2, v2).toString());
     }
 
     @Test

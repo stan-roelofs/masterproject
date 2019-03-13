@@ -18,11 +18,6 @@ class Function {
         this.inputSorts.addAll(input);
     }
 
-    FunctionTerm apply(Collection<FunctionTerm> inputTerms) {
-
-        return null;
-    }
-
     public String getName() {
         return name;
     }
@@ -33,6 +28,11 @@ class Function {
 
     public Collection<Sort> getInputSorts() {
         return this.inputSorts;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 
     @Override

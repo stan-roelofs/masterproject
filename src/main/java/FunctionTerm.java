@@ -9,12 +9,18 @@ class FunctionTerm extends Term {
 
     FunctionTerm(Function function) {
         super(function.getOutputSort());
+
+        if (function.getInputSorts().size() != 0) {
+            throw new IllegalArgumentException("No subterms given for function with more than 0 inputs");
+        }
         this.function = function;
         this.subterms = new ArrayList<>();
     }
 
     FunctionTerm(Function function, Collection<Term> subTerms) {
-        this(function);
+        super(function.getOutputSort());
+        this.function = function;
+        this.subterms = new ArrayList<>();
 
         if (subTerms == null || subTerms.size() != function.getInputSorts().size()) {
             throw new IllegalArgumentException("Number of arguments does not match the number of function inputs");

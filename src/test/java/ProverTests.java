@@ -54,13 +54,14 @@ public class ProverTests {
         Collection<Equation> eqs = new ArrayList<>();
         eqs.add(eq1);
         eqs.add(eq2);
-        EquationSystem lol = new EquationSystem(eqs, Sigma, C);
 
         subterms.clear();
         subterms.add(var);
         subterms.add(new FunctionTerm(zero));
         FunctionTerm hoi = new FunctionTerm(plus, subterms);
         Equation goal = new Equation(hoi, var);
-        Prover.induction(lol, goal);
+
+        EquationSystem lol = new EquationSystem(eqs, Sigma, C, goal);
+        Prover.induction(lol);
     }
 }

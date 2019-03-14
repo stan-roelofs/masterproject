@@ -5,7 +5,7 @@ class Equation {
     private Term right;
 
     Equation(Term l, Term r) {
-        if (l.sort != r.sort) {
+        if (!(l.sort.equals(r.sort))) {
             throw new IllegalArgumentException("Sort of the two terms should be the same");
         }
 

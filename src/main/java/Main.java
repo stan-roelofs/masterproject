@@ -31,7 +31,8 @@ public class Main {
                         line = br.readLine();
                     }
 
-                    InputParser.parse(input);
+                    EquationSystem system = InputParser.parseSystem(input);
+                    system.print();
                 }
             }
         }

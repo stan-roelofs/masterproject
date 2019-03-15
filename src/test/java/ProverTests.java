@@ -2,6 +2,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ProverTests {
 
@@ -10,20 +11,20 @@ public class ProverTests {
         Sort nat = new Sort("nat");
         Function zero = new Function("0", nat);
 
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         inputs.add(nat);
         Function successor = new Function("s", inputs, nat);
 
-        Collection<Function> C = new ArrayList<>();
+        List<Function> C = new ArrayList<>();
         C.add(zero);
         C.add(successor);
 
-        Collection<Function> Sigma = new ArrayList<>(C);
+        List<Function> Sigma = new ArrayList<>(C);
         inputs.add(nat);
         Function plus = new Function("+", inputs, nat);
         Sigma.add(plus);
 
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         subterms.add(new FunctionTerm(zero));
 
         Variable var = new Variable(nat, "x");

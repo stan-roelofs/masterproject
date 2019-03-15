@@ -3,6 +3,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class VariableTests {
 
@@ -54,13 +55,13 @@ public class VariableTests {
         Function zero = new Function("0", nat);
 
         // Create a function "f" of this sort with one input
-        Collection<Sort> input = new ArrayList<>();
+        List<Sort> input = new ArrayList<>();
         input.add(nat);
         Function f = new Function("f", input, nat);
 
         // Create a term 0, then a term f(0)
         Term zeroo = new FunctionTerm(zero);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         subterms.add(zeroo);
         Term f0 = new FunctionTerm(f, subterms);
 

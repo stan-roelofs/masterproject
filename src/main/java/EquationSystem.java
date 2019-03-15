@@ -12,4 +12,21 @@ class EquationSystem {
         this.C = C;
         this.goal = goal;
     }
+
+    public void print() {
+        System.out.println("Sigma:");
+        for (Function f : sigma) {
+            System.out.println(f.toString());
+        }
+        System.out.println("E:");
+        for (Equation eq : equations) {
+            System.out.println(eq.toString());
+        }
+        System.out.println("C:");
+        for (Function f : C) {
+            System.out.println(f.toString());
+        }
+        System.out.println("Goal:");
+        System.out.println(goal.toString());
+    }
 }

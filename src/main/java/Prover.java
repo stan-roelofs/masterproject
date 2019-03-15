@@ -1,11 +1,15 @@
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 public class Prover {
 
-    public static void induction(EquationSystem system, Equation goal) {
-        System.out.println("Goal: " + goal.toString());
+    private final static Logger LOGGER = Logger.getLogger(Prover.class.getName());
+
+    public static void induction(EquationSystem system) {
+        Equation goal = system.goal;
+        LOGGER.info("Goal: " + goal.toString());
 
         // Try induction for each variable in function
         HashSet<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());
@@ -13,7 +17,7 @@ public class Prover {
         allVariables.addAll(goal.getRight().getVariables());
 
         for (Variable inductionVar : allVariables) {
-            System.out.println("Induction variable: " + inductionVar.toString());
+            LOGGER.info("Trying induction variable: " + inductionVar.toString());
 
             // For each function in C
             for (Function function : system.C) {
@@ -45,9 +49,15 @@ public class Prover {
 
                 // Prove left = right using system.equations and hypotheses
                 Equation newGoal = new Equation(left, right);
-                System.out.println("To prove: " + newGoal.toString());
-                for (Equation hypothesis : hypotheses) {
-                    System.out.println("Hypothesis: " + hypothesis.toString());
+                LOGGER.info("To prove: " + newGoal.toString());
+
+                if (hypotheses.size() > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Equation hypothesis : hypotheses) {
+                        sb.append(hypothesis.toString());
+                        sb.append(" ");
+                    }
+                    LOGGER.info("Hypotheses: " + sb.toString());
                 }
             }
         }

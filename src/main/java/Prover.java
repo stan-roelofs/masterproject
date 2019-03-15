@@ -1,6 +1,6 @@
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class Prover {
@@ -22,8 +22,8 @@ public class Prover {
             // For each function in C
             for (Function function : system.C) {
 
-                Collection<Term> newConstants = new ArrayList<>();
-                Collection<Equation> hypotheses = new ArrayList<>();
+                List<Term> newConstants = new ArrayList<>();
+                List<Equation> hypotheses = new ArrayList<>();
 
                 String constant = "a";
                 int count = 1;

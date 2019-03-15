@@ -1,16 +1,31 @@
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Class that represents a function
+ * A function has a name, 0 or more input sorts, and one output sort
+ *
+ * @author Stan Roelofs
+ * @version 1.0
+ */
 class Function {
     private List<Sort> inputSorts;
     private Sort outputSort;
     private String name;
 
+    /**
+     * Creates a function without any input sorts (a constant)
+     * @param name The name of the function
+     * @param sort The sort of the function
+     * @throws IllegalArgumentException If {@code name} is empty or null, or {@code sort} is null
+     */
     Function(String name, Sort sort) {
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Name should not be empty");
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name should not be empty or null");
+        }
+        if (sort == null) {
+            throw new IllegalArgumentException("Sort must not be null");
         }
 
         this.name = name;
@@ -18,20 +33,26 @@ class Function {
         this.inputSorts = new ArrayList<>();
     }
 
-    Function(String name, Collection<Sort> input, Sort output) {
+    /**
+     * Creates a function
+     * @param name The name of the function
+     * @param input A list of input sorts
+     * @param output An output sort
+     */
+    Function(String name, List<Sort> input, Sort output) {
         this(name, output);
         this.inputSorts.addAll(input);
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public Sort getOutputSort() {
+    Sort getOutputSort() {
         return this.outputSort;
     }
 
-    public Collection<Sort> getInputSorts() {
+    List<Sort> getInputSorts() {
         return this.inputSorts;
     }
 

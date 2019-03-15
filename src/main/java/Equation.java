@@ -1,7 +1,7 @@
 import java.util.Objects;
 
 /**
- * Class that represents an Equation
+ * Class that represents an equation
  * An equation is constructed from two terms of equal sort
  *
  * @author Stan Roelofs
@@ -48,8 +48,14 @@ class Equation {
      * @param var The variable to be substituted
      * @param sub The term that replaces the variable
      * @return A new Equation with each occurrence of {@code var} replaced by {@code sub}
+     * @throws IllegalArgumentException if any of the parameters is null
+     * @see Variable
+     * @see Term
      */
     Equation substitute(Variable var, Term sub) {
+        if (var == null || sub == null) {
+            throw new IllegalArgumentException("var and sub must not be null");
+        }
         return new Equation(left.substitute(var, sub), right.substitute(var, sub));
     }
 

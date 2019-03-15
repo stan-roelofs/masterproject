@@ -14,7 +14,7 @@ class FunctionTerm extends Term {
         this.subterms = new ArrayList<>();
     }
 
-    FunctionTerm(Function function, Collection<Term> subTerms) {
+    FunctionTerm(Function function, List<Term> subTerms) {
         super(function.getOutputSort());
         this.function = function;
         this.subterms = new ArrayList<>();
@@ -38,7 +38,7 @@ class FunctionTerm extends Term {
 
     @Override
     public Term substitute(Variable var, Term substitute) {
-        Collection<Term> newTerms = new ArrayList<>();
+        List<Term> newTerms = new ArrayList<>();
         for (Term term : subterms) {
             newTerms.add(term.substitute(var, substitute));
         }

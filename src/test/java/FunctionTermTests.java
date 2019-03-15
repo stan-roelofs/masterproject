@@ -2,15 +2,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class FunctionTermTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionException() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         inputs.add(new Sort("x"));
         inputs.add(new Sort("y"));
         Function f = new Function("f", inputs, new Sort("z"));
@@ -19,7 +19,7 @@ public class FunctionTermTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionTermsNullException() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         inputs.add(new Sort("x"));
         inputs.add(new Sort("y"));
         Function f = new Function("f", inputs, new Sort("z"));
@@ -28,7 +28,7 @@ public class FunctionTermTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionTermsSizeException() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         inputs.add(new Sort("x"));
         inputs.add(new Sort("z"));
         Function f = new Function("f", inputs, new Sort("x"));
@@ -37,11 +37,11 @@ public class FunctionTermTests {
 
     @Test
     public void testSubstituteEqual() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
         Term t = new FunctionTerm(f, subterms);
@@ -50,11 +50,11 @@ public class FunctionTermTests {
 
     @Test
     public void testSubstituteSimple() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
         Term t = new FunctionTerm(f, subterms);
@@ -63,11 +63,11 @@ public class FunctionTermTests {
 
     @Test
     public void testSubstituteDeep() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
         Term t = new FunctionTerm(f, subterms);
@@ -86,11 +86,11 @@ public class FunctionTermTests {
 
     @Test
     public void testGetVariablesSimple() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
         Term t = new FunctionTerm(f, subterms);
@@ -101,11 +101,11 @@ public class FunctionTermTests {
 
     @Test
     public void testGetVariablesDeep() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
         Term t = new FunctionTerm(f, subterms);
@@ -119,12 +119,12 @@ public class FunctionTermTests {
 
     @Test
     public void testGetVariablesDeepMultiple() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         Variable y = new Variable(s, "y");
         subterms.add(x);
@@ -150,11 +150,11 @@ public class FunctionTermTests {
 
     @Test
     public void testToStringFunctionSimple() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
         Term t = new FunctionTerm(f, subterms);
@@ -163,11 +163,11 @@ public class FunctionTermTests {
 
     @Test
     public void testToStringFunctionDeep() {
-        Collection<Sort> inputs = new ArrayList<>();
+        List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
         Function f = new Function("f", inputs, s);
-        Collection<Term> subterms = new ArrayList<>();
+        List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
         Term t = new FunctionTerm(f, subterms);
@@ -203,11 +203,11 @@ public class FunctionTermTests {
     @Test
     public void testEqualsCopy2() {
         Sort s = new Sort("x");
-        Collection<Sort> sorts = new ArrayList<>();
+        List<Sort> sorts = new ArrayList<>();
         sorts.add(s);
         Function f = new Function("f", sorts, s);
 
-        Collection<Term> terms = new ArrayList<>();
+        List<Term> terms = new ArrayList<>();
         terms.add(new Variable(s, "x"));
         FunctionTerm ft = new FunctionTerm(f, terms);
         terms.clear();
@@ -243,11 +243,11 @@ public class FunctionTermTests {
     @Test
     public void testEqualsSubtermsDifference() {
         Sort s = new Sort("x");
-        Collection<Sort> sorts = new ArrayList<>();
+        List<Sort> sorts = new ArrayList<>();
         sorts.add(s);
         Function f = new Function("f", sorts, s);
 
-        Collection<Term> terms = new ArrayList<>();
+        List<Term> terms = new ArrayList<>();
         terms.add(new Variable(s, "x"));
         FunctionTerm ft = new FunctionTerm(f, terms);
         terms.clear();
@@ -260,14 +260,14 @@ public class FunctionTermTests {
     @Test
     public void testEqualsSubtermsSizeDifference() {
         Sort s = new Sort("x");
-        Collection<Sort> sorts = new ArrayList<>();
+        List<Sort> sorts = new ArrayList<>();
         sorts.add(s);
         Function f = new Function("f", sorts, s);
 
         sorts.add(s);
         Function f2 = new Function("f", sorts, s);
 
-        Collection<Term> terms = new ArrayList<>();
+        List<Term> terms = new ArrayList<>();
         terms.add(new Variable(s, "x"));
         FunctionTerm ft = new FunctionTerm(f, terms);
         terms.add(new Variable(s, "y"));

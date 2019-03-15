@@ -2,6 +2,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Class that represents a variable
+ * A variable is a Term and additionally has a name
+ *
+ * @author Stan Roelofs
+ * @version 1.0
+ */
 class Variable extends Term {
     private String name;
 
@@ -14,7 +21,7 @@ class Variable extends Term {
         this.name = name;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 

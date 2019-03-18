@@ -33,11 +33,12 @@ public class Main {
 
                     EquationSystem system = InputParser.parseSystem(input);
                     system.print();
+                    Prover.induction(system);
                 }
             }
         }
         catch(ParseException exp) {
-            System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
+            Logger.e( "Parsing failed.  Reason: " + exp.getMessage() );
         } catch (IOException e) {
             e.printStackTrace();
         }

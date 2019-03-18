@@ -38,7 +38,12 @@ class InputParser {
                     break;
                 case 2 :
                     // C
-                    // TODO
+                    line = line.replaceAll(" ", "");
+                    for (Function f : Sigma) {
+                        if (f.getName().equals(line)) {
+                            C.add(f);
+                        }
+                    }
                     break;
                 case 3 :
                     // Goal
@@ -111,12 +116,7 @@ class InputParser {
      * @see Function
      */
     private static Equation parseEquation(Set<Function> functions, String line) throws IllegalArgumentException {
-        if (functions == null || functions.isEmpty()) {
-            throw new IllegalArgumentException("functions must not be empty or null");
-        }
-        if (line == null) {
-            throw new IllegalArgumentException("line must not be null");
-        }
+        checkParameters(functions, line);
         if (!line.contains("=")) {
             throw new IllegalArgumentException("line does not contain '=', therefore is not an equation");
         }
@@ -162,12 +162,7 @@ class InputParser {
      * @see FunctionTerm
      */
     private static Term parseTerm(Set<Function> functions, String line, Sort varSort) {
-        if (functions == null || functions.isEmpty()) {
-            throw new IllegalArgumentException("functions must not be empty or null");
-        }
-        if (line == null) {
-            throw new IllegalArgumentException("line must not be null");
-        }
+        checkParameters(functions, line);
 
         String normalized = line.replaceAll(" ", "");
 
@@ -243,12 +238,22 @@ class InputParser {
         }
 
         if (varSort == null) {
-            // TODO
+            throw new IllegalArgumentException("Term is not a function and no sort is given for variable");
         }
 
         // If none of the functions match, the symbol has to be a variable
         Variable v = new Variable(varSort, function);
         Logger.d("Parsed Variable " + v.toString());
         return v;
+    }
+
+
+    private static void checkParameters(Set<Function> functions, String line) {
+        if (functions == null || functions.isEmpty()) {
+            throw new IllegalArgumentException("functions must not be empty or null");
+        }
+        if (line == null) {
+            throw new IllegalArgumentException("line must not be null");
+        }
     }
 }

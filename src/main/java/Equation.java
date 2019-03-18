@@ -78,4 +78,12 @@ class Equation {
 
         return Objects.equals(left, eq.getLeft()) && Objects.equals(right, eq.getRight());
     }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + left.hashCode();
+        result = 31 * result + right.hashCode();
+        return result;
+    }
 }

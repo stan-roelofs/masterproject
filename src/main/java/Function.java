@@ -95,4 +95,17 @@ class Function {
 
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + this.name.hashCode();
+        result = 31 * result + this.outputSort.hashCode();
+
+        for (Sort sort : inputSorts) {
+            result = 31 * result + sort.hashCode();
+        }
+
+        return result;
+    }
 }

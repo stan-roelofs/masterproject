@@ -112,4 +112,17 @@ class FunctionTerm extends Term {
 
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + this.sort.hashCode();
+        result = 31 * result + this.function.hashCode();
+
+        for (Term subterm : subterms) {
+            result = 31 * result + subterm.hashCode();
+        }
+
+        return result;
+    }
 }

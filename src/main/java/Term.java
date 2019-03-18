@@ -36,6 +36,8 @@ abstract class Term {
 
     public abstract boolean equals(Object o);
 
+    public abstract int hashCode();
+
     public Sort getSort() {
         return sort;
     }

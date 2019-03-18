@@ -28,7 +28,7 @@ class Variable extends Term {
     @Override
     public Term substitute(Variable var, Term substitute) {
         if (var.equals(this)) {
-            if (this.sort != substitute.getSort()) {
+            if (!this.sort.equals(substitute.getSort())) {
                 throw new IllegalArgumentException("Sorts of variable and substitute do not match");
             }
             return substitute;
@@ -61,5 +61,13 @@ class Variable extends Term {
 
         Variable var = (Variable) o;
         return Objects.equals(this.sort, var.getSort()) && Objects.equals(this.name, var.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + this.sort.hashCode();
+        result = 31 * result + this.name.hashCode();
+        return result;
     }
 }

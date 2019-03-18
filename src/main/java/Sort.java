@@ -33,4 +33,11 @@ class Sort {
     public String toString() {
         return this.name;
     }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + this.name.hashCode();
+        return result;
+    }
 }

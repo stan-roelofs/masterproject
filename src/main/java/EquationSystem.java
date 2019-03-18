@@ -13,20 +13,20 @@ class EquationSystem {
         this.goal = goal;
     }
 
-    public void print() {
-        System.out.println("Sigma:");
+    void print() {
+        Logger.i("Sigma:");
         for (Function f : sigma) {
-            System.out.println(f.toString());
+            Logger.i(f.toString());
         }
-        System.out.println("E:");
+        Logger.i("E:");
         for (Equation eq : equations) {
-            System.out.println(eq.toString());
+            Logger.i(eq.toString());
         }
-        System.out.println("C:");
+        Logger.i("C:");
         for (Function f : C) {
-            System.out.println(f.toString());
+            Logger.i(f.toString());
         }
-        System.out.println("Goal:");
-        System.out.println(goal.toString());
+        Logger.i("Goal:");
+        Logger.i(goal.toString());
     }
 }

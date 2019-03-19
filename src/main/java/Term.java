@@ -1,4 +1,5 @@
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Abstract class that represents a term
@@ -15,6 +16,8 @@ abstract class Term {
         }
         this.sort = sort;
     }
+
+    public abstract boolean instanceOf(Term term, Map<Variable, Term> substitutions);
 
     /**
      * Substitutes each occurrence of {@code var} in this term by the term {@code substitute}

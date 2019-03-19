@@ -28,12 +28,37 @@ class FunctionTerm extends Term {
         this.subterms.addAll(subTerms);
     }
 
-    public Function getFunction() {
+    Function getFunction() {
         return this.function;
     }
 
-    public Collection<Term> getSubterms() {
+    List<Term> getSubterms() {
         return this.subterms;
+    }
+
+    @Override
+    public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
+        if (term instanceof Variable) {
+            return false;
+        } else if (term instanceof FunctionTerm) {
+            FunctionTerm fterm = (FunctionTerm) term;
+
+            // Function must be equal
+            if (this.function.equals(fterm.getFunction())) {
+                // All subterms of fterm must be an instance of all subterms of this.subterms
+                for (int i = 0; i < this.subterms.size(); i++) {
+                    if (!(this.subterms.get(i).instanceOf(fterm.getSubterms().get(i), substitutions))) {
+                        return false;
+                    }
+                    if (this.subterms.get(i).instanceOf(fterm, substitutions)) {
+                        return true;
+                    }
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

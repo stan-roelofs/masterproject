@@ -1,23 +1,21 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Set;
 
 public class Prover {
 
-    private final static Logger LOGGER = Logger.getLogger(Prover.class.getName());
-
     public static void induction(EquationSystem system) {
         Equation goal = system.goal;
-        LOGGER.info("Goal: " + goal.toString());
+        Logger.i("Goal: " + goal.toString());
 
         // Try induction for each variable in function
-        HashSet<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());
+        Set<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());
 
         allVariables.addAll(goal.getRight().getVariables());
 
         for (Variable inductionVar : allVariables) {
-            LOGGER.info("Trying induction variable: " + inductionVar.toString());
+            Logger.i("Trying induction variable: " + inductionVar.toString());
 
             // For each function in C
             for (Function function : system.C) {
@@ -49,7 +47,7 @@ public class Prover {
 
                 // Prove left = right using system.equations and hypotheses
                 Equation newGoal = new Equation(left, right);
-                LOGGER.info("To prove: " + newGoal.toString());
+                Logger.i("To prove: " + newGoal.toString());
 
                 if (hypotheses.size() > 0) {
                     StringBuilder sb = new StringBuilder();
@@ -57,9 +55,35 @@ public class Prover {
                         sb.append(hypothesis.toString());
                         sb.append(" ");
                     }
-                    LOGGER.info("Hypotheses: " + sb.toString());
+                    Logger.i("Hypotheses: " + sb.toString());
                 }
+
+                // Do BFS for convertibility
+                Set<Term> leftTerms = new HashSet<>();
+                Set<Term> rightTerms = new HashSet<>();
+
+                leftTerms.add(left);
+                rightTerms.add(right);
+
+
+                //while (!checkConvergence(leftTerms, rightTerms)) {
+                    for (Term term : leftTerms) {
+                        for (Equation eq : system.equations) {
+                            if (eq.applies(term)) {
+                                System.out.println(eq.toString() + " " + term.toString() + " " + eq.applies(term));
+                            }
+                        }
+                    }
+                    // Do the same for right? or is just left enough..?
+                //}
             }
         }
+    }
+
+    private static boolean checkConvergence(Set<Term> left, Set<Term> right) {
+        Set<Term> intersection = new HashSet<>(left);
+        intersection.retainAll(right);
+
+        return !intersection.isEmpty();
     }
 }

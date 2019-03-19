@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -23,6 +24,18 @@ class Variable extends Term {
 
     String getName() {
         return name;
+    }
+
+    @Override
+    public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
+        if (substitutions.containsKey(this)) {
+            return substitutions.get(this).equals(term);
+        }
+        if (term.getSort().equals(this.sort)) {
+            substitutions.put(this, term);
+            return true;
+        }
+        return false;
     }
 
     @Override

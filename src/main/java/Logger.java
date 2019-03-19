@@ -1,3 +1,11 @@
+/**
+ * A simple logging class with four different levels: DEBUG, INFO, WARNING, ERROR
+ * A logging call is only logged if the current logging level is greater than or equal to the level of the call
+ *
+ * @author Stan Roelofs
+ * @version 1.0
+ */
+
 public class Logger {
 
     private static Level level = Level.INFO;
@@ -21,7 +29,7 @@ public class Logger {
     }
 
     public static void e(String msg) {
-        if (level.ordinal() <= Level.WARNING.ordinal()) {
+        if (level.ordinal() <= Level.ERROR.ordinal()) {
             System.err.println("ERROR: " + msg);
         }
     }

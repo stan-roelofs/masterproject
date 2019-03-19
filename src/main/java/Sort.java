@@ -11,7 +11,7 @@ class Sort {
         this.name = name;
     }
 
-    public String getName() {
+    String getName() {
         return this.name;
     }
 

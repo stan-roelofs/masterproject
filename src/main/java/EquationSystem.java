@@ -1,5 +1,12 @@
 import java.util.Collection;
 
+/**
+ * Class that represents an instance of the inductive theorem, which consists of a set equations over a signature
+ * Sigma, a subset of Sigma called C (constructors) and an equation that should be proven
+ *
+ * @author Stan Roelofs
+ * @version 1.0
+ */
 class EquationSystem {
     public Collection<Equation> equations;
     public Collection<Function> sigma;

@@ -37,6 +37,31 @@ class FunctionTerm extends Term {
     }
 
     @Override
+    public Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions) {
+        if (term instanceof Variable) {
+            return null;
+        } else if (term instanceof FunctionTerm) {
+            FunctionTerm fterm = (FunctionTerm) term;
+
+            // Function must be equal
+            if (this.function.equals(fterm.getFunction())) {
+                // All subterms of fterm must be an instance of all subterms of this.subterms
+
+                for (int i = 0; i < this.subterms.size(); i++) {
+                    if (this.subterms.get(i).getSubstitution(fterm.getSubterms().get(i), substitutions) == null) {
+                        return null;
+                    }
+                }
+
+                return substitutions;
+            } else {
+                return null;
+            }
+        }
+        return substitutions;
+    }
+
+    @Override
     public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
         if (term instanceof Variable) {
             return false;
@@ -46,14 +71,14 @@ class FunctionTerm extends Term {
             // Function must be equal
             if (this.function.equals(fterm.getFunction())) {
                 // All subterms of fterm must be an instance of all subterms of this.subterms
+
                 for (int i = 0; i < this.subterms.size(); i++) {
                     if (!(this.subterms.get(i).instanceOf(fterm.getSubterms().get(i), substitutions))) {
                         return false;
                     }
-                    if (this.subterms.get(i).instanceOf(fterm, substitutions)) {
-                        return true;
-                    }
                 }
+
+                return true;
             } else {
                 return false;
             }
@@ -115,7 +140,7 @@ class FunctionTerm extends Term {
 
         FunctionTerm term = (FunctionTerm) o;
 
-        if (!(Objects.equals(this.sort, term.sort))) {
+        if (!(Objects.equals(this.sort, term.getSort()))) {
             return false;
         }
 
@@ -127,11 +152,9 @@ class FunctionTerm extends Term {
             return false;
         }
 
-        for (Term subterm : subterms) {
-            for (Term subTerm2 : term.getSubterms()) {
-                if (!(Objects.equals(subterm, subTerm2))) {
-                    return false;
-                }
+        for (int i = 0; i < subterms.size(); i++) {
+            if (!Objects.equals(subterms.get(i), term.getSubterms().get(i))) {
+                return false;
             }
         }
 

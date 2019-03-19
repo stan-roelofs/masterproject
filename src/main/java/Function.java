@@ -85,11 +85,9 @@ class Function {
             return false;
         }
 
-        for (Sort inputSort : this.inputSorts) {
-            for (Sort inputSort2 : func.getInputSorts()) {
-                if (!(Objects.equals(inputSort, inputSort2))) {
-                    return false;
-                }
+        for (int i = 0; i < inputSorts.size(); i++) {
+            if (!(Objects.equals(inputSorts.get(i), func.getInputSorts().get(i)))) {
+                return false;
             }
         }
 

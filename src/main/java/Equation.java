@@ -30,14 +30,27 @@ class Equation {
         this.right = r;
     }
 
+    /**
+     * Returns left term of this equation
+     * @return this.left
+     */
     Term getLeft() {
         return this.left;
     }
 
+    /**
+     * Returns right term of this equation
+     * @return this.right
+     */
     Term getRight() {
         return this.right;
     }
 
+    /**
+     * Returns the sort of this equation
+     * @return this.left.sort
+     * @see Sort
+     */
     Sort getSort() {
         return left.sort;
     }

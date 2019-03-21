@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Prover {
 
@@ -65,17 +62,33 @@ public class Prover {
                 leftTerms.add(left);
                 rightTerms.add(right);
 
+                Set<Equation> allEquations = new HashSet<>(system.equations);
+                allEquations.addAll(hypotheses);
 
-                //while (!checkConvergence(leftTerms, rightTerms)) {
+                while (!checkConvergence(leftTerms, rightTerms)) {
+                    Set<Term> toAdd = new HashSet<>();
+
                     for (Term term : leftTerms) {
-                        for (Equation eq : system.equations) {
-                            if (eq.applies(term)) {
-                                System.out.println(eq.toString() + " " + term.toString() + " " + eq.applies(term));
+                        for (Equation eq : allEquations) {
+
+                            for (Term term2 : term.getAllSubTerms()) {
+                                // TODO: Right
+                                if (eq.getLeft().instanceOf(term2, new HashMap<>())) {
+                                    Map<Variable, Term> sub = eq.getLeft().getSubstitution(term2, new HashMap<>());
+
+                                    Term newt = eq.getRight();
+                                    for (Map.Entry<Variable, Term> entry : sub.entrySet()) {
+                                        newt = newt.substitute(entry.getKey(), entry.getValue());
+                                    }
+
+                                    toAdd.add(term.substitute(term2, newt));
+                                }
                             }
                         }
                     }
-                    // Do the same for right? or is just left enough..?
-                //}
+
+                    leftTerms.addAll(toAdd);
+                }
             }
         }
     }
@@ -83,6 +96,25 @@ public class Prover {
     private static boolean checkConvergence(Set<Term> left, Set<Term> right) {
         Set<Term> intersection = new HashSet<>(left);
         intersection.retainAll(right);
+
+        Logger.d("Checking convergence");
+        Logger.d("Left:");
+        for (Term t : left) {
+            Logger.d(t.toString());
+        }
+        Logger.d("Right:");
+        for (Term t : right) {
+            Logger.d(t.toString());
+        }
+
+        Logger.d("Intersection:");
+        for (Term t : intersection) {
+            Logger.d(t.toString());
+        }
+
+        if (!intersection.isEmpty()) {
+            Logger.i("Found intersection");
+        }
 
         return !intersection.isEmpty();
     }

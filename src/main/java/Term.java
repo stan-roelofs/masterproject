@@ -1,5 +1,6 @@
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Abstract class that represents a term
@@ -17,15 +18,34 @@ abstract class Term {
         this.sort = sort;
     }
 
+    /**
+     * Returns a substitution such that the substitution applied to this term yields {@code term}.
+     * If this is not possible it returns null
+     *
+     * @param term The term that should be obtained by applying the substitution
+     * @param substitutions The substitutions that are already defined
+     * @return A substitution such that if the substitution is applied to this term it yields {@code term},
+     *         or null if such a substitution is not possible
+     * @see Variable
+     */
+    public abstract Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions);
+
     public abstract boolean instanceOf(Term term, Map<Variable, Term> substitutions);
 
     /**
-     * Substitutes each occurrence of {@code var} in this term by the term {@code substitute}
-     * @param var The variable to be substituted
-     * @param substitute The term that replaces the variable
-     * @return A new Term with each occurrence of {@code var} replaced by {@code substitute}
+     * Returns all subterms of this term, including the term itself
+     *
+     * @return a Set of terms that are subterms of this term (including this term)
      */
-    public abstract Term substitute(Variable var, Term substitute);
+    public abstract Set<Term> getAllSubTerms();
+
+    /**
+     * Substitutes each occurrence of {@code term} in this term by the term {@code substitute}
+     * @param term The term to be substituted
+     * @param substitute The term that replaces the old term
+     * @return A new Term with each occurrence of {@code term} replaced by {@code substitute}
+     */
+    public abstract Term substitute(Term term, Term substitute);
 
     /**
      * Returns all the variables that occur in this term

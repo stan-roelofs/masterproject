@@ -23,7 +23,11 @@ class FunctionTerm extends Term {
             throw new IllegalArgumentException("Number of arguments does not match the number of function inputs");
         }
 
-        // TODO: check sort of function matches sort of subterms
+        for (int i = 0; i < subTerms.size(); i++) {
+            if (!function.getInputSorts().get(i).equals(subTerms.get(i).getSort())) {
+                throw new IllegalArgumentException("Input sort at position " + i + " does not match subterm sort");
+            }
+        }
 
         this.subterms.addAll(subTerms);
     }
@@ -34,6 +38,18 @@ class FunctionTerm extends Term {
 
     List<Term> getSubterms() {
         return this.subterms;
+    }
+
+    @Override
+    public Set<Term> getAllSubTerms() {
+        Set<Term> result = new HashSet<>(this.subterms);
+        result.add(this);
+
+        for (Term subterm : this.subterms) {
+            result.addAll(subterm.getAllSubTerms());
+        }
+
+        return result;
     }
 
     @Override
@@ -71,7 +87,6 @@ class FunctionTerm extends Term {
             // Function must be equal
             if (this.function.equals(fterm.getFunction())) {
                 // All subterms of fterm must be an instance of all subterms of this.subterms
-
                 for (int i = 0; i < this.subterms.size(); i++) {
                     if (!(this.subterms.get(i).instanceOf(fterm.getSubterms().get(i), substitutions))) {
                         return false;
@@ -83,16 +98,20 @@ class FunctionTerm extends Term {
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     @Override
-    public Term substitute(Variable var, Term substitute) {
-        List<Term> newTerms = new ArrayList<>();
-        for (Term term : subterms) {
-            newTerms.add(term.substitute(var, substitute));
+    public Term substitute(Term term, Term substitute) {
+        if (this.equals(term)) {
+            return substitute;
+        } else {
+            List<Term> newSubterms = new ArrayList<>();
+            for (Term subterm : this.subterms) {
+                newSubterms.add(subterm.substitute(term, substitute));
+            }
+            return new FunctionTerm(this.function, newSubterms);
         }
-        return new FunctionTerm(this.function, newTerms);
     }
 
     @Override

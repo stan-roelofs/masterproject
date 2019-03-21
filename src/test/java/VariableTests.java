@@ -1,9 +1,7 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class VariableTests {
 
@@ -122,4 +120,48 @@ public class VariableTests {
         Variable v2 = new Variable(s2, "y");
         Assert.assertNotEquals(v, v2);
     }
+
+    @Test
+    public void testInstanceOfVariable() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        Map<Variable, Term> subs = new HashMap<>();
+        Assert.assertTrue(v1.instanceOf(v2, subs));
+        Assert.assertTrue(subs.containsKey(v1));
+        Assert.assertEquals(subs.get(v1), v2);
+    }
+
+    @Test
+    public void testInstanceOfVariableCollisionSameTerm() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Map<Variable, Term> subs = new HashMap<>();
+        subs.put(v1, v1);
+        Assert.assertTrue(v1.instanceOf(v1, subs));
+        Assert.assertTrue(subs.containsKey(v1));
+        Assert.assertEquals(subs.get(v1), v1);
+    }
+
+    @Test
+    public void testInstanceOfVariableCollisionDifferentTerm() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Variable v2 = new Variable(s, " y");
+        Map<Variable, Term> subs = new HashMap<>();
+        subs.put(v1, v2);
+        Assert.assertFalse(v1.instanceOf(v1, subs));
+        Assert.assertTrue(subs.containsKey(v1));
+        Assert.assertEquals(subs.get(v1), v2);
+    }
+
+    @Test
+    public void testInstanceOfFalse() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Sort s2 = new Sort("string");
+        Variable v2 = new Variable(s2, "x");
+        Assert.assertFalse(v1.instanceOf(v2, new HashMap<>()));
+    }
+
 }

@@ -1,5 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,16 +28,6 @@ class Equation {
 
         this.left = l;
         this.right = r;
-    }
-
-    boolean applies(Term term) {
-        return left.instanceOf(term, new HashMap<>()) || right.instanceOf(term, new HashMap<>());
-    }
-
-    Map<Variable, Term> rewriteTerm(Term term) {
-        Map<Variable, Term> result = new HashMap<>();
-
-        return null;
     }
 
     Term getLeft() {

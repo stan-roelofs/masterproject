@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Class that represents a variable
@@ -27,6 +24,20 @@ class Variable extends Term {
     }
 
     @Override
+    public Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions) {
+        if (substitutions.containsKey(this)) {
+            if (substitutions.get(this).equals(term)) {
+                return substitutions;
+            }
+        }
+        if (term.getSort().equals(this.sort)) {
+            substitutions.put(this, term);
+            return substitutions;
+        }
+        return null;
+    }
+
+    @Override
     public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
         if (substitutions.containsKey(this)) {
             return substitutions.get(this).equals(term);
@@ -39,14 +50,23 @@ class Variable extends Term {
     }
 
     @Override
-    public Term substitute(Variable var, Term substitute) {
-        if (var.equals(this)) {
-            if (!this.sort.equals(substitute.getSort())) {
-                throw new IllegalArgumentException("Sorts of variable and substitute do not match");
-            }
-            return substitute;
+    public Set<Term> getAllSubTerms() {
+        return new HashSet<>();
+    }
+
+    @Override
+    public Term substitute(Term term, Term substitute) {
+        if (!(term instanceof Variable)) {
+            throw new IllegalArgumentException("Variable cannot contain FunctionTerm");
         } else {
-            return this;
+            if (term.equals(this)) {
+                if (!this.sort.equals(substitute.getSort())) {
+                    throw new IllegalArgumentException("Sorts of variable and substitute do not match");
+                }
+                return substitute;
+            } else {
+                return this;
+            }
         }
     }
 

@@ -30,6 +30,16 @@ abstract class Term {
      */
     public abstract Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions);
 
+    /**
+     * Checks whether this term is an instance of {@code term}, i.e. true is returned iff
+     * there is some substitution such that the substitution applied to this term
+     * yields {@code term}
+     *
+     * @param term
+     * @param substitutions
+     * @return
+     */
+    @Deprecated
     public abstract boolean instanceOf(Term term, Map<Variable, Term> substitutions);
 
     /**

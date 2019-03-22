@@ -65,7 +65,9 @@ public class Prover {
                 Set<Equation> allEquations = new HashSet<>(system.equations);
                 allEquations.addAll(hypotheses);
 
-                while (!checkConvergence(leftTerms, rightTerms)) {
+                Map<Term, Term> steps = new HashMap<>();
+
+                while (checkConvergence(leftTerms, rightTerms) == null) {
                     Set<Term> toAdd = new HashSet<>();
 
                     for (Term term : leftTerms) {
@@ -73,27 +75,50 @@ public class Prover {
 
                             for (Term term2 : term.getAllSubTerms()) {
                                 // TODO: Right
-                                if (eq.getLeft().instanceOf(term2, new HashMap<>())) {
-                                    Map<Variable, Term> sub = eq.getLeft().getSubstitution(term2, new HashMap<>());
+                                Map<Variable, Term> sub = eq.getLeft().getSubstitution(term2, new HashMap<>());
 
-                                    Term newt = eq.getRight();
-                                    for (Map.Entry<Variable, Term> entry : sub.entrySet()) {
-                                        newt = newt.substitute(entry.getKey(), entry.getValue());
-                                    }
-
-                                    toAdd.add(term.substitute(term2, newt));
+                                if (sub == null) {
+                                    continue;
                                 }
+
+                                Term newt = eq.getRight();
+                                for (Map.Entry<Variable, Term> entry : sub.entrySet()) {
+                                    newt = newt.substitute(entry.getKey(), entry.getValue());
+                                }
+
+                                toAdd.add(term.substitute(term2, newt));
+                                steps.put(term.substitute(term2, newt), term);
                             }
                         }
                     }
 
                     leftTerms.addAll(toAdd);
                 }
+
+                Term convergence = checkConvergence(leftTerms, rightTerms);
+                List<Term> revSequence = new ArrayList<>();
+
+                while (steps.containsKey(convergence)) {
+                    revSequence.add(convergence);
+                    convergence = steps.get(convergence);
+                }
+                revSequence.add(convergence);
+
+                StringBuilder stepsString = new StringBuilder();
+                for (int i = revSequence.size() - 1; i >= 0; i--) {
+                    stepsString.append(revSequence.get(i));
+
+                    if (i > 0) {
+                        stepsString.append(" -> ");
+                    }
+                }
+
+                System.out.println(stepsString.toString());
             }
         }
     }
 
-    private static boolean checkConvergence(Set<Term> left, Set<Term> right) {
+    private static Term checkConvergence(Set<Term> left, Set<Term> right) {
         Set<Term> intersection = new HashSet<>(left);
         intersection.retainAll(right);
 
@@ -116,6 +141,10 @@ public class Prover {
             Logger.i("Found intersection");
         }
 
-        return !intersection.isEmpty();
+        if (intersection.size() > 1) {
+            Logger.w("Intersection size > 1");
+        }
+
+        return intersection.isEmpty() ? null : intersection.iterator().next();
     }
 }

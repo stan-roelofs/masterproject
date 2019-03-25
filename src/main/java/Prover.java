@@ -12,6 +12,9 @@ public class Prover {
         allVariables.addAll(goal.getRight().getVariables());
 
         for (Variable inductionVar : allVariables) {
+            if (!(inductionVar.getName().equals("x"))) {
+                continue;//TODO: remove
+            }
             Logger.i("Trying induction variable: " + inductionVar.toString());
 
             // For each function in C
@@ -77,17 +80,32 @@ public class Prover {
                                 // TODO: Right
                                 Map<Variable, Term> sub = eq.getLeft().getSubstitution(term2, new HashMap<>());
 
-                                if (sub == null) {
-                                    continue;
+                                if (sub != null) {
+                                    Term newt = eq.getRight();
+                                    for (Map.Entry<Variable, Term> entry : sub.entrySet()) {
+                                        newt = newt.substitute(entry.getKey(), entry.getValue());
+                                    }
+
+                                    toAdd.add(term.substitute(term2, newt));
+                                    if (!steps.containsKey(term.substitute(term2, newt))) {
+                                        steps.put(term.substitute(term2, newt), term);
+                                    }
                                 }
 
-                                Term newt = eq.getRight();
-                                for (Map.Entry<Variable, Term> entry : sub.entrySet()) {
-                                    newt = newt.substitute(entry.getKey(), entry.getValue());
-                                }
+                                // TODO: Right
+                                Map<Variable, Term> sub2 = eq.getRight().getSubstitution(term2, new HashMap<>());
 
-                                toAdd.add(term.substitute(term2, newt));
-                                steps.put(term.substitute(term2, newt), term);
+                                if (sub2 != null) {
+                                    Term newt = eq.getLeft();
+                                    for (Map.Entry<Variable, Term> entry : sub2.entrySet()) {
+                                        newt = newt.substitute(entry.getKey(), entry.getValue());
+                                    }
+
+                                    toAdd.add(term.substitute(term2, newt));
+                                    if (!steps.containsKey(term.substitute(term2, newt))) {
+                                        steps.put(term.substitute(term2, newt), term);
+                                    }
+                                }
                             }
                         }
                     }
@@ -98,7 +116,8 @@ public class Prover {
                 Term convergence = checkConvergence(leftTerms, rightTerms);
                 List<Term> revSequence = new ArrayList<>();
 
-                while (steps.containsKey(convergence)) {
+                // Trace back the steps until we reach the start term
+                while (!(convergence.equals(left))) {
                     revSequence.add(convergence);
                     convergence = steps.get(convergence);
                 }

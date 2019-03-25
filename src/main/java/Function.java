@@ -16,11 +16,11 @@ class Function {
 
     /**
      * Creates a function without any input sorts (a constant)
-     * @param name The name of the function
      * @param sort The sort of the function
+     * @param name The name of the function
      * @throws IllegalArgumentException If {@code name} is empty or null, or {@code sort} is null
      */
-    Function(String name, Sort sort) {
+    Function(Sort sort, String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name should not be empty or null");
         }
@@ -40,7 +40,7 @@ class Function {
      * @param output An output sort
      */
     Function(String name, List<Sort> input, Sort output) {
-        this(name, output);
+        this(output, name);
         this.inputSorts.addAll(input);
     }
 

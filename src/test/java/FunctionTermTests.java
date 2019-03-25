@@ -104,7 +104,7 @@ public class FunctionTermTests {
     @Test
     public void testGetVariablesNone() {
         Sort s = new Sort("x");
-        Function f = new Function("f", s);
+        Function f = new Function(s, "f");
         Term t = new FunctionTerm(f);
         Set<Variable> vs = new HashSet<>();
         Assert.assertEquals(vs, t.getVariables());
@@ -169,7 +169,7 @@ public class FunctionTermTests {
     @Test
     public void testToStringConstant() {
         Sort s = new Sort("x");
-        Function f = new Function("f", s);
+        Function f = new Function(s, "f");
         Term t = new FunctionTerm(f);
         Assert.assertEquals("f", t.toString());
     }
@@ -203,7 +203,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsNull() {
-        Function f = new Function("f", new Sort("x"));
+        Function f = new Function(new Sort("x"), "f");
         FunctionTerm ft = new FunctionTerm(f);
 
         Assert.assertNotEquals(null, ft);
@@ -211,7 +211,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsReflexivity() {
-        Function f = new Function("f", new Sort("x"));
+        Function f = new Function(new Sort("x"), "f");
         FunctionTerm ft = new FunctionTerm(f);
 
         Assert.assertEquals(ft, ft);
@@ -219,7 +219,7 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsCopy() {
-        Function f = new Function("f", new Sort("x"));
+        Function f = new Function(new Sort("x"), "f");
         FunctionTerm ft = new FunctionTerm(f);
         FunctionTerm ft2 = new FunctionTerm(f);
 
@@ -245,10 +245,10 @@ public class FunctionTermTests {
 
     @Test
     public void testEqualsSortDifference() {
-        Function f = new Function("f", new Sort("x"));
+        Function f = new Function(new Sort("x"), "f");
         FunctionTerm ft = new FunctionTerm(f);
 
-        Function f2 = new Function("g", new Sort("x"));
+        Function f2 = new Function(new Sort("x"), "g");
         FunctionTerm ft2 = new FunctionTerm(f2);
 
         Assert.assertNotEquals(ft2, ft);
@@ -257,10 +257,10 @@ public class FunctionTermTests {
     @Test
     public void testEqualsFunctionDifference() {
         Sort s = new Sort("x");
-        Function f = new Function("f", s);
+        Function f = new Function(s, "f");
         FunctionTerm ft = new FunctionTerm(f);
 
-        Function f2 = new Function("g", s);
+        Function f2 = new Function(s, "g");
         FunctionTerm ft2 = new FunctionTerm(f2);
 
         Assert.assertNotEquals(ft2, ft);

@@ -1,5 +1,12 @@
 import java.util.Objects;
 
+/**
+ * Class that represents a sort.
+ * Sorts are identified by a name.
+ *
+ * @author Stan Roelofs
+ * @version 1.0
+ */
 class Sort {
 
     private String name;

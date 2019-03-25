@@ -66,7 +66,7 @@ public class VariableTests {
         Term term = v;
 
         // Create a constant zero of this sort
-        Function zero = new Function("0", nat);
+        Function zero = new Function(nat, "0");
 
         // Create a function "f" of this sort with one input
         List<Sort> input = new ArrayList<>();

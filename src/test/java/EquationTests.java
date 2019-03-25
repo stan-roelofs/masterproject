@@ -73,7 +73,7 @@ public class EquationTests {
         Variable var2 = new Variable(sort, "y");
         Equation eq = new Equation(var, var2);
 
-        Function zero = new Function("0", sort);
+        Function zero = new Function(sort, "0");
         FunctionTerm z = new FunctionTerm(zero);
 
         Equation newEq = eq.substitute(var, z);
@@ -86,4 +86,46 @@ public class EquationTests {
         Assert.assertEquals(z, nnewEq.getLeft());
         Assert.assertEquals(z, nnewEq.getRight());
     }
+
+    @Test
+    public void testEqualsNull() {
+        Sort sort = new Sort("nat");
+        Variable var = new Variable(sort, "x");
+        Variable var2 = new Variable(sort, "y");
+        Equation eq = new Equation(var, var2);
+        Assert.assertNotEquals(null, eq);
+    }
+
+    @Test
+    public void testEqualsReflexivity() {
+        Sort sort = new Sort("nat");
+        Variable var = new Variable(sort, "x");
+        Variable var2 = new Variable(sort, "y");
+        Equation eq = new Equation(var, var2);
+        Assert.assertEquals(eq, eq);
+    }
+
+    @Test
+    public void testEqualsDifferentNotEqual() {
+        Sort sort = new Sort("nat");
+        Variable var = new Variable(sort, "x");
+        Variable var2 = new Variable(sort, "y");
+        Equation eq = new Equation(var, var2);
+        Equation eq2 = new Equation(var2, var);
+
+        Assert.assertNotEquals(eq2, eq);
+    }
+
+    @Test
+    public void testEqualsDifferentEqual() {
+        Sort sort = new Sort("nat");
+        Variable var = new Variable(sort, "x");
+        Variable var2 = new Variable(sort, "y");
+        Equation eq = new Equation(var, var2);
+        Equation eq2 = new Equation(var, var2);
+
+        Assert.assertEquals(eq2, eq);
+    }
 }
+
+

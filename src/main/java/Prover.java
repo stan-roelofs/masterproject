@@ -1,5 +1,11 @@
 import java.util.*;
 
+/**
+ * Class with static functions that can prove an EquationSystem
+ *
+ * @author Stan Roelofs
+ * @version 1.0
+ */
 public class Prover {
 
     public static void induction(EquationSystem system) {
@@ -28,7 +34,7 @@ public class Prover {
 
                 // Add hypotheses
                 for (Sort s : function.getInputSorts()) {
-                    Function cnst = new Function(constant + count, s);
+                    Function cnst = new Function(s, constant + count);
                     FunctionTerm a = new FunctionTerm(cnst, new ArrayList<>());
                     newConstants.add(a);
 

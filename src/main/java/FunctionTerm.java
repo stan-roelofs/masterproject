@@ -1,5 +1,12 @@
 import java.util.*;
 
+/**
+ * Class that represents a term constructed by applying a function to zero or more
+ * arguments
+ *
+ * @author Stan Roelofs
+ * @version 1.0
+ */
 class FunctionTerm extends Term {
     private List<Term> subterms;
     private Function function;

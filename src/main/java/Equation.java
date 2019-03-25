@@ -57,18 +57,18 @@ class Equation {
 
     /**
      * Substitutes each occurrence of {@code var} in this equation by the term {@code sub}
-     * @param var The variable to be substituted
+     * @param term The variable to be substituted
      * @param sub The term that replaces the variable
      * @return A new Equation with each occurrence of {@code var} replaced by {@code sub}
      * @throws IllegalArgumentException if any of the parameters is null
      * @see Variable
      * @see Term
      */
-    Equation substitute(Variable var, Term sub) {
-        if (var == null || sub == null) {
+    Equation substitute(Term term, Term sub) {
+        if (term == null || sub == null) {
             throw new IllegalArgumentException("var and sub must not be null");
         }
-        return new Equation(left.substitute(var, sub), right.substitute(var, sub));
+        return new Equation(left.substitute(term, sub), right.substitute(term, sub));
     }
 
     @Override

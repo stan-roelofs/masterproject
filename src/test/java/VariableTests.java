@@ -24,6 +24,22 @@ public class VariableTests {
         Assert.assertEquals(vs, v.getVariables());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testSubstituteNullFirst() {
+        Sort s = new Sort("x");
+        Variable v = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        v.substitute(null, v);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSubstituteNullSecond() {
+        Sort s = new Sort("x");
+        Variable v = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        v.substitute(v, null);
+    }
+
     @Test
     public void testSubstituteVariable() {
         Sort s = new Sort("x");

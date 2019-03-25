@@ -35,6 +35,32 @@ public class FunctionTermTests {
         Term t = new FunctionTerm(f, new ArrayList<>());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testSubstituteNullFirst() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        t.substitute(null, t);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSubstituteNullSecond() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        t.substitute(t, null);
+    }
+
     @Test
     public void testSubstituteEqual() {
         List<Sort> inputs = new ArrayList<>();

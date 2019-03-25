@@ -25,6 +25,10 @@ class Variable extends Term {
 
     @Override
     public Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions) {
+        if (term == null || substitutions == null) {
+            throw new IllegalArgumentException("term and substitutions must not be null");
+        }
+
         if (substitutions.containsKey(this)) {
             if (substitutions.get(this).equals(term)) {
                 return substitutions;
@@ -39,6 +43,10 @@ class Variable extends Term {
 
     @Override
     public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
+        if (term == null || substitutions == null) {
+            throw new IllegalArgumentException("term and substitutions must not be null");
+        }
+
         if (substitutions.containsKey(this)) {
             return substitutions.get(this).equals(term);
         }
@@ -56,17 +64,16 @@ class Variable extends Term {
 
     @Override
     public Term substitute(Term term, Term substitute) {
-        if (!(term instanceof Variable)) {
-            throw new IllegalArgumentException("Variable cannot contain FunctionTerm");
-        } else {
-            if (term.equals(this)) {
-                if (!this.sort.equals(substitute.getSort())) {
-                    throw new IllegalArgumentException("Sorts of variable and substitute do not match");
-                }
-                return substitute;
-            } else {
-                return this;
+        if (term == null || substitute == null) {
+            throw new IllegalArgumentException("term and substitute must not be null");
+        }
+        if (term.equals(this)) {
+            if (!this.sort.equals(substitute.getSort())) {
+                throw new IllegalArgumentException("Sorts of variable and substitute do not match");
             }
+            return substitute;
+        } else {
+            return this;
         }
     }
 

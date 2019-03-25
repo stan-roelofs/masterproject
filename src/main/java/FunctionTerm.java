@@ -54,6 +54,10 @@ class FunctionTerm extends Term {
 
     @Override
     public Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions) {
+        if (term == null || substitutions == null) {
+            throw new IllegalArgumentException("term and substitutions must not be null");
+        }
+
         if (term instanceof Variable) {
             return null;
         } else if (term instanceof FunctionTerm) {
@@ -79,6 +83,10 @@ class FunctionTerm extends Term {
 
     @Override
     public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
+        if (term == null || substitutions == null) {
+            throw new IllegalArgumentException("term and substitutions must not be null");
+        }
+
         if (term instanceof Variable) {
             return false;
         } else if (term instanceof FunctionTerm) {
@@ -103,7 +111,13 @@ class FunctionTerm extends Term {
 
     @Override
     public Term substitute(Term term, Term substitute) {
+        if (term == null || substitute == null) {
+            throw new IllegalArgumentException("term and substitute must not be null");
+        }
         if (this.equals(term)) {
+            if (!this.sort.equals(substitute.getSort())) {
+                throw new IllegalArgumentException("Sorts of term and substitute do not match");
+            }
             return substitute;
         } else {
             List<Term> newSubterms = new ArrayList<>();

@@ -185,6 +185,10 @@ class InputParser {
 
         // Remove outer ( and ) from subterms
         if (subterms.length() > 0) {
+            if (subterms.charAt(subterms.length() - 1) != ')') {
+                throw new IllegalArgumentException("Invalid character found while parsing" +
+                        " term: " + subterms.charAt(subterms.length() - 1) + ", expected )");
+            }
             subterms = subterms.substring(1, subterms.length() - 1);
         }
 

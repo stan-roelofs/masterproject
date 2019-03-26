@@ -8,12 +8,35 @@ import java.util.Collection;
  * @version 1.0
  */
 class EquationSystem {
+    // TODO: Getters
     public Collection<Equation> equations;
     public Collection<Function> sigma;
     public Collection<Function> C;
     public Equation goal;
 
     EquationSystem(Collection<Equation> eq, Collection<Function> sigma, Collection<Function> C, Equation goal) {
+        if (eq == null || sigma == null || C == null || goal == null) {
+            throw new IllegalArgumentException("Eq, Sigma, C, Goal must not be null");
+        }
+
+        Sort sort = null;
+        for (Function f : C) {
+            // Take sort of f if it is currently null
+            if (sort == null) {
+                sort = f.getOutputSort();
+                continue;
+            }
+            // Check sorts are the same
+            if (!f.getOutputSort().equals(sort)) {
+                throw new IllegalArgumentException("Sorts of functions in C should be the same: " +
+                        f.toString() + " of sort " + f.getOutputSort().toString() + " expected " + sort.toString());
+            }
+            // Check C subset of Sigma
+            if (!sigma.contains(f)) {
+                throw new IllegalArgumentException("C must be a subset of Sigma, symbol " + f.toString() + " not in Sigma");
+            }
+        }
+
         this.equations = eq;
         this.sigma = sigma;
         this.C = C;

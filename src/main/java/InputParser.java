@@ -14,42 +14,48 @@ class InputParser {
         Set<Function> Sigma = new HashSet<>();
         Equation goal = null;
 
-        int mode = 0;
-        for (String line : input) {
-            // When empty line move to next mode
-            if (line.isEmpty()) {
-                mode++;
-                continue;
-            }
+        int lineCount = 0;
+        try {
+            int mode = 0;
+            for (String line : input) {
+                lineCount++;
+                // When empty line move to next mode
+                if (line.isEmpty()) {
+                    mode++;
+                    continue;
+                }
 
-            // Ignore comments (lines starting with //)
-            if (line.startsWith("//")) {
-                continue;
-            }
+                // Ignore comments (lines starting with //)
+                if (line.startsWith("//")) {
+                    continue;
+                }
 
-            switch(mode) {
-                case 0 :
-                    // Function
-                    Sigma.add(parseFunction(line));
-                    break;
-                case 1 :
-                    // Equation
-                    equations.add(parseEquation(Sigma, line));
-                    break;
-                case 2 :
-                    // C
-                    line = line.replaceAll(" ", "");
-                    for (Function f : Sigma) {
-                        if (f.getName().equals(line)) {
-                            C.add(f);
+                switch (mode) {
+                    case 0:
+                        // Function
+                        Sigma.add(parseFunction(line));
+                        break;
+                    case 1:
+                        // Equation
+                        equations.add(parseEquation(Sigma, line));
+                        break;
+                    case 2:
+                        // C
+                        line = line.replaceAll(" ", "");
+                        for (Function f : Sigma) {
+                            if (f.getName().equals(line)) {
+                                C.add(f);
+                            }
                         }
-                    }
-                    break;
-                case 3 :
-                    // Goal
-                    goal = parseEquation(Sigma, line);
-                    break;
+                        break;
+                    case 3:
+                        // Goal
+                        goal = parseEquation(Sigma, line);
+                        break;
+                }
             }
+        } catch (IllegalArgumentException e) {
+            Logger.e("Error on line: " + lineCount + " " + e.getMessage());
         }
 
         return new EquationSystem(equations, Sigma, C, goal);

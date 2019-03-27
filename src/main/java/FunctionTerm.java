@@ -11,6 +11,13 @@ class FunctionTerm extends Term {
     private List<Term> subterms;
     private Function function;
 
+    /**
+     * Creates a new FunctionTerm from a constant
+     * @param function A function with no inputs (a constant)
+     * @throws IllegalArgumentException if {@code function} is not a constant or its sort is null
+     * @see Term#Term(Sort)
+     * @see Function
+     */
     FunctionTerm(Function function) {
         super(function.getOutputSort());
 
@@ -21,6 +28,18 @@ class FunctionTerm extends Term {
         this.subterms = new ArrayList<>();
     }
 
+    /**
+     * Creates a new FunctionTerm from a function and a list of arguments
+     * @param function A function
+     * @throws IllegalArgumentException if the sort of {@code function} is null,
+     *                                  {@code subTerms} is null or the number of elements
+     *                                  does not match the number of inputs of {@code function}
+     *                                  or the sorts of the elements in {@code subTerms} do not
+     *                                  match the sorts of the inputs of {@code function}
+     * @see Term#Term(Sort)
+     * @see Term
+     * @see Function
+     */
     FunctionTerm(Function function, List<Term> subTerms) {
         super(function.getOutputSort());
         this.function = function;
@@ -39,10 +58,18 @@ class FunctionTerm extends Term {
         this.subterms.addAll(subTerms);
     }
 
+    /**
+     * Returns the function used to construct this term
+     * @return this.term
+     */
     Function getFunction() {
         return this.function;
     }
 
+    /**
+     * Returns the arguments used to construct this term using this.function
+     * @return this.subterms
+     */
     List<Term> getSubterms() {
         return this.subterms;
     }
@@ -85,35 +112,7 @@ class FunctionTerm extends Term {
                 return null;
             }
         }
-        return substitutions;
-    }
-
-    @Override
-    public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
-        if (term == null || substitutions == null) {
-            throw new IllegalArgumentException("term and substitutions must not be null");
-        }
-
-        if (term instanceof Variable) {
-            return false;
-        } else if (term instanceof FunctionTerm) {
-            FunctionTerm fterm = (FunctionTerm) term;
-
-            // Function must be equal
-            if (this.function.equals(fterm.getFunction())) {
-                // All subterms of fterm must be an instance of all subterms of this.subterms
-                for (int i = 0; i < this.subterms.size(); i++) {
-                    if (!(this.subterms.get(i).instanceOf(fterm.getSubterms().get(i), substitutions))) {
-                        return false;
-                    }
-                }
-
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
+        return null;
     }
 
     @Override

@@ -1,0 +1,32 @@
+// Functions
+0 nat
+o bool
+1 bool
+s nat nat
+take nat i bool
+head i bool
+tail i i
+alt i
+zip i i i
+ones i
+zeros i
+
+// Equations
+head(zip(x,y)) = head(x)
+tail(zip(x,y)) = zip(y, tail(x))
+take(0,x) = head(x)
+take(s(x),y) = take(x, tail(y))
+head(alt) = o
+head(tail(alt)) = 1
+tail(tail(alt)) = alt
+head(zeros) = o
+tail(zeros) = zeros
+head(ones) = 1
+tail(ones) = ones
+
+// C
+0
+s
+
+// Goal
+take(x, zip(zeros,ones)) = take(x, alt)

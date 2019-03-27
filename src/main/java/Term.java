@@ -11,6 +11,11 @@ import java.util.Set;
 abstract class Term {
     protected Sort sort;
 
+    /**
+     * Creates a new term of sort {@code sort}
+     * @param sort The sort of the new term
+     * @throws IllegalArgumentException if {@code sort} is null
+     */
     Term(Sort sort) {
         if (sort == null) {
             throw new IllegalArgumentException("Sort must not be null");
@@ -29,18 +34,6 @@ abstract class Term {
      * @see Variable
      */
     public abstract Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions);
-
-    /**
-     * Checks whether this term is an instance of {@code term}, i.e. true is returned iff
-     * there is some substitution such that the substitution applied to this term
-     * yields {@code term}
-     *
-     * @param term
-     * @param substitutions
-     * @return
-     */
-    @Deprecated
-    public abstract boolean instanceOf(Term term, Map<Variable, Term> substitutions);
 
     /**
      * Returns all subterms of this term, including the term itself

@@ -1,0 +1,27 @@
+// Functions
+0 nat
+s nat nat
+* nat nat
+t nat nat
+
+
+// Equations
+Equations:
++(0,x) = x
++(s(x),y) = s(+(x,y))
++(x,y) = +(y,x)
++(x,+(y,z)) = +(+(x,y),z)
+*(0,x) = 0
+*(s(x),y) = +(y,*(x,y))
+*(x,y) = *(y,x)
+*(x,+(y,z)) = +(*(x,y),*(x,z))
++(*(x,y),*(x,z)) = *(x,+(y,z))
+t(0) = 0
+t(s(x)) = +(t(x),s(x))
+
+// C
+0
+s
+
+// Goal
++(t(x),t(x)) = *(s(x),x)

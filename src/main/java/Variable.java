@@ -10,6 +10,14 @@ import java.util.*;
 class Variable extends Term {
     private String name;
 
+    /**
+     * Creates a variable with sort {@code sort} and name {@code name}.
+     * @param sort The sort of the new variable
+     * @param name The name of the new variable
+     * @throws IllegalArgumentException if {@code name} is empty or {@code sort} is null
+     * @see Sort
+     * @see Term#Term(Sort)
+     */
     Variable(Sort sort, String name) {
         super(sort);
 
@@ -19,6 +27,10 @@ class Variable extends Term {
         this.name = name;
     }
 
+    /**
+     * Returns the name of this variable
+     * @return this.name
+     */
     String getName() {
         return name;
     }
@@ -39,22 +51,6 @@ class Variable extends Term {
             return substitutions;
         }
         return null;
-    }
-
-    @Override
-    public boolean instanceOf(Term term, Map<Variable, Term> substitutions) {
-        if (term == null || substitutions == null) {
-            throw new IllegalArgumentException("term and substitutions must not be null");
-        }
-
-        if (substitutions.containsKey(this)) {
-            return substitutions.get(this).equals(term);
-        }
-        if (term.getSort().equals(this.sort)) {
-            substitutions.put(this, term);
-            return true;
-        }
-        return false;
     }
 
     @Override

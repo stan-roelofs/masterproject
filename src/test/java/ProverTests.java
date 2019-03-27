@@ -63,6 +63,6 @@ public class ProverTests {
         Equation goal = new Equation(hoi, var);
 
         EquationSystem lol = new EquationSystem(eqs, Sigma, C, goal);
-        Prover.induction(lol);
+        //Prover.induction(lol, writer);
     }
 }

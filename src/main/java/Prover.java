@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -8,9 +10,10 @@ import java.util.*;
  */
 public class Prover {
 
-    public static void induction(EquationSystem system) {
+    public static void induction(EquationSystem system, BufferedWriter outputWriter) throws IOException {
         Equation goal = system.goal;
-        Logger.i("Goal: " + goal.toString());
+        outputWriter.write("Goal: " + goal.toString());
+        outputWriter.newLine();
 
         // Try induction for each variable in function
         Set<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());
@@ -18,10 +21,11 @@ public class Prover {
         allVariables.addAll(goal.getRight().getVariables());
 
         for (Variable inductionVar : allVariables) {
-            if (!(inductionVar.getName().equals("x"))) {
+            if (!(inductionVar.getName().equals("x"))) { // TODO: check sort of variable
                 continue;//TODO: remove
             }
-            Logger.i("Trying induction variable: " + inductionVar.toString());
+            outputWriter.write("Trying induction variable: " + inductionVar.toString());
+            outputWriter.newLine();
 
             // For each function in C
             for (Function function : system.C) {
@@ -53,7 +57,8 @@ public class Prover {
 
                 // Prove left = right using system.equations and hypotheses
                 Equation newGoal = new Equation(left, right);
-                Logger.i("To prove: " + newGoal.toString());
+                outputWriter.write("To prove: " + newGoal.toString());
+                outputWriter.newLine();
 
                 if (hypotheses.size() > 0) {
                     StringBuilder sb = new StringBuilder();
@@ -61,7 +66,8 @@ public class Prover {
                         sb.append(hypothesis.toString());
                         sb.append(" ");
                     }
-                    Logger.i("Hypotheses: " + sb.toString());
+                    outputWriter.write("Hypotheses: " + sb.toString());
+                    outputWriter.newLine();
                 }
 
                 // Do BFS for convertibility
@@ -81,7 +87,6 @@ public class Prover {
 
                     for (Term term : leftTerms) {
                         for (Equation eq : allEquations) {
-
                             for (Term term2 : term.getAllSubTerms()) {
                                 // TODO: Right
                                 Map<Variable, Term> sub = eq.getLeft().getSubstitution(term2, new HashMap<>());
@@ -117,6 +122,46 @@ public class Prover {
                     }
 
                     leftTerms.addAll(toAdd);
+                    toAdd.clear();
+
+                    // tODO: steps right
+                    for (Term term : rightTerms) {
+                        for (Equation eq : allEquations) {
+                            for (Term term2 : term.getAllSubTerms()) {
+                                // TODO: Right
+                                Map<Variable, Term> sub = eq.getLeft().getSubstitution(term2, new HashMap<>());
+
+                                if (sub != null) {
+                                    Term newt = eq.getRight();
+                                    for (Map.Entry<Variable, Term> entry : sub.entrySet()) {
+                                        newt = newt.substitute(entry.getKey(), entry.getValue());
+                                    }
+
+                                    toAdd.add(term.substitute(term2, newt));
+                                    if (!steps.containsKey(term.substitute(term2, newt))) {
+                                        steps.put(term.substitute(term2, newt), term);
+                                    }
+                                }
+
+                                // TODO: Right
+                                Map<Variable, Term> sub2 = eq.getRight().getSubstitution(term2, new HashMap<>());
+
+                                if (sub2 != null) {
+                                    Term newt = eq.getLeft();
+                                    for (Map.Entry<Variable, Term> entry : sub2.entrySet()) {
+                                        newt = newt.substitute(entry.getKey(), entry.getValue());
+                                    }
+
+                                    toAdd.add(term.substitute(term2, newt));
+                                    if (!steps.containsKey(term.substitute(term2, newt))) {
+                                        steps.put(term.substitute(term2, newt), term);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    rightTerms.addAll(toAdd);
                 }
 
                 Term convergence = checkConvergence(leftTerms, rightTerms);
@@ -130,6 +175,7 @@ public class Prover {
                 revSequence.add(convergence);
 
                 StringBuilder stepsString = new StringBuilder();
+                stepsString.append("Conversion: ");
                 for (int i = revSequence.size() - 1; i >= 0; i--) {
                     stepsString.append(revSequence.get(i));
 
@@ -138,7 +184,8 @@ public class Prover {
                     }
                 }
 
-                System.out.println(stepsString.toString());
+                outputWriter.write(stepsString.toString());
+                outputWriter.newLine();
             }
         }
     }

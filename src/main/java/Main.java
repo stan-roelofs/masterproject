@@ -1,8 +1,6 @@
 import org.apache.commons.cli.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +11,7 @@ public class Main {
         // Create options
         Options options = new Options();
         options.addOption(Option.builder("i").longOpt("input").hasArg().desc("File name of input file").argName("file").required().build());
+        options.addOption(Option.builder("o").longOpt("output").hasArg().desc("File name of output file").argName("file").build());
 
         try {
             // parse the command line arguments
@@ -33,12 +32,35 @@ public class Main {
 
                     EquationSystem system = InputParser.parseSystem(input);
                     system.print();
-                    Prover.induction(system);
+
+                    // If no output file specified, use System.out
+                    OutputStream output;
+                    if (!commandLine.hasOption("o")) {
+                        output = System.out;
+                    } else {
+                        try {
+                            output = new FileOutputStream(commandLine.getOptionValue("o"));
+                        } catch (FileNotFoundException e) {
+                            Logger.e("File not found");
+                            return;
+                        }
+                    }
+
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+
+                    try {
+                        Prover.induction(system, writer);
+                    } catch (IOException e) {
+                        Logger.e("IOException: " + e.getMessage());
+                    }
+                    writer.flush();
+                    writer.close();
                 }
+            } else {
+                // TODO: print usage instructions
             }
-        }
-        catch(ParseException exp) {
-            Logger.e( "Parsing failed.  Reason: " + exp.getMessage() );
+        } catch(ParseException exp) {
+            Logger.e("Parsing failed.  Reason: " + exp.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
         }

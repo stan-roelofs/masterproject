@@ -8,11 +8,10 @@ import java.util.Collection;
  * @version 1.0
  */
 class EquationSystem {
-    // TODO: Getters
-    public Collection<Equation> equations;
-    public Collection<Function> sigma;
-    public Collection<Function> C;
-    public Equation goal;
+    private Collection<Equation> equations;
+    private Collection<Function> sigma;
+    private Collection<Function> C;
+    private Equation goal;
 
     EquationSystem(Collection<Equation> eq, Collection<Function> sigma, Collection<Function> C, Equation goal) {
         if (eq == null || sigma == null || C == null || goal == null) {
@@ -41,6 +40,22 @@ class EquationSystem {
         this.sigma = sigma;
         this.C = C;
         this.goal = goal;
+    }
+
+    public Collection<Equation> getEquations() {
+        return equations;
+    }
+
+    public Collection<Function> getSigma() {
+        return sigma;
+    }
+
+    public Collection<Function> getC() {
+        return C;
+    }
+
+    public Equation getGoal() {
+        return goal;
     }
 
     void print() {

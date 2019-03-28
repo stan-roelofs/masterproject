@@ -155,7 +155,7 @@ class InputParser {
         return eq;
     }
 
-    // TODO: fix this method and documentation
+    // TODO: if there are multiple functions with the same name but different sorts this doesnt work properly
     /**
      * Takes a string and a set of functions as input and constructs a Term object from this input
      * @param functions A set of functions that are necessary to recognize function symbols in the input string

@@ -213,18 +213,28 @@ public class VariableTests {
         Assert.assertEquals(v.getName(), "name123");
     }
 
+    /**
+     * Any variable should not be equal to null
+     */
     @Test
     public void testEqualsNull() {
         Variable v = new Variable(new Sort("x"), "x");
         Assert.assertNotEquals(null, v);
     }
 
+    /**
+     * Any variable should be equal to itself
+     */
     @Test
     public void testEqualsReflexivity() {
         Variable v = new Variable(new Sort("x"), "x");
         Assert.assertEquals(v, v);
     }
 
+    /**
+     * Any variable should be equal to an identical variable where the only difference
+     * is the reference
+     */
     @Test
     public void testEqualsCopy() {
         Sort s = new Sort("x");
@@ -233,6 +243,9 @@ public class VariableTests {
         Assert.assertEquals(v, v2);
     }
 
+    /**
+     * Two variables should not be the same if their sorts are different
+     */
     @Test
     public void testEqualsSortDifference() {
         Sort s = new Sort("x");
@@ -242,20 +255,14 @@ public class VariableTests {
         Assert.assertNotEquals(v, v2);
     }
 
+    /**
+     * Two variables should not be the same if their names are different
+     */
     @Test
     public void testEqualsNameDifference() {
         Sort s = new Sort("x");
         Variable v = new Variable(s, "x");
         Variable v2 = new Variable(s, "y");
-        Assert.assertNotEquals(v, v2);
-    }
-
-    @Test
-    public void testEqualsNameSortDifference() {
-        Sort s = new Sort("x");
-        Variable v = new Variable(s, "x");
-        Sort s2 = new Sort("x");
-        Variable v2 = new Variable(s2, "y");
         Assert.assertNotEquals(v, v2);
     }
 }

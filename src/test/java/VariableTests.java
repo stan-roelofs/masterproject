@@ -5,6 +5,7 @@ import java.util.*;
 
 public class VariableTests {
 
+
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor() {
         Variable v = new Variable(new Sort("x"), "");
@@ -16,30 +17,132 @@ public class VariableTests {
         Assert.assertEquals("x", v.getName());
     }
 
-    @Test
-    public void testGetVariables() {
-        Variable v = new Variable(new Sort("x"), "x");
-        Collection<Variable> vs = new ArrayList<>();
-        vs.add(v);
-        Assert.assertEquals(vs, v.getVariables());
+
+
+    /**
+     * If term is null we expect an IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetSubstitutionTermNull() {
+        Variable v1 = new Variable(new Sort("nat"), "x");
+        v1.getSubstitution(null, new HashMap<>());
     }
 
+    /**
+     * If subs is null we expect an IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
-    public void testSubstituteNullFirst() {
+    public void testGetSubstitutionSubsNull() {
+        Variable v1 = new Variable(new Sort("nat"), "x");
+        v1.getSubstitution(v1, null);
+    }
+
+    /**
+     * If x is not in the current substitutions map and y is of the same sort
+     * then x.getSubstitution(y, subs) should return x=y
+     */
+    @Test
+    public void testGetSubstitution() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        Map<Variable, Term> subs = new HashMap<>();
+        Map<Variable, Term> expected = new HashMap<>();
+        expected.put(v1, v2);
+        Assert.assertEquals(expected, v1.getSubstitution(v2, subs));
+    }
+
+    /**
+     * If x is already occupied in the current substitutions map for a substitution x=y
+     * then x.getSubstitution(y, subs) should return x=y instead of null
+     */
+    @Test
+    public void testGetSubstitutionCollisionSameTerm() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        Map<Variable, Term> subs = new HashMap<>();
+        Map<Variable, Term> expected = new HashMap<>();
+        expected.put(v1, v2);
+        subs.put(v1, v2);
+        Assert.assertEquals(expected, v1.getSubstitution(v2, subs));
+    }
+
+    /**
+     * If x is already occupied in the current substitutions map for a substitution x=y
+     * then x.getSubstitution(z, subs) should return null since x=y and x=z cannot hold
+     * at the same time
+     */
+    @Test
+    public void testGetSubstitutionCollisionDifferentTerm() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        Map<Variable, Term> subs = new HashMap<>();
+        subs.put(v1, v2);
+        Assert.assertNull(v1.getSubstitution(v1, subs));
+    }
+
+    /**
+     * If terms are of a different sort a substitution is not possible
+     * so null should be returned
+     */
+    @Test
+    public void testGetSubstitutionDifferentSort() {
+        Sort s = new Sort("nat");
+        Variable v1 = new Variable(s, "x");
+        Sort s2 = new Sort("string");
+        Variable v2 = new Variable(s2, "x");
+        Assert.assertNull(v1.getSubstitution(v2, new HashMap<>()));
+    }
+
+    /**
+     * A variable has no subterms so we expect an empty set here
+     */
+    @Test
+    public void testGetAllSubTerms() {
+        Variable v1 = new Variable(new Sort("x"), "x");
+        Assert.assertTrue(v1.getAllSubTerms().isEmpty());
+    }
+
+    /**
+     * If null is used as term expect IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSubstituteNullTerm() {
         Sort s = new Sort("x");
         Variable v = new Variable(s, "x");
         Variable v2 = new Variable(s, "y");
         v.substitute(null, v);
     }
 
+    /**
+     * If null is used as substitute expect IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
-    public void testSubstituteNullSecond() {
+    public void testSubstituteNull() {
         Sort s = new Sort("x");
         Variable v = new Variable(s, "x");
         Variable v2 = new Variable(s, "y");
         v.substitute(v, null);
     }
 
+    /**
+     * If substitute.sort does not match x.sort if x.substitute(x, substitute) is called
+     * then expect IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSubstituteDifferentSort() {
+        Sort s = new Sort("x");
+        Variable v = new Variable(s, "x");
+        Variable v2 = new Variable(new Sort("y"), "y");
+        v.substitute(v, v2);
+    }
+
+    /**
+     * If we call x.substitute(x, term) then expect
+     * term to be returned
+     */
     @Test
     public void testSubstituteVariable() {
         Sort s = new Sort("x");
@@ -48,6 +151,10 @@ public class VariableTests {
         Assert.assertEquals("y", v.substitute(v, v2).toString());
     }
 
+    /**
+     * If we call x.substitute(y, term) and x != y then expect
+     * x to be returned (no substitution happens)
+     */
     @Test
     public void testSubstituteDifferentVariable() {
         Sort s = new Sort("x");
@@ -56,6 +163,9 @@ public class VariableTests {
         Assert.assertEquals(v.toString(), v.substitute(v2, v2).toString());
     }
 
+    /**
+     * Tests substitution of x for a functionterm of the same sort
+     */
     @Test
     public void testSubstituteFunctionTerm() {
         // Create sort
@@ -83,6 +193,18 @@ public class VariableTests {
         Term newt = term.substitute(v, f0);
 
         Assert.assertEquals("f(0)", newt.toString());
+    }
+
+    /**
+     * getVariables should return a collection that contains just
+     * the variable and nothing else
+     */
+    @Test
+    public void testGetVariables() {
+        Variable v = new Variable(new Sort("x"), "x");
+        Collection<Variable> vs = new ArrayList<>();
+        vs.add(v);
+        Assert.assertEquals(vs, v.getVariables());
     }
 
     @Test
@@ -135,54 +257,5 @@ public class VariableTests {
         Sort s2 = new Sort("x");
         Variable v2 = new Variable(s2, "y");
         Assert.assertNotEquals(v, v2);
-    }
-
-    @Test
-    public void testgetSubstitutionVariable() {
-        Sort s = new Sort("nat");
-        Variable v1 = new Variable(s, "x");
-        Variable v2 = new Variable(s, "y");
-        Map<Variable, Term> subs = new HashMap<>();
-        Map<Variable, Term> expected = new HashMap<>();
-        expected.put(v1, v2);
-        Assert.assertEquals(expected, v1.getSubstitution(v2, subs));
-    }
-
-    @Test
-    public void testGetSubstitutionVariableCollisionSameTerm() {
-        Sort s = new Sort("nat");
-        Variable v1 = new Variable(s, "x");
-        Map<Variable, Term> subs = new HashMap<>();
-        Map<Variable, Term> expected = new HashMap<>();
-        expected.put(v1, v1);
-        subs.put(v1, v1);
-        Assert.assertEquals(expected, v1.getSubstitution(v1, subs));
-    }
-
-    /**
-     * If a substitution x=y and x=z are required at the same time
-     * getSubstitution should return null as this is not possible
-     */
-    @Test
-    public void testGetSubstitutionVariableCollisionDifferentTerm() {
-        Sort s = new Sort("nat");
-        Variable v1 = new Variable(s, "x");
-        Variable v2 = new Variable(s, "y");
-        Map<Variable, Term> subs = new HashMap<>();
-        subs.put(v1, v2);
-        Assert.assertNull(v1.getSubstitution(v1, subs));
-    }
-
-    /**
-     * If terms are of a different sort a substitution is not possible
-     * so null should be returned
-     */
-    @Test
-    public void testInstanceOfFalse() {
-        Sort s = new Sort("nat");
-        Variable v1 = new Variable(s, "x");
-        Sort s2 = new Sort("string");
-        Variable v2 = new Variable(s2, "x");
-        Assert.assertNull(v1.getSubstitution(v2, new HashMap<>()));
     }
 }

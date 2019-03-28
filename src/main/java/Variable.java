@@ -45,10 +45,12 @@ class Variable extends Term {
             if (substitutions.get(this).equals(term)) {
                 return substitutions;
             }
-        }
-        if (term.getSort().equals(this.sort)) {
-            substitutions.put(this, term);
-            return substitutions;
+            return null;
+        } else {
+            if (term.getSort().equals(this.sort)) {
+                substitutions.put(this, term);
+                return substitutions;
+            }
         }
         return null;
     }

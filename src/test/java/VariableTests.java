@@ -138,46 +138,51 @@ public class VariableTests {
     }
 
     @Test
-    public void testInstanceOfVariable() {
+    public void testgetSubstitutionVariable() {
         Sort s = new Sort("nat");
         Variable v1 = new Variable(s, "x");
         Variable v2 = new Variable(s, "y");
         Map<Variable, Term> subs = new HashMap<>();
-        Assert.assertTrue(v1.instanceOf(v2, subs));
-        Assert.assertTrue(subs.containsKey(v1));
-        Assert.assertEquals(subs.get(v1), v2);
+        Map<Variable, Term> expected = new HashMap<>();
+        expected.put(v1, v2);
+        Assert.assertEquals(expected, v1.getSubstitution(v2, subs));
     }
 
     @Test
-    public void testInstanceOfVariableCollisionSameTerm() {
+    public void testGetSubstitutionVariableCollisionSameTerm() {
         Sort s = new Sort("nat");
         Variable v1 = new Variable(s, "x");
         Map<Variable, Term> subs = new HashMap<>();
+        Map<Variable, Term> expected = new HashMap<>();
+        expected.put(v1, v1);
         subs.put(v1, v1);
-        Assert.assertTrue(v1.instanceOf(v1, subs));
-        Assert.assertTrue(subs.containsKey(v1));
-        Assert.assertEquals(subs.get(v1), v1);
+        Assert.assertEquals(expected, v1.getSubstitution(v1, subs));
     }
 
+    /**
+     * If a substitution x=y and x=z are required at the same time
+     * getSubstitution should return null as this is not possible
+     */
     @Test
-    public void testInstanceOfVariableCollisionDifferentTerm() {
+    public void testGetSubstitutionVariableCollisionDifferentTerm() {
         Sort s = new Sort("nat");
         Variable v1 = new Variable(s, "x");
-        Variable v2 = new Variable(s, " y");
+        Variable v2 = new Variable(s, "y");
         Map<Variable, Term> subs = new HashMap<>();
         subs.put(v1, v2);
-        Assert.assertFalse(v1.instanceOf(v1, subs));
-        Assert.assertTrue(subs.containsKey(v1));
-        Assert.assertEquals(subs.get(v1), v2);
+        Assert.assertNull(v1.getSubstitution(v1, subs));
     }
 
+    /**
+     * If terms are of a different sort a substitution is not possible
+     * so null should be returned
+     */
     @Test
     public void testInstanceOfFalse() {
         Sort s = new Sort("nat");
         Variable v1 = new Variable(s, "x");
         Sort s2 = new Sort("string");
         Variable v2 = new Variable(s2, "x");
-        Assert.assertFalse(v1.instanceOf(v2, new HashMap<>()));
+        Assert.assertNull(v1.getSubstitution(v2, new HashMap<>()));
     }
-
 }

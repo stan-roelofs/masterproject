@@ -1,13 +1,14 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class FunctionTermTests {
 
+    /**
+     * If a function is given as argument to the constructor with >0 inputs
+     * and no subterms are given as argument we expect an IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionException() {
         List<Sort> inputs = new ArrayList<>();
@@ -17,6 +18,9 @@ public class FunctionTermTests {
         Term t = new FunctionTerm(f);
     }
 
+    /**
+     * If null is given as subterms, expect IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionTermsNullException() {
         List<Sort> inputs = new ArrayList<>();
@@ -26,6 +30,10 @@ public class FunctionTermTests {
         Term t = new FunctionTerm(f, null);
     }
 
+    /**
+     * If the number of inputs of a function does not match
+     * the number of subterms expect IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFunctionTermsSizeException() {
         List<Sort> inputs = new ArrayList<>();
@@ -33,6 +41,141 @@ public class FunctionTermTests {
         inputs.add(new Sort("z"));
         Function f = new Function("f", inputs, new Sort("x"));
         Term t = new FunctionTerm(f, new ArrayList<>());
+    }
+
+    @Test
+    public void testGetFunction() {
+        Function f = new Function(new Sort("sort"), "f");
+        FunctionTerm t = new FunctionTerm(f);
+        Assert.assertEquals(f, t.getFunction());
+    }
+
+    @Test
+    public void testGetSubterms() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        FunctionTerm t = new FunctionTerm(f, subterms);
+        Assert.assertEquals(subterms, t.getSubTerms());
+    }
+
+    @Test
+    public void testGetAllSubterms() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        FunctionTerm t = new FunctionTerm(f, subterms);
+        subterms.clear();
+        subterms.add(t);
+        FunctionTerm t2 = new FunctionTerm(f, subterms);
+
+        Set<Term> expected = new HashSet<>();
+        expected.add(x);
+        expected.add(t);
+        expected.add(t2);
+
+        Assert.assertEquals(expected, t2.getAllSubTerms());
+    }
+
+    /**
+     * If term is null we expect an IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetSubstitutionTermNull() {
+        Function f = new Function(new Sort("sort"), "f");
+        FunctionTerm t = new FunctionTerm(f);
+        t.getSubstitution(null, new HashMap<>());
+    }
+
+    /**
+     * If subs is null we expect an IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetSubstitutionSubsNull() {
+        Function f = new Function(new Sort("sort"), "f");
+        FunctionTerm t = new FunctionTerm(f);
+        t.getSubstitution(t, null);
+    }
+
+    /**
+     * If term is a variable a substitution is not possible, so expect null
+     */
+    @Test
+    public void testGetSubstitutionVariable() {
+        Function f = new Function(new Sort("sort"), "f");
+        FunctionTerm t = new FunctionTerm(f);
+        Map<Variable, Term> subs = t.getSubstitution(new Variable(new Sort("sort"), "x"), new HashMap<>());
+        Assert.assertNull(subs);
+    }
+
+    /**
+     * If term does not have the same function a substitution is not possible, so expect null
+     */
+    @Test
+    public void testGetSubstitutionDifferentFunction() {
+        Function f = new Function(new Sort("sort"), "f");
+        FunctionTerm t = new FunctionTerm(f);
+        Function g = new Function(new Sort("nat"), "g");
+        FunctionTerm t2 = new FunctionTerm(g);
+        Map<Variable, Term> subs = t.getSubstitution(t2, new HashMap<>());
+        Assert.assertNull(subs);
+    }
+
+    /**
+     * If term has the same function, but getSubstitution on one of the subterms fails,
+     * expect null as no substitution is possible
+     */
+    @Test
+    public void testGetSubstitutionSubtermsFail() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort nat = new Sort("nat");
+        inputs.add(nat);
+        Function s = new Function("s", inputs, nat);
+        Function zero = new Function(nat, "0");
+        FunctionTerm t = new FunctionTerm(zero); // 0
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(t);
+        FunctionTerm t2 = new FunctionTerm(s, subterms); // s(0)
+        subterms.clear();
+        subterms.add(new Variable(nat, "x"));
+        FunctionTerm t3 = new FunctionTerm(s, subterms); // s(x)
+        Map<Variable, Term> subs = t2.getSubstitution(t3, new HashMap<>());
+        Assert.assertNull(subs);
+    }
+
+    /**
+     * If term has the same function, and getSubstitution succeeds on all subterms,
+     * expect a valid substitution
+     */
+    @Test
+    public void testGetSubstitutionSubtermsPass() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort nat = new Sort("nat");
+        inputs.add(nat);
+        Function s = new Function("s", inputs, nat);
+        Function zero = new Function(nat, "0");
+        FunctionTerm t = new FunctionTerm(zero); // 0
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(t);
+        FunctionTerm t2 = new FunctionTerm(s, subterms); // s(0)
+        subterms.clear();
+        Variable x = new Variable(nat, "x");
+        subterms.add(x);
+        FunctionTerm t3 = new FunctionTerm(s, subterms); // s(x)
+        Map<Variable, Term> subs = t3.getSubstitution(t2, new HashMap<>());
+
+        Map<Variable, Term> expected = new HashMap<>();
+        expected.put(x, t); // x -> 0
+
+        Assert.assertEquals(expected, subs);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -101,6 +244,9 @@ public class FunctionTermTests {
         Assert.assertEquals("f(f(f(x)))", t2.substitute(x, t).toString());
     }
 
+    /**
+     * If t contains no variables, expect empty list
+     */
     @Test
     public void testGetVariablesNone() {
         Sort s = new Sort("x");
@@ -110,6 +256,9 @@ public class FunctionTermTests {
         Assert.assertEquals(vs, t.getVariables());
     }
 
+    /**
+     * If t has a single variable as direct subterm
+     */
     @Test
     public void testGetVariablesSimple() {
         List<Sort> inputs = new ArrayList<>();
@@ -125,6 +274,9 @@ public class FunctionTermTests {
         Assert.assertEquals(vs, t.getVariables());
     }
 
+    /**
+     * If t has a single variable as subterm of a subterm
+     */
     @Test
     public void testGetVariablesDeep() {
         List<Sort> inputs = new ArrayList<>();
@@ -143,6 +295,9 @@ public class FunctionTermTests {
         Assert.assertEquals(vs, t2.getVariables());
     }
 
+    /**
+     * If t has multiple variables in subterms
+     */
     @Test
     public void testGetVariablesDeepMultiple() {
         List<Sort> inputs = new ArrayList<>();

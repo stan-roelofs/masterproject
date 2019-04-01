@@ -17,8 +17,6 @@ public class VariableTests {
         Assert.assertEquals("x", v.getName());
     }
 
-
-
     /**
      * If term is null we expect an IllegalArgumentException
      */

@@ -70,7 +70,7 @@ class FunctionTerm extends Term {
      * Returns the arguments used to construct this term using this.function
      * @return this.subterms
      */
-    List<Term> getSubterms() {
+    List<Term> getSubTerms() {
         return this.subterms;
     }
 
@@ -102,7 +102,7 @@ class FunctionTerm extends Term {
                 // All subterms of fterm must be an instance of all subterms of this.subterms
 
                 for (int i = 0; i < this.subterms.size(); i++) {
-                    if (this.subterms.get(i).getSubstitution(fterm.getSubterms().get(i), substitutions) == null) {
+                    if (this.subterms.get(i).getSubstitution(fterm.getSubTerms().get(i), substitutions) == null) {
                         return null;
                     }
                 }
@@ -187,12 +187,12 @@ class FunctionTerm extends Term {
             return false;
         }
 
-        if (!(Objects.equals(this.subterms.size(), term.getSubterms().size()))) {
+        if (!(Objects.equals(this.subterms.size(), term.getSubTerms().size()))) {
             return false;
         }
 
         for (int i = 0; i < subterms.size(); i++) {
-            if (!Objects.equals(subterms.get(i), term.getSubterms().get(i))) {
+            if (!Objects.equals(subterms.get(i), term.getSubTerms().get(i))) {
                 return false;
             }
         }

@@ -11,6 +11,11 @@ class Sort {
 
     private String name;
 
+    /**
+     * Creates a new sort with name {@code name}
+     * @param name The name of the sort
+     * @throws IllegalArgumentException if name is null
+     */
     Sort(String name) {
         if (name == null) {
             throw new IllegalArgumentException("name must not be null");
@@ -18,6 +23,10 @@ class Sort {
         this.name = name;
     }
 
+    /**
+     * Returns the name of this sort
+     * @return this.name
+     */
     String getName() {
         return this.name;
     }

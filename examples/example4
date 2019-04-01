@@ -1,12 +1,11 @@
 // Functions
 0 nat
 s nat nat
-* nat nat
+* nat nat nat
 t nat nat
-
++ nat nat nat
 
 // Equations
-Equations:
 +(0,x) = x
 +(s(x),y) = s(+(x,y))
 +(x,y) = +(y,x)

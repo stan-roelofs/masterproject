@@ -38,12 +38,16 @@ public class Main {
                     if (!commandLine.hasOption("o")) {
                         output = System.out;
                     } else {
-                        try {
-                            output = new FileOutputStream(commandLine.getOptionValue("o"));
-                        } catch (FileNotFoundException e) {
-                            Logger.e("File not found");
-                            return;
+                        // Otherwise use the specified file
+                        String pathToFile = commandLine.getOptionValue("o");
+                        File outputFile = new File(pathToFile);
+
+                        if (!outputFile.isFile()) {
+                            Logger.e("Specified output is not a file");
+                            throw new IllegalArgumentException("Output must be a file");
                         }
+
+                        output = new FileOutputStream(outputFile);
                     }
 
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));

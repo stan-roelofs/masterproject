@@ -101,7 +101,32 @@ public class Prover {
         }
     }
 
+    /**
+     * Returns a string that represents the conversion steps that were used in the conversion from the term
+     * {@code initial} to the term {@code goal}.
+     * This conversion is found using a Breadth-First Search starting from both {@code initial} and {@code goal}
+     * and a set of equations, which therefore creates two sets of terms, terms that can be found by rewriting
+     * {@code initial} and terms that can be found by rewriting {@code goal}.
+     *
+     * The map {@code leftSteps} stores for each term which term was used to create it, for all terms found by
+     * rewriting {@code initial}. This allows us to trace back the steps that were used for the conversion.
+     * {@code rightSteps} does the same for terms created by rewriting {@code goal}.
+     *
+     * When a term is found that is common to both sets of terms, there exists a conversion from {@code initial} to
+     * {@code goal}. There can be multiple common terms, {@code convergence} is one of those common terms.
+     *
+     * @param initial The initial term where the conversion starts
+     * @param goal The final term where the conversion ends
+     * @param convergence A term that both {@code initial} and {@code goal} can be rewritten to
+     * @param leftSteps A map that links each term to the term that was used to create it, from {@code convergence} to {@code initial}
+     * @param rightSteps A map that links each term to the term that was used to create it, from {@code convergence} to {@code goal}
+     * @return A string which represents the conversion steps that were used to rewrite {@code initial} to {@code goal}
+     */
+
     private static String getConversionString(Term initial, Term goal, Term convergence, Map<Term,Term> leftSteps, Map<Term,Term> rightSteps) {
+        if (initial == null || goal == null || convergence == null || leftSteps == null || rightSteps == null) {
+            throw new IllegalArgumentException("Arguments cannot be null");
+        }
         List<Term> revSequence = new ArrayList<>();
 
         Term temp =  null;
@@ -115,10 +140,14 @@ public class Prover {
                 temp = leftSteps.get(convergence);
             } else {
                 temp = leftSteps.get(temp);
+                if (temp == null) {
+                    throw new IllegalStateException("Missing term in leftSteps");
+                }
             }
             revSequence.add(temp);
         }
 
+        // Reverse this sequence, as it starts from convergence and ends in initial
         List<Term> sequence = new ArrayList<>();
         // Reverse sequence
         for (int i = revSequence.size() - 1; i >= 0; i--) {
@@ -126,7 +155,7 @@ public class Prover {
         }
 
         temp =  null;
-        // Trace back the steps until we reach the start term
+        // Trace back the steps until we reach the final term
         while (!(goal.equals(temp))) {
             if (temp == null) {
                 if (!rightSteps.containsKey(convergence)) {
@@ -135,17 +164,25 @@ public class Prover {
                 temp = rightSteps.get(convergence);
             } else {
                 temp = rightSteps.get(temp);
+                if (temp == null) {
+                    throw new IllegalStateException("Missing term in rightSteps");
+                }
             }
             sequence.add(temp);
         }
 
+        // Turn the sequence into a string using a stringbuilder for efficiency
         StringBuilder stepsString = new StringBuilder();
         stepsString.append("Conversion: ");
         for (int i = 0; i < sequence.size(); i++) {
             stepsString.append(sequence.get(i));
 
             if (i < sequence.size() - 1) {
-                stepsString.append(" -> ");
+                if (i < revSequence.size() - 1) {
+                    stepsString.append(" -> ");
+                } else {
+                    stepsString.append(" <- ");
+                }
             }
         }
 

@@ -257,7 +257,6 @@ class InputParser {
         return v;
     }
 
-
     private static void checkParameters(Set<Function> functions, String line) {
         if (functions == null || functions.isEmpty()) {
             throw new IllegalArgumentException("functions must not be empty or null");

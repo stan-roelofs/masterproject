@@ -28,7 +28,7 @@ abstract class Term {
      * If this is not possible it returns null
      *
      * @param term The term that should be obtained by applying the substitution
-     * @param substitutions The substitutions that are already defined
+     * @param substitutions The substitutions that are already defined, can be modified by this function
      * @return A substitution such that if the substitution is applied to this term it yields {@code term},
      *         or null if such a substitution is not possible
      * @see Variable

@@ -42,7 +42,7 @@ public class Main {
                         String pathToFile = commandLine.getOptionValue("o");
                         File outputFile = new File(pathToFile);
 
-                        if (!outputFile.isFile()) {
+                        if (outputFile.exists() && !outputFile.isFile()) {
                             Logger.e("Specified output is not a file");
                             throw new IllegalArgumentException("Output must be a file");
                         }

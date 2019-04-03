@@ -35,6 +35,8 @@ abstract class Term {
      */
     public abstract Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions);
 
+    public abstract Term applySubstitution(Map<Variable, Term> substitution);
+
     /**
      * Returns all subterms of this term, including the term itself
      *

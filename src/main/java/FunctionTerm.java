@@ -116,6 +116,19 @@ class FunctionTerm extends Term {
     }
 
     @Override
+    public Term applySubstitution(Map<Variable, Term> substitution) {
+        if (substitution == null) {
+            throw new IllegalArgumentException("Substitution must not be null");
+        }
+
+        List<Term> newSubterms = new ArrayList<>();
+        for (Term subterm : this.subterms) {
+            newSubterms.add(subterm.applySubstitution(substitution));
+        }
+        return new FunctionTerm(this.function, newSubterms);
+    }
+
+    @Override
     public Term substitute(Term term, Term substitute) {
         if (term == null || substitute == null) {
             throw new IllegalArgumentException("term and substitute must not be null");

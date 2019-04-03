@@ -8,7 +8,7 @@
 
 public class Logger {
 
-    private static Level level = Level.INFO;
+    private static Level level = Level.ERROR;
 
     public static void w(String msg) {
         if (level.ordinal() <= Level.WARNING.ordinal()) {

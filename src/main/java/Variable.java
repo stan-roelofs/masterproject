@@ -45,7 +45,6 @@ class Variable extends Term {
             if (substitutions.get(this).equals(term)) {
                 return substitutions;
             }
-            return null;
         } else {
             if (term.getSort().equals(this.sort)) {
                 substitutions.put(this, term);
@@ -53,6 +52,14 @@ class Variable extends Term {
             }
         }
         return null;
+    }
+
+    @Override
+    public Term applySubstitution(Map<Variable, Term> substitution) {
+        if (substitution == null) {
+            throw new IllegalArgumentException("Substitution must not be null");
+        }
+        return substitution.getOrDefault(this, this);
     }
 
     @Override

@@ -12,8 +12,7 @@ public class Prover {
 
     public static void induction(EquationSystem system, BufferedWriter outputWriter) throws IOException {
         Equation goal = system.getGoal();
-        outputWriter.write("Goal: " + goal.toString());
-        outputWriter.newLine();
+        Util.writeLine(outputWriter, "Goal: " + goal.toString());
 
         // Try induction for each variable in function
         Set<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());
@@ -24,8 +23,7 @@ public class Prover {
             if (!(inductionVar.getName().equals("x"))) { // TODO: check sort of variable
                 continue;//TODO: remove
             }
-            outputWriter.write("Trying induction variable: " + inductionVar.toString());
-            outputWriter.newLine();
+            Util.writeLine(outputWriter, "Trying induction variable: " + inductionVar.toString());
 
             // For each function in C
             for (Function function : system.getC()) {
@@ -33,7 +31,7 @@ public class Prover {
                 List<Term> newConstants = new ArrayList<>();
                 List<Equation> hypotheses = new ArrayList<>();
 
-                String constant = "a";
+                String constant = "a"; // TODO: check if this already exists as a function
                 int count = 1;
 
                 // Add hypotheses
@@ -57,8 +55,7 @@ public class Prover {
 
                 // Prove left = right using system.equations and hypotheses
                 Equation newGoal = new Equation(left, right);
-                outputWriter.write("To prove: " + newGoal.toString());
-                outputWriter.newLine();
+                Util.writeLine(outputWriter, "To prove: " + newGoal.toString());
 
                 if (hypotheses.size() > 0) {
                     StringBuilder sb = new StringBuilder();
@@ -66,8 +63,7 @@ public class Prover {
                         sb.append(hypothesis.toString());
                         sb.append(" ");
                     }
-                    outputWriter.write("Hypotheses: " + sb.toString());
-                    outputWriter.newLine();
+                    Util.writeLine(outputWriter, "Hypotheses: " + sb.toString());
                 }
 
                 // Do BFS for convertibility
@@ -83,26 +79,37 @@ public class Prover {
                 Map<Term, Term> leftSteps = new HashMap<>();
                 Map<Term, Term> rightSteps = new HashMap<>();
 
-                while (checkConvergence(leftTerms, rightTerms) == null) {
+                int searchDepth = 0;
+                while (checkConvergence(leftTerms, rightTerms) == null && searchDepth < 8) {
                     leftTerms.addAll(rewriteAll(leftTerms, allEquations, leftSteps));
                     rightTerms.addAll(rewriteAll(rightTerms, allEquations, rightSteps));
+                    searchDepth++;
                 }
 
                 Term convergence = checkConvergence(leftTerms, rightTerms);
                 if (convergence == null) {
                     Logger.w("Convergence null");
+
+                    Util.writeLine(outputWriter, "Trying double induction");
+
+                    List<Term> lpap = new ArrayList<>();
+                    lpap.add(inductionVar);
+
+                    Equation newGoalll = system.getGoal().substitute(inductionVar, new FunctionTerm(function, lpap));
+                    EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);
+                    induction(newSystem, outputWriter);
                     return;
                 }
 
-                String conversion = getConversionString(left, right, convergence, leftSteps, rightSteps);
-                outputWriter.write(conversion);
-                outputWriter.newLine();
+                List<Term> conversion = getConversionSequence(left, right, convergence, leftSteps, rightSteps);
+                String conversionString = getConversionString(conversion);
+                Util.writeLine(outputWriter, conversionString);
             }
         }
     }
 
     /**
-     * Returns a string that represents the conversion steps that were used in the conversion from the term
+     * Returns a list of terms that represents the conversion steps that were used in the conversion from the term
      * {@code initial} to the term {@code goal}.
      * This conversion is found using a Breadth-First Search starting from both {@code initial} and {@code goal}
      * and a set of equations, which therefore creates two sets of terms, terms that can be found by rewriting
@@ -120,10 +127,10 @@ public class Prover {
      * @param convergence A term that both {@code initial} and {@code goal} can be rewritten to
      * @param leftSteps A map that links each term to the term that was used to create it, from {@code convergence} to {@code initial}
      * @param rightSteps A map that links each term to the term that was used to create it, from {@code convergence} to {@code goal}
-     * @return A string which represents the conversion steps that were used to rewrite {@code initial} to {@code goal}
+     * @return A list of terms which represents the conversion steps that were used to rewrite {@code initial} to {@code goal}
+     * @see Term
      */
-
-    private static String getConversionString(Term initial, Term goal, Term convergence, Map<Term,Term> leftSteps, Map<Term,Term> rightSteps) {
+    private static List<Term> getConversionSequence(Term initial, Term goal, Term convergence, Map<Term,Term> leftSteps, Map<Term,Term> rightSteps) {
         if (initial == null || goal == null || convergence == null || leftSteps == null || rightSteps == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }
@@ -171,18 +178,18 @@ public class Prover {
             sequence.add(temp);
         }
 
+        return sequence;
+    }
+
+    private static String getConversionString(List<Term> conversion) {
         // Turn the sequence into a string using a stringbuilder for efficiency
         StringBuilder stepsString = new StringBuilder();
-        stepsString.append("Conversion: ");
-        for (int i = 0; i < sequence.size(); i++) {
-            stepsString.append(sequence.get(i));
+        stepsString.append("Conversion: \n");
+        for (int i = 0; i < conversion.size(); i++) {
+            stepsString.append(conversion.get(i));
 
-            if (i < sequence.size() - 1) {
-                if (i < revSequence.size() - 1) {
-                    stepsString.append(" -> ");
-                } else {
-                    stepsString.append(" <- ");
-                }
+            if (i < conversion.size() - 1) {
+                stepsString.append(" = \n");
             }
         }
 
@@ -207,7 +214,7 @@ public class Prover {
 
                     if (sub != null) {
                         Term rewriteGoal = eq.getRight();
-                        toAdd.addAll(rewriteTerm(steps, term, subterm, sub, rewriteGoal));
+                        toAdd.add(rewriteTerm(steps, term, subterm, sub, rewriteGoal));
                     }
 
                     // Try right
@@ -215,7 +222,7 @@ public class Prover {
 
                     if (sub2 != null) {
                         Term newt = eq.getLeft();
-                        toAdd.addAll(rewriteTerm(steps, term, subterm, sub2, newt));
+                        toAdd.add(rewriteTerm(steps, term, subterm, sub2, newt));
                     }
                 }
             }
@@ -232,27 +239,18 @@ public class Prover {
      * sub: the substitutions required to do this
      * newTerm: the term obtained
      */
-    private static Set<Term> rewriteTerm(Map<Term, Term> steps, Term term, Term subterm, Map<Variable, Term> sub, Term subtermSubstitute) {
-        Set<Term> toAdd = new HashSet<>();
-
-        /*
-         * subterm can be rewritten to subtermSubstitute using the substitutions in sub
-         * So perform all these substitutions on subtermSubstitute
-         */
-        for (Map.Entry<Variable, Term> entry : sub.entrySet()) {
-            subtermSubstitute = subtermSubstitute.substitute(entry.getKey(), entry.getValue());
-        }
+    private static Term rewriteTerm(Map<Term, Term> steps, Term term, Term subterm, Map<Variable, Term> sub, Term subtermSubstitute) {
+        subtermSubstitute = subtermSubstitute.applySubstitution(sub);
 
         // Create the new term by substituting subterm in term by subtermSubstitute
         Term newTerm = term.substitute(subterm, subtermSubstitute);
-        toAdd.add(newTerm);
 
         // Add this step to steps
         if (!steps.containsKey(newTerm)) {
             steps.put(newTerm, term);
         }
 
-        return toAdd;
+        return newTerm;
     }
 
     private static Term checkConvergence(Set<Term> left, Set<Term> right) {

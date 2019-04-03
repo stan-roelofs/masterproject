@@ -94,6 +94,26 @@ public class VariableTests {
         Assert.assertNull(v1.getSubstitution(v2, new HashMap<>()));
     }
 
+    @Test
+    public void testGetSubstitution2() {
+        Sort s = new Sort("i");
+        Variable v1 = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+
+        Map<Variable, Term> sub1 = v1.getSubstitution(v2, new HashMap<>());
+
+        List<Sort> sorts = new ArrayList<>();
+        sorts.add(s);
+        Function tl = new Function("tl", sorts, s);
+
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(v2);
+        Term t2 = new FunctionTerm(tl, subterms); // tl(y)
+
+        Map<Variable, Term> sub2 = v2.getSubstitution(t2, sub1);
+        Assert.assertNull(sub2);
+    }
+
     /**
      * A variable has no subterms so we expect an empty set here
      */

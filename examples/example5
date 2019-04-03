@@ -6,27 +6,24 @@ s nat nat
 take nat i bool
 head i bool
 tail i i
-alt i
 zip i i i
 ones i
-zeros i
+h nat nat
 
 // Equations
 head(zip(x,y)) = head(x)
 tail(zip(x,y)) = zip(y, tail(x))
 take(0,x) = head(x)
 take(s(x),y) = take(x, tail(y))
-head(alt) = O
-head(tail(alt)) = 1
-tail(tail(alt)) = alt
-head(zeros) = O
-tail(zeros) = zeros
 head(ones) = 1
-tail(ones) = ones
+tail(ones) = zip(ones, ones)
+h(0) = 0
+h(s(0)) = 0
+h(s(s(x))) = s(h(x))
 
 // C
 0
 s
 
 // Goal
-take(x, zip(zeros,ones)) = take(x, alt)
+take(x, zip(z, z)) = take(h(x), z)

@@ -35,6 +35,16 @@ abstract class Term {
      */
     public abstract Map<Variable, Term> getSubstitution(Term term, Map<Variable, Term> substitutions);
 
+    /**
+     * Applies a substitution (a mapping from variables to terms) on this term.
+     * Hence, after execution every variable in this term is replaced by substitution.get(variable)
+     *
+     * @param substitution A substitution which replaces variables by terms
+     * @return A new term such that all variables in {@code substitution} im this term
+     *          are replaced by substitution.get(variable)
+     * @see Term
+     * @see Variable
+     */
     public abstract Term applySubstitution(Map<Variable, Term> substitution);
 
     /**

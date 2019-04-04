@@ -178,6 +178,67 @@ public class FunctionTermTests {
         Assert.assertEquals(expected, subs);
     }
 
+    /**
+     * If substitution is null, expect IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testApplySubstitutionNull() {
+        Sort s = new Sort("x");
+        Function f = new Function(s, "f");
+        Term t = new FunctionTerm(f);
+        t.applySubstitution(null);
+    }
+
+    /**
+     * If substitution contains a variable and applySubstitution is called on a FunctionTerm that
+     * contains this variable in a subterm we expect the variable to be substituted
+     */
+    @Test
+    public void testApplySubstitutionApplied() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms); // f(x)
+
+        subterms.clear();
+        Variable y = new Variable(s, "y");
+        subterms.add(y);
+        Term t2 = new FunctionTerm(f, subterms);
+
+        Map<Variable, Term> subs = new HashMap<>();
+        subs.put(x, y);
+        Assert.assertEquals(t2, t.applySubstitution(subs));
+    }
+
+    /**
+     * If substitution does not contain a variable and applySubstitution is called on that variable
+     * we expect no changes
+     */
+    @Test
+    public void testApplySubstitutionNotApplied() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms); // f(x)
+
+        subterms.clear();
+        Variable y = new Variable(s, "y");
+        subterms.add(y);
+        Term t2 = new FunctionTerm(f, subterms);
+
+        Map<Variable, Term> subs = new HashMap<>();
+        subs.put(y, x);
+        Assert.assertEquals(t, t.applySubstitution(subs));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testSubstituteNullFirst() {
         List<Sort> inputs = new ArrayList<>();

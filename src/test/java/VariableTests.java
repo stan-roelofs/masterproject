@@ -95,6 +95,44 @@ public class VariableTests {
     }
 
     /**
+     * If substitution is null, expect IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testApplySubstitutionNull() {
+        Sort s = new Sort("nat");
+        Variable v = new Variable(s, "x");
+        v.applySubstitution(null);
+    }
+
+    /**
+     * If substitution contains a variable and applySubstitution is called on that variable
+     * we expect substitution.get(variable) to be returned
+     */
+    @Test
+    public void testApplySubstitutionApplied() {
+        Sort s = new Sort("nat");
+        Variable v = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        Map<Variable, Term> subs = new HashMap<>();
+        subs.put(v, v2);
+        Assert.assertEquals(v2, v.applySubstitution(subs));
+    }
+
+    /**
+     * If substitution does not contain a variable and applySubstitution is called on that variable
+     * we expect no changes
+     */
+    @Test
+    public void testApplySubstitutionNotApplied() {
+        Sort s = new Sort("nat");
+        Variable v = new Variable(s, "x");
+        Variable v2 = new Variable(s, "y");
+        Map<Variable, Term> subs = new HashMap<>();
+        subs.put(v2, v);
+        Assert.assertEquals(v, v.applySubstitution(subs));
+    }
+
+    /**
      * A variable has no subterms so we expect an empty set here
      */
     @Test

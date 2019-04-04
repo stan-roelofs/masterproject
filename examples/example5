@@ -26,4 +26,4 @@ h(s(s(x))) = s(h(x))
 s
 
 // Goal
-take(x, zip(z, z)) = take(h(x), z)
+take(x, zip(y, y)) = take(h(x), y)

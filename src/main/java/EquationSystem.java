@@ -18,6 +18,10 @@ class EquationSystem {
             throw new IllegalArgumentException("Eq, Sigma, C, Goal must not be null");
         }
 
+        if (C.isEmpty()) {
+            throw new IllegalArgumentException("C must not be empty");
+        }
+
         Sort sort = null;
         for (Function f : C) {
             // Take sort of f if it is currently null
@@ -56,6 +60,11 @@ class EquationSystem {
 
     public Equation getGoal() {
         return goal;
+    }
+
+    public Sort getCSort() {
+        // Get the first function using iterator and return the sort of that function
+        return this.C.iterator().next().getOutputSort();
     }
 
     void print() {

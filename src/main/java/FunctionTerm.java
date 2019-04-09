@@ -31,6 +31,7 @@ class FunctionTerm extends Term {
     /**
      * Creates a new FunctionTerm from a function and a list of arguments
      * @param function A function
+     * @param subTerms A list of subterms that are used as arguments for {@code function}
      * @throws IllegalArgumentException if the sort of {@code function} is null,
      *                                  {@code subTerms} is null or the number of elements
      *                                  does not match the number of inputs of {@code function}

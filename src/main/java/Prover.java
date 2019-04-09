@@ -10,6 +10,9 @@ import java.util.*;
  */
 public class Prover {
 
+    public static int SearchSteps = 8;
+    public static String constantName = "a";
+
     public static void induction(EquationSystem system, BufferedWriter outputWriter) throws IOException {
         Equation goal = system.getGoal();
         Util.writeLine(outputWriter, "Goal: " + goal.toString());
@@ -20,6 +23,11 @@ public class Prover {
         allVariables.addAll(goal.getRight().getVariables());
 
         for (Variable inductionVar : allVariables) {
+            // Check whether induction variable sort is the same as the sort of C
+            if (!inductionVar.getSort().equals(system.getCSort())) {
+                continue;
+            }
+
             if (!(inductionVar.getName().equals("x"))) { // TODO: check sort of variable
                 continue;//TODO: remove
             }
@@ -31,30 +39,13 @@ public class Prover {
                 List<Term> newConstants = new ArrayList<>();
                 List<Equation> hypotheses = new ArrayList<>();
 
-                String constant = "a"; // TODO: check if this already exists as a function
-                int count = 1;
-
-                // Add hypotheses
-                for (Sort s : function.getInputSorts()) {
-                    Function cnst = new Function(s, constant + count);
-                    FunctionTerm a = new FunctionTerm(cnst, new ArrayList<>());
-                    newConstants.add(a);
-
-                    if (s == function.getOutputSort()) {
-                        Equation hypothesis = goal.substitute(inductionVar, a);
-                        hypotheses.add(hypothesis);
-                    }
-                }
+                generateHypotheses(function, inductionVar, system, newConstants, hypotheses);
 
                 // Create term f(a1, ..., an)
                 FunctionTerm inductionTerm = new FunctionTerm(function, newConstants);
 
-                // Create left and right terms of goal
-                Term left = goal.getLeft().substitute(inductionVar, inductionTerm);
-                Term right = goal.getRight().substitute(inductionVar, inductionTerm);
+                Equation newGoal = goal.substitute(inductionVar, inductionTerm);
 
-                // Prove left = right using system.equations and hypotheses
-                Equation newGoal = new Equation(left, right);
                 Util.writeLine(outputWriter, "To prove: " + newGoal.toString());
 
                 if (hypotheses.size() > 0) {
@@ -70,8 +61,8 @@ public class Prover {
                 Set<Term> leftTerms = new HashSet<>();
                 Set<Term> rightTerms = new HashSet<>();
 
-                leftTerms.add(left);
-                rightTerms.add(right);
+                leftTerms.add(newGoal.getLeft());
+                rightTerms.add(newGoal.getRight());
 
                 Set<Equation> allEquations = new HashSet<>(system.getEquations());
                 allEquations.addAll(hypotheses);
@@ -80,7 +71,7 @@ public class Prover {
                 Map<Term, Term> rightSteps = new HashMap<>();
 
                 int searchDepth = 0;
-                while (checkConvergence(leftTerms, rightTerms) == null && searchDepth < 8) {
+                while (checkConvergence(leftTerms, rightTerms) == null && searchDepth < SearchSteps) {
                     leftTerms.addAll(rewriteAll(leftTerms, allEquations, leftSteps));
                     rightTerms.addAll(rewriteAll(rightTerms, allEquations, rightSteps));
                     searchDepth++;
@@ -90,20 +81,54 @@ public class Prover {
                 if (convergence == null) {
                     Logger.w("Convergence null");
 
+                    // TODO: for now only double induction for s
+                    if (function.getInputSorts().size() != 1) {
+                        Logger.w("Skipping double induction");
+                        return;
+                    }
+
                     Util.writeLine(outputWriter, "Trying double induction");
 
-                    List<Term> lpap = new ArrayList<>();
-                    lpap.add(inductionVar);
+                    // Create term f
+                    List<Term> subterms = new ArrayList<>();
+                    subterms.add(inductionVar);
+                    Term newInductionTerm = new FunctionTerm(function, subterms);
 
-                    Equation newGoalll = system.getGoal().substitute(inductionVar, new FunctionTerm(function, lpap));
+                    Equation newGoalll = system.getGoal().substitute(inductionVar, newInductionTerm);
                     EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);
                     induction(newSystem, outputWriter);
                     return;
                 }
 
-                List<Term> conversion = getConversionSequence(left, right, convergence, leftSteps, rightSteps);
+                List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
                 String conversionString = getConversionString(conversion);
                 Util.writeLine(outputWriter, conversionString);
+            }
+        }
+    }
+
+    /**
+     * modifies newconstants, hypotheses
+     */
+    private static void generateHypotheses(Function function, Variable inductionVar, EquationSystem system, List<Term> newConstants, List<Equation> hypotheses) {
+        int count = 1;
+
+        // Add hypotheses
+        for (Sort s : function.getInputSorts()) {
+            Function cnst = new Function(s, constantName + count);
+
+            for (Function f : system.getSigma()) {
+                if (f.equals(cnst)) {
+                    Logger.e("Fresh constant " + cnst.toString() + " already exists, possibly introduces errors");
+                }
+            }
+
+            FunctionTerm a = new FunctionTerm(cnst, new ArrayList<>());
+            newConstants.add(a);
+
+            if (s == function.getOutputSort()) {
+                Equation hypothesis = system.getGoal().substitute(inductionVar, a);
+                hypotheses.add(hypothesis);
             }
         }
     }

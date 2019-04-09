@@ -58,6 +58,19 @@ class InputParser {
             Logger.e("Error on line: " + lineCount + " " + e.getMessage());
         }
 
+        boolean duplicate = false;
+        for (Function f : Sigma) {
+            for (Function f2 : Sigma) {
+                if (f.getName().equals(f2.getName()) && !f.equals(f2)) {
+                    duplicate = true;
+                }
+            }
+        }
+
+        if (duplicate) {
+            Logger.w("Detected two functions with equal names, potentially results in errors");
+        }
+
         return new EquationSystem(equations, Sigma, C, goal);
     }
 
@@ -160,7 +173,8 @@ class InputParser {
      * Takes a string and a set of functions as input and constructs a Term object from this input
      * @param functions A set of functions that are necessary to recognize function symbols in the input string
      * @param line The input string
-     * @return
+     * @param varSort The expected sort of the variable if {@code line} represents a variable
+     * @return A term object that represents the same term as {@code line}
      * @throws IllegalArgumentException if {@code functions} is empty or null,
      * @see Function
      * @see Term

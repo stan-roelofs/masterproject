@@ -1,13 +1,10 @@
 // Functions
 0 nat
-O bool
-1 bool
 s nat nat
 take nat i bool
 head i bool
 tail i i
 zip i i i
-ones i
 h nat nat
 
 // Equations
@@ -15,8 +12,6 @@ head(zip(x,y)) = head(x)
 tail(zip(x,y)) = zip(y, tail(x))
 take(0,x) = head(x)
 take(s(x),y) = take(x, tail(y))
-head(ones) = 1
-tail(ones) = zip(ones, ones)
 h(0) = 0
 h(s(0)) = 0
 h(s(s(x))) = s(h(x))

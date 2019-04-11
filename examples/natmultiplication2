@@ -1,0 +1,20 @@
+// Functions
+0 nat
+s nat nat
++ nat nat nat
+* nat nat nat
+
+// Equations
++(0, x) = x
++(s(x), y) = s(+(x, y))
++(x,+(y,z)) = +(+(x,y),z)
++(x,y) = +(y,x)
+*(0,x) = 0
+*(s(x),y) = +(y,*(x,y))
+
+// C
+0
+s
+
+// Goal
+*(x, s(y)) = +(x,*(x,y))

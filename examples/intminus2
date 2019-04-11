@@ -1,0 +1,22 @@
+// Functions
+0 nat
+s nat nat
+p nat nat
+- nat nat nat
+
+// Equations
+-(x,0) = x
+-(x,s(y)) = p(-(x,y))
+-(x,p(y)) = s(-(x,y))
+s(p(x)) = x
+p(s(x)) = x
+-(s(y),x) = s(-(y,x))
+-(p(y),x) = p(-(y,x))
+
+// C
+0
+s
+p
+
+// Goal
+-(x,x) = 0

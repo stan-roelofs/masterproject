@@ -1,0 +1,34 @@
+// Functions
+0 nat
+s nat nat
+O b
+take nat i b
+head i b
+tail i i
+zip i i i
+: b i i
+f i i
+inv i i
+not b b
+morse i
+
+// Equations
+head(zip(x,y)) = head(x)
+tail(zip(x,y)) = zip(y,tail(x))
+head(:(x,y)) = x
+tail(:(x,y)) = y
+not(not(x)) = x
+f(x) = :(head(x),:(not(head(x)),f(tail(x))))
+take(0,x) = head(x)
+take(s(x),y) = take(x,tail(y))
+inv(x) = :(not(head(x)),inv(tail(x)))
+head(morse) = O
+tail(morse) = zip(inv(morse),tail(morse))
+take(x,f(y)) = take(x,zip(y,inv(y)))
+
+// C
+0
+s
+
+// Goal
+take(x,f(morse)) = take(x,morse)

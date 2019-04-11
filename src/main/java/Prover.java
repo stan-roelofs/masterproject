@@ -10,28 +10,45 @@ import java.util.*;
  */
 public class Prover {
 
-    public static int SearchSteps = 8;
     public static String constantName = "a";
+    public static int maxDepth = 2;
 
-    public static void induction(EquationSystem system, BufferedWriter outputWriter) throws IOException {
+    public static boolean induction(EquationSystem system, BufferedWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
+        if (recursionDepth >= maxDepth) {
+            Util.writeLine(outputWriter, "Maximum recursion depth " + maxDepth + " reached, induction on " + inductionVar.toString() + " failed.");
+            return false;
+        }
+
         Equation goal = system.getGoal();
-        Util.writeLine(outputWriter, "Goal: " + goal.toString());
+        //Util.writeLine(outputWriter, "Goal: " + goal.toString());
 
         // Try induction for each variable in function
         Set<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());
 
         allVariables.addAll(goal.getRight().getVariables());
 
-        for (Variable inductionVar : allVariables) {
-            // Check whether induction variable sort is the same as the sort of C
-            if (!inductionVar.getSort().equals(system.getCSort())) {
-                continue;
+        if (inductionVar == null) {
+            for (Variable variable : allVariables) {
+                Util.writeLine(outputWriter, "Trying induction variable: " + variable.toString());
+                if (induction(system, outputWriter, searchSteps, recursionDepth, variable)) {
+                    return true;
+                }
             }
 
-            if (!(inductionVar.getName().equals("x"))) { // TODO: check sort of variable
-                continue;//TODO: remove
+            Util.writeLine(outputWriter, "Induction on all variables failed.");
+            return false;
+        }
+
+        //for (Variable inductionVar : allVariables) {
+            // Check whether induction variable sort is the same as the sort of C
+            if (!inductionVar.getSort().equals(system.getCSort())) {
+                Util.writeLine(outputWriter, "Skipping variable " + inductionVar.toString() + ", sort does not match sort of C");
+                return false;
             }
-            Util.writeLine(outputWriter, "Trying induction variable: " + inductionVar.toString());
+
+            if (!(inductionVar.getName().equals("x"))) {
+                //continue;//TODO: remove
+            }
 
             // For each function in C
             for (Function function : system.getC()) {
@@ -71,20 +88,23 @@ public class Prover {
                 Map<Term, Term> rightSteps = new HashMap<>();
 
                 int searchDepth = 0;
-                while (checkConvergence(leftTerms, rightTerms) == null && searchDepth < SearchSteps) {
+                Term convergence = null;
+                while (convergence == null && searchDepth < searchSteps) {
                     leftTerms.addAll(rewriteAll(leftTerms, allEquations, leftSteps));
                     rightTerms.addAll(rewriteAll(rightTerms, allEquations, rightSteps));
                     searchDepth++;
+                    convergence = checkConvergence(leftTerms, rightTerms);
                 }
 
-                Term convergence = checkConvergence(leftTerms, rightTerms);
+                //Term convergence = checkConvergence(leftTerms, rightTerms);
                 if (convergence == null) {
                     Logger.w("Convergence null");
 
                     // TODO: for now only double induction for s
                     if (function.getInputSorts().size() != 1) {
                         Logger.w("Skipping double induction");
-                        return;
+                        Util.writeLine(outputWriter, "Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
+                        return false;
                     }
 
                     Util.writeLine(outputWriter, "Trying double induction");
@@ -96,15 +116,15 @@ public class Prover {
 
                     Equation newGoalll = system.getGoal().substitute(inductionVar, newInductionTerm);
                     EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);
-                    induction(newSystem, outputWriter);
-                    return;
+                    return induction(newSystem, outputWriter, searchSteps, recursionDepth + 1, inductionVar);
+                } else {
+                    List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
+                    String conversionString = getConversionString(conversion);
+                    Util.writeLine(outputWriter, conversionString);
                 }
-
-                List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
-                String conversionString = getConversionString(conversion);
-                Util.writeLine(outputWriter, conversionString);
             }
-        }
+        //}
+        return true;
     }
 
     /**
@@ -239,7 +259,8 @@ public class Prover {
 
                     if (sub != null) {
                         Term rewriteGoal = eq.getRight();
-                        toAdd.add(rewriteTerm(steps, term, subterm, sub, rewriteGoal));
+                        Term newT = rewriteTerm(steps, term, subterm, sub, rewriteGoal);
+                        toAdd.add(newT);
                     }
 
                     // Try right

@@ -12,12 +12,14 @@ public class Main {
         Options options = new Options();
         options.addOption(Option.builder("i").longOpt("input").hasArg().desc("File name of input file").argName("file").required().build());
         options.addOption(Option.builder("o").longOpt("output").hasArg().desc("File name of output file").argName("file").build());
+        options.addOption(Option.builder("d").longOpt("depth").hasArg().desc("The maximum depth when using BFS to search for a conversion").build());
 
         try {
             // parse the command line arguments
             CommandLine commandLine = parser.parse( options, args );
 
-            if (commandLine.hasOption("i")) {
+            // Probably unnecessary, parseError is thrown if this is the case since i is marked as required
+            //if (commandLine.hasOption("i")) {
                 String fileName = commandLine.getOptionValue("i");
 
                 // Read file
@@ -30,7 +32,12 @@ public class Main {
                         line = br.readLine();
                     }
 
-                    EquationSystem system = InputParser.parseSystem(input);
+                    EquationSystem system = null;
+                    try {
+                        system = InputParser.parseSystem(input);
+                    } catch(Exception e) {
+                        Logger.e("Exception while parsing, quitting program");
+                    }
                     system.print();
 
                     // If no output file specified, use System.out
@@ -52,17 +59,22 @@ public class Main {
 
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
 
+                    int searchDepth = 7;
+                    if (commandLine.hasOption("d")) {
+                        searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
+                    }
+
                     try {
-                        Prover.induction(system, writer);
+                        Prover.induction(system, writer, searchDepth, 0, null);
                     } catch (IOException e) {
                         Logger.e("IOException: " + e.getMessage());
                     }
                     writer.flush();
                     writer.close();
                 }
-            } else {
+            //} else {
                 // TODO: print usage instructions
-            }
+            //}
         } catch(ParseException exp) {
             Logger.e("Parsing failed.  Reason: " + exp.getMessage());
         } catch (IOException e) {

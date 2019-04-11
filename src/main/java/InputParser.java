@@ -54,7 +54,7 @@ class InputParser {
                         break;
                 }
             }
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSortException | InvalidFunctionArgumentException e) {
             Logger.e("Error on line: " + lineCount + " " + e.getMessage());
         }
 
@@ -134,7 +134,7 @@ class InputParser {
      * @see Equation
      * @see Function
      */
-    private static Equation parseEquation(Set<Function> functions, String line) throws IllegalArgumentException {
+    private static Equation parseEquation(Set<Function> functions, String line) throws IllegalArgumentException, InvalidFunctionArgumentException, NoSortException {
         checkParameters(functions, line);
         if (!line.contains("=")) {
             throw new IllegalArgumentException("line does not contain '=', therefore is not an equation");
@@ -157,11 +157,10 @@ class InputParser {
         try {
             left = parseTerm(functions, leftString, null);
             right = parseTerm(functions, rightString, left.getSort());
-        } catch (IllegalArgumentException e) {
+        } catch (NoSortException e) {
             right = parseTerm(functions, rightString, null);
             left = parseTerm(functions, rightString, right.getSort());
         }
-
 
         Equation eq = new Equation(left, right);
         Logger.d("Parsed equation " + eq.toString());
@@ -181,7 +180,7 @@ class InputParser {
      * @see Variable
      * @see FunctionTerm
      */
-    private static Term parseTerm(Set<Function> functions, String line, Sort varSort) {
+    private static Term parseTerm(Set<Function> functions, String line, Sort varSort) throws InvalidFunctionArgumentException, NoSortException {
         checkParameters(functions, line);
 
         String normalized = line.replaceAll(" ", "");
@@ -245,7 +244,7 @@ class InputParser {
                     subtermsStrings.add(current.toString());
 
                     if (subtermsStrings.size() != numArguments) {
-                        throw new IllegalArgumentException("Invalid");
+                        throw new InvalidFunctionArgumentException("Invalid number of function arguments. Actual: " + subtermsStrings.size() + ", expected: " + numArguments);
                     }
 
                     int input = 0;
@@ -262,7 +261,7 @@ class InputParser {
         }
 
         if (varSort == null) {
-            throw new IllegalArgumentException("Term is not a function and no sort is given for variable");
+            throw new NoSortException("Term is not a function and no sort is given for variable");
         }
 
         // If none of the functions match, the symbol has to be a variable
@@ -278,5 +277,17 @@ class InputParser {
         if (line == null) {
             throw new IllegalArgumentException("line must not be null");
         }
+    }
+}
+
+class NoSortException extends Exception {
+    public NoSortException(String errorMessage) {
+        super(errorMessage);
+    }
+}
+
+class InvalidFunctionArgumentException extends Exception {
+    public InvalidFunctionArgumentException(String errorMessage) {
+        super(errorMessage);
     }
 }

@@ -1,6 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class with static functions that can prove an EquationSystem
@@ -15,6 +16,7 @@ public class Prover {
 
     public static boolean induction(EquationSystem system, BufferedWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {
+            Logger.i("Reached maximum recursion depth of " + maxDepth + ", returning false");
             Util.writeLine(outputWriter, "Maximum recursion depth " + maxDepth + " reached, induction on " + inductionVar.toString() + " failed.");
             return false;
         }
@@ -29,101 +31,140 @@ public class Prover {
 
         if (inductionVar == null) {
             for (Variable variable : allVariables) {
+                Logger.i("Induction on " + variable.toString());
                 Util.writeLine(outputWriter, "Trying induction variable: " + variable.toString());
                 if (induction(system, outputWriter, searchSteps, recursionDepth, variable)) {
                     return true;
                 }
             }
 
+            Logger.i("Induction on all variables failed, returning false");
             Util.writeLine(outputWriter, "Induction on all variables failed.");
             return false;
         }
 
-        //for (Variable inductionVar : allVariables) {
-            // Check whether induction variable sort is the same as the sort of C
-            if (!inductionVar.getSort().equals(system.getCSort())) {
-                Util.writeLine(outputWriter, "Skipping variable " + inductionVar.toString() + ", sort does not match sort of C");
-                return false;
+        // Check whether induction variable sort is the same as the sort of C
+        if (!inductionVar.getSort().equals(system.getCSort())) {
+            Logger.i("Skipping induction variable " + inductionVar.toString() + ", invalid sort");
+            Util.writeLine(outputWriter, "Skipping variable " + inductionVar.toString() + ", sort does not match sort of C");
+            return false;
+        }
+
+        // For each function in C
+        for (Function function : system.getC()) {
+
+            List<Term> newConstants = new ArrayList<>();
+            List<Equation> hypotheses = new ArrayList<>();
+
+            generateHypotheses(function, inductionVar, system, newConstants, hypotheses);
+
+            // Create term f(a1, ..., an)
+            FunctionTerm inductionTerm = new FunctionTerm(function, newConstants);
+
+            Equation newGoal = goal.substitute(inductionVar, inductionTerm);
+
+            Util.writeLine(outputWriter, "To prove: " + newGoal.toString());
+
+            if (hypotheses.size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                for (Equation hypothesis : hypotheses) {
+                    sb.append(hypothesis.toString());
+                    sb.append(" ");
+                }
+                Util.writeLine(outputWriter, "Hypotheses: " + sb.toString());
             }
 
-            if (!(inductionVar.getName().equals("x"))) {
-                //continue;//TODO: remove
+            // Do BFS for convertibility
+            Set<Term> leftTerms = new HashSet<>();
+            Set<Term> rightTerms = new HashSet<>();
+
+            leftTerms.add(newGoal.getLeft());
+            rightTerms.add(newGoal.getRight());
+
+            Set<Equation> allEquations = new HashSet<>(system.getEquations());
+            allEquations.addAll(hypotheses);
+
+            Map<Term, Term> leftSteps = new ConcurrentHashMap<>();
+            Map<Term, Term> rightSteps = new ConcurrentHashMap<>();
+
+            int numThreads = 5;
+            int numEquationsPerThread = (int) Math.floor(allEquations.size() / (double) numThreads);
+            int numEquationsLastThread = allEquations.size() - ((numThreads - 1) * numEquationsPerThread);
+            int[] numEquations = new int[numThreads];
+            for (int i = 0; i < numThreads - 1; i++) {
+                numEquations[i] = numEquationsPerThread;
+            }
+            numEquations[numThreads - 1] = numEquationsLastThread;
+
+            // TODO: threadTerms ?
+            ArrayList<Set<Equation>> threadEquations = new ArrayList<>(numThreads);
+            for (int i = 0; i < numThreads; i++) {
+                threadEquations.add(new HashSet<>());
             }
 
-            // For each function in C
-            for (Function function : system.getC()) {
+            Iterator<Equation> it = allEquations.iterator();
+            for (int i = 0; i < numThreads; i++) {
+                for (int j = 0; j < numEquations[i]; j++) {
+                    threadEquations.get(i).add(it.next());
+                }
+            }
 
-                List<Term> newConstants = new ArrayList<>();
-                List<Equation> hypotheses = new ArrayList<>();
+            int searchDepth = 0;
+            Term convergence = null;
+            while (convergence == null && searchDepth < searchSteps) {
+                Logger.i("Rewriting step " + searchDepth + ", using " + numThreads + " threads");
 
-                generateHypotheses(function, inductionVar, system, newConstants, hypotheses);
+                RewriteThread[] rewriteThreads = new RewriteThread[numThreads];
+                Thread[] threads = new Thread[numThreads];
+                for (int i = 0; i < numThreads; i++) {
+                    rewriteThreads[i] = new RewriteThread(i, leftTerms, rightTerms, threadEquations.get(i), leftSteps, rightSteps);
+                    threads[i] = new Thread(rewriteThreads[i]);
+                    threads[i].start();
+                }
 
-                // Create term f(a1, ..., an)
-                FunctionTerm inductionTerm = new FunctionTerm(function, newConstants);
-
-                Equation newGoal = goal.substitute(inductionVar, inductionTerm);
-
-                Util.writeLine(outputWriter, "To prove: " + newGoal.toString());
-
-                if (hypotheses.size() > 0) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Equation hypothesis : hypotheses) {
-                        sb.append(hypothesis.toString());
-                        sb.append(" ");
+                for (int i = 0; i < numThreads; i++) {
+                    try {
+                        threads[i].join();
+                    } catch (InterruptedException e) {
+                        Logger.e("Thread " + i + " interrupted " + e.getMessage());
                     }
-                    Util.writeLine(outputWriter, "Hypotheses: " + sb.toString());
                 }
 
-                // Do BFS for convertibility
-                Set<Term> leftTerms = new HashSet<>();
-                Set<Term> rightTerms = new HashSet<>();
-
-                leftTerms.add(newGoal.getLeft());
-                rightTerms.add(newGoal.getRight());
-
-                Set<Equation> allEquations = new HashSet<>(system.getEquations());
-                allEquations.addAll(hypotheses);
-
-                Map<Term, Term> leftSteps = new HashMap<>();
-                Map<Term, Term> rightSteps = new HashMap<>();
-
-                int searchDepth = 0;
-                Term convergence = null;
-                while (convergence == null && searchDepth < searchSteps) {
-                    leftTerms.addAll(rewriteAll(leftTerms, allEquations, leftSteps));
-                    rightTerms.addAll(rewriteAll(rightTerms, allEquations, rightSteps));
-                    searchDepth++;
-                    convergence = checkConvergence(leftTerms, rightTerms);
+                for (int i = 0; i < numThreads; i++) {
+                    leftTerms.addAll(rewriteThreads[i].getResultLeft());
+                    rightTerms.addAll(rewriteThreads[i].getResultRight());
                 }
-
-                //Term convergence = checkConvergence(leftTerms, rightTerms);
-                if (convergence == null) {
-                    Logger.w("Convergence null");
-
-                    // TODO: for now only double induction for s
-                    if (function.getInputSorts().size() != 1) {
-                        Logger.w("Skipping double induction");
-                        Util.writeLine(outputWriter, "Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
-                        return false;
-                    }
-
-                    Util.writeLine(outputWriter, "Trying double induction");
-
-                    // Create term f
-                    List<Term> subterms = new ArrayList<>();
-                    subterms.add(inductionVar);
-                    Term newInductionTerm = new FunctionTerm(function, subterms);
-
-                    Equation newGoalll = system.getGoal().substitute(inductionVar, newInductionTerm);
-                    EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);
-                    return induction(newSystem, outputWriter, searchSteps, recursionDepth + 1, inductionVar);
-                } else {
-                    List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
-                    String conversionString = getConversionString(conversion);
-                    Util.writeLine(outputWriter, conversionString);
-                }
+                searchDepth++;
+                convergence = checkConvergence(leftTerms, rightTerms);
             }
-        //}
+
+            //Term convergence = checkConvergence(leftTerms, rightTerms);
+            if (convergence == null) {
+                Logger.w("Convergence null");
+
+                // TODO: for now only double induction for s
+                if (function.getInputSorts().size() != 1) {
+                    Logger.w("Skipping double induction");
+                    Util.writeLine(outputWriter, "Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
+                    return false;
+                }
+
+                Util.writeLine(outputWriter, "Trying double induction");
+
+                // Create term f
+                List<Term> subterms = new ArrayList<>();
+                subterms.add(inductionVar);
+                Term newInductionTerm = new FunctionTerm(function, subterms);
+
+                Equation newGoalll = system.getGoal().substitute(inductionVar, newInductionTerm);
+                EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);
+                return induction(newSystem, outputWriter, searchSteps, recursionDepth + 1, inductionVar);
+            } else {
+                List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
+                String conversionString = getConversionString(conversion);
+                Util.writeLine(outputWriter, conversionString);
+            }
+        }
         return true;
     }
 
@@ -248,7 +289,7 @@ public class Prover {
      *
      * Returns a set of terms created as a result of this procedure
      */
-    private static Set<Term> rewriteAll(Set<Term> terms, Set<Equation> allEquations, Map<Term, Term> steps) {
+    public static Set<Term> rewriteAll(Set<Term> terms, Set<Equation> allEquations, Map<Term, Term> steps) {
         Set<Term> toAdd = new HashSet<>();
 
         for (Term term : terms) {
@@ -319,11 +360,11 @@ public class Prover {
         }
 
         if (!intersection.isEmpty()) {
-            Logger.i("Found intersection");
+            Logger.i("Found conversion");
         }
 
         if (intersection.size() > 1) {
-            Logger.w("Intersection size > 1");
+            Logger.w("Intersection size > 1, choosing the first term");
         }
 
         return intersection.isEmpty() ? null : intersection.iterator().next();

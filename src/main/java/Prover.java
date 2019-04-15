@@ -87,25 +87,24 @@ public class Prover {
             Map<Term, Term> leftSteps = new ConcurrentHashMap<>();
             Map<Term, Term> rightSteps = new ConcurrentHashMap<>();
 
-            int numThreads = 5;
-            int numEquationsPerThread = (int) Math.floor(allEquations.size() / (double) numThreads);
-            int numEquationsLastThread = allEquations.size() - ((numThreads - 1) * numEquationsPerThread);
+            // Maximum of 4 threads
+            int numThreads = Math.min(4, allEquations.size());
+
+            // Calculate the number of equations each thread should get
             int[] numEquations = new int[numThreads];
-            for (int i = 0; i < numThreads - 1; i++) {
-                numEquations[i] = numEquationsPerThread;
+            for (int i = 0; i < allEquations.size(); i++) {
+                numEquations[i % numThreads]++;
             }
-            numEquations[numThreads - 1] = numEquationsLastThread;
 
-            // TODO: threadTerms ?
+            // Create the set of equations for each thread
             ArrayList<Set<Equation>> threadEquations = new ArrayList<>(numThreads);
-            for (int i = 0; i < numThreads; i++) {
-                threadEquations.add(new HashSet<>());
-            }
-
             Iterator<Equation> it = allEquations.iterator();
             for (int i = 0; i < numThreads; i++) {
+                Set<Equation> tmp = new HashSet<>();
+                threadEquations.add(tmp);
+
                 for (int j = 0; j < numEquations[i]; j++) {
-                    threadEquations.get(i).add(it.next());
+                    tmp.add(it.next());
                 }
             }
 
@@ -347,11 +346,11 @@ public class Prover {
         Logger.d("Checking convergence");
         Logger.d("Left:");
         for (Term t : left) {
-            Logger.d(t.toString());
+            // Logger.d(t.toString());
         }
         Logger.d("Right:");
         for (Term t : right) {
-            Logger.d(t.toString());
+            //  Logger.d(t.toString());
         }
 
         Logger.d("Intersection:");

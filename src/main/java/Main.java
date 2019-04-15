@@ -18,63 +18,57 @@ public class Main {
             // parse the command line arguments
             CommandLine commandLine = parser.parse( options, args );
 
-            // Probably unnecessary, parseError is thrown if this is the case since i is marked as required
-            //if (commandLine.hasOption("i")) {
-                String fileName = commandLine.getOptionValue("i");
+            String fileName = commandLine.getOptionValue("i");
+            // Read file
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                List<String> input = new ArrayList<>();
 
-                // Read file
-                try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-                    List<String> input = new ArrayList<>();
-
-                    String line = br.readLine();
-                    while (line != null) {
-                        input.add(line);
-                        line = br.readLine();
-                    }
-
-                    EquationSystem system = null;
-                    try {
-                        system = InputParser.parseSystem(input);
-                    } catch(Exception e) {
-                        Logger.e("Exception while parsing, quitting program");
-                    }
-                    system.print();
-
-                    // If no output file specified, use System.out
-                    OutputStream output;
-                    if (!commandLine.hasOption("o")) {
-                        output = System.out;
-                    } else {
-                        // Otherwise use the specified file
-                        String pathToFile = commandLine.getOptionValue("o");
-                        File outputFile = new File(pathToFile);
-
-                        if (outputFile.exists() && !outputFile.isFile()) {
-                            Logger.e("Specified output is not a file");
-                            throw new IllegalArgumentException("Output must be a file");
-                        }
-
-                        output = new FileOutputStream(outputFile);
-                    }
-
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-                    int searchDepth = 5;
-                    if (commandLine.hasOption("d")) {
-                        searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
-                    }
-
-                    try {
-                        Prover.induction(system, writer, searchDepth, 0, null);
-                    } catch (IOException e) {
-                        Logger.e("IOException: " + e.getMessage());
-                    }
-                    writer.flush();
-                    writer.close();
+                String line = br.readLine();
+                while (line != null) {
+                    input.add(line);
+                    line = br.readLine();
                 }
-            //} else {
-                // TODO: print usage instructions
-            //}
+
+                EquationSystem system = null;
+                try {
+                    system = InputParser.parseSystem(input);
+                } catch(Exception e) {
+                    Logger.e("Exception while parsing, quitting program");
+                }
+                system.print();
+
+                // If no output file specified, use System.out
+                OutputStream output;
+                if (!commandLine.hasOption("o")) {
+                    output = System.out;
+                } else {
+                    // Otherwise use the specified file
+                    String pathToFile = commandLine.getOptionValue("o");
+                    File outputFile = new File(pathToFile);
+
+                    if (outputFile.exists() && !outputFile.isFile()) {
+                        Logger.e("Specified output is not a file");
+                        throw new IllegalArgumentException("Output must be a file");
+                    }
+
+                    output = new FileOutputStream(outputFile);
+                }
+
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+
+                int searchDepth = 5;
+                if (commandLine.hasOption("d")) {
+                    searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
+                }
+
+                try {
+                    Prover.induction(system, writer, searchDepth, 0, null);
+                } catch (IOException e) {
+                    Logger.e("IOException: " + e.getMessage());
+                }
+                writer.flush();
+                writer.close();
+            }
         } catch(ParseException exp) {
             Logger.e("Parsing failed.  Reason: " + exp.getMessage());
         } catch (IOException e) {

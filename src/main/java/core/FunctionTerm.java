@@ -1,3 +1,5 @@
+package core;
+
 import java.util.*;
 
 /**
@@ -7,18 +9,18 @@ import java.util.*;
  * @author Stan Roelofs
  * @version 1.0
  */
-class FunctionTerm extends Term {
+public class FunctionTerm extends Term {
     private List<Term> subterms;
     private Function function;
 
     /**
-     * Creates a new FunctionTerm from a constant
+     * Creates a new core.FunctionTerm from a constant
      * @param function A function with no inputs (a constant)
      * @throws IllegalArgumentException if {@code function} is not a constant or its sort is null
      * @see Term#Term(Sort)
      * @see Function
      */
-    FunctionTerm(Function function) {
+    public FunctionTerm(Function function) {
         super(function.getOutputSort());
 
         if (function.getInputSorts().size() != 0) {
@@ -29,7 +31,7 @@ class FunctionTerm extends Term {
     }
 
     /**
-     * Creates a new FunctionTerm from a function and a list of arguments
+     * Creates a new core.FunctionTerm from a function and a list of arguments
      * @param function A function
      * @param subTerms A list of subterms that are used as arguments for {@code function}
      * @throws IllegalArgumentException if the sort of {@code function} is null,
@@ -41,7 +43,7 @@ class FunctionTerm extends Term {
      * @see Term
      * @see Function
      */
-    FunctionTerm(Function function, List<Term> subTerms) {
+    public FunctionTerm(Function function, List<Term> subTerms) {
         super(function.getOutputSort());
         this.function = function;
         this.subterms = new ArrayList<>();
@@ -63,7 +65,7 @@ class FunctionTerm extends Term {
      * Returns the function used to construct this term
      * @return this.term
      */
-    Function getFunction() {
+    public Function getFunction() {
         return this.function;
     }
 
@@ -71,7 +73,7 @@ class FunctionTerm extends Term {
      * Returns the arguments used to construct this term using this.function
      * @return this.subterms
      */
-    List<Term> getSubTerms() {
+    public List<Term> getSubTerms() {
         return this.subterms;
     }
 
@@ -98,7 +100,7 @@ class FunctionTerm extends Term {
         } else if (term instanceof FunctionTerm) {
             FunctionTerm fterm = (FunctionTerm) term;
 
-            // Function must be equal
+            // core.Function must be equal
             if (this.function.equals(fterm.getFunction())) {
                 // All subterms of fterm must be an instance of all subterms of this.subterms
 

@@ -1,3 +1,4 @@
+import core.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -63,6 +64,6 @@ public class ProverTests {
         Equation goal = new Equation(hoi, var);
 
         EquationSystem lol = new EquationSystem(eqs, Sigma, C, goal);
-        //Prover.induction(lol, writer);
+        //core.Prover.induction(lol, writer);
     }
 }

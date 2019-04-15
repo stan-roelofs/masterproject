@@ -1,3 +1,6 @@
+package cli;
+
+import core.*;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -32,7 +35,7 @@ public class Main {
                 EquationSystem system = null;
                 try {
                     system = InputParser.parseSystem(input);
-                } catch(Exception e) {
+                } catch(ParserException e) {
                     Logger.e("Exception while parsing, quitting program");
                 }
                 system.print();

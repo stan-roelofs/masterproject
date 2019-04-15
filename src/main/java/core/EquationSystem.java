@@ -1,3 +1,5 @@
+package core;
+
 import java.util.Collection;
 
 /**
@@ -7,13 +9,13 @@ import java.util.Collection;
  * @author Stan Roelofs
  * @version 1.0
  */
-class EquationSystem {
+public class EquationSystem {
     private Collection<Equation> equations;
     private Collection<Function> sigma;
     private Collection<Function> C;
     private Equation goal;
 
-    EquationSystem(Collection<Equation> eq, Collection<Function> sigma, Collection<Function> C, Equation goal) {
+    public EquationSystem(Collection<Equation> eq, Collection<Function> sigma, Collection<Function> C, Equation goal) {
         if (eq == null || sigma == null || C == null || goal == null) {
             throw new IllegalArgumentException("Eq, Sigma, C, Goal must not be null");
         }
@@ -67,7 +69,7 @@ class EquationSystem {
         return this.C.iterator().next().getOutputSort();
     }
 
-    void print() {
+    public void print() {
         Logger.i("Sigma:");
         for (Function f : sigma) {
             Logger.i(f.toString());

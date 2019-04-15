@@ -1,3 +1,4 @@
+import core.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -190,7 +191,7 @@ public class FunctionTermTests {
     }
 
     /**
-     * If substitution contains a variable and applySubstitution is called on a FunctionTerm that
+     * If substitution contains a variable and applySubstitution is called on a core.FunctionTerm that
      * contains this variable in a subterm we expect the variable to be substituted
      */
     @Test

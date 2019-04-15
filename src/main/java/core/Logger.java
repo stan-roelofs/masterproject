@@ -1,3 +1,5 @@
+package core;
+
 /**
  * A simple logging class.
  * A logging call is only logged if the current logging level is greater than or equal to the level of the call

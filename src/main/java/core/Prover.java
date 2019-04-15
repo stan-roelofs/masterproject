@@ -1,10 +1,12 @@
+package core;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Class with static functions that can prove an EquationSystem
+ * Class with static functions that can prove an core.EquationSystem
  *
  * @author Stan Roelofs
  * @version 1.0
@@ -22,7 +24,7 @@ public class Prover {
         }
 
         Equation goal = system.getGoal();
-        //Util.writeLine(outputWriter, "Goal: " + goal.toString());
+        //core.Util.writeLine(outputWriter, "Goal: " + goal.toString());
 
         // Try induction for each variable in function
         Set<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());
@@ -137,12 +139,12 @@ public class Prover {
                 convergence = checkConvergence(leftTerms, rightTerms);
             }
 
-            //Term convergence = checkConvergence(leftTerms, rightTerms);
+            //core.Term convergence = checkConvergence(leftTerms, rightTerms);
             if (convergence == null) {
                 Logger.w("Convergence null");
 
                 // TODO: for now only double induction for s
-                if (function.getInputSorts().size() != 1) {
+                if (!function.getName().equals("s") || function.getInputSorts().size() != 1) {
                     Logger.w("Skipping double induction");
                     Util.writeLine(outputWriter, "Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
                     return false;
@@ -346,11 +348,11 @@ public class Prover {
         Logger.d("Checking convergence");
         Logger.d("Left:");
         for (Term t : left) {
-            // Logger.d(t.toString());
+            // core.Logger.d(t.toString());
         }
         Logger.d("Right:");
         for (Term t : right) {
-            //  Logger.d(t.toString());
+            //  core.Logger.d(t.toString());
         }
 
         Logger.d("Intersection:");

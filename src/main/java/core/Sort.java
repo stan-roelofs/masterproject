@@ -1,3 +1,5 @@
+package core;
+
 import java.util.Objects;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Objects;
  * @author Stan Roelofs
  * @version 1.0
  */
-class Sort {
+public class Sort {
 
     private String name;
 
@@ -16,7 +18,7 @@ class Sort {
      * @param name The name of the sort
      * @throws IllegalArgumentException if name is null
      */
-    Sort(String name) {
+    public Sort(String name) {
         if (name == null) {
             throw new IllegalArgumentException("name must not be null");
         }
@@ -27,7 +29,7 @@ class Sort {
      * Returns the name of this sort
      * @return this.name
      */
-    String getName() {
+    public String getName() {
         return this.name;
     }
 

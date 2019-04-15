@@ -1,3 +1,5 @@
+package core;
+
 import java.util.Objects;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Objects;
  * @author Stan Roelofs
  * @version 1.0
  */
-class Equation {
+public class Equation {
     private Term left;
     private Term right;
 
@@ -18,12 +20,12 @@ class Equation {
      * @throws IllegalArgumentException if one of the parameters is null or their sorts do not match
      * @see Term
      */
-    Equation(Term l, Term r) {
+    public Equation(Term l, Term r) {
         if (l == null || r == null) {
             throw new IllegalArgumentException("l or r must not be null");
         }
         if (!(l.sort.equals(r.sort))) {
-            throw new IllegalArgumentException("Sort of the two terms should be the same");
+            throw new IllegalArgumentException("core.Sort of the two terms should be the same");
         }
 
         this.left = l;
@@ -34,7 +36,7 @@ class Equation {
      * Returns left term of this equation
      * @return this.left
      */
-    Term getLeft() {
+    public Term getLeft() {
         return this.left;
     }
 
@@ -42,7 +44,7 @@ class Equation {
      * Returns right term of this equation
      * @return this.right
      */
-    Term getRight() {
+    public Term getRight() {
         return this.right;
     }
 
@@ -51,7 +53,7 @@ class Equation {
      * @return this.left.sort
      * @see Sort
      */
-    Sort getSort() {
+    public Sort getSort() {
         return left.sort;
     }
 
@@ -59,12 +61,12 @@ class Equation {
      * Substitutes each occurrence of {@code var} in this equation by the term {@code sub}
      * @param term The variable to be substituted
      * @param sub The term that replaces the variable
-     * @return A new Equation with each occurrence of {@code var} replaced by {@code sub}
+     * @return A new core.Equation with each occurrence of {@code var} replaced by {@code sub}
      * @throws IllegalArgumentException if any of the parameters is null
      * @see Variable
      * @see Term
      */
-    Equation substitute(Term term, Term sub) {
+    public Equation substitute(Term term, Term sub) {
         if (term == null || sub == null) {
             throw new IllegalArgumentException("var and sub must not be null");
         }

@@ -1,3 +1,5 @@
+package core;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +11,7 @@ import java.util.Objects;
  * @author Stan Roelofs
  * @version 1.0
  */
-class Function {
+public class Function {
     private List<Sort> inputSorts;
     private Sort outputSort;
     private String name;
@@ -20,12 +22,12 @@ class Function {
      * @param name The name of the function
      * @throws IllegalArgumentException If {@code name} is empty or null, or {@code sort} is null
      */
-    Function(Sort sort, String name) {
+    public Function(Sort sort, String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name should not be empty or null");
         }
         if (sort == null) {
-            throw new IllegalArgumentException("Sort must not be null");
+            throw new IllegalArgumentException("core.Sort must not be null");
         }
 
         this.name = name;
@@ -39,20 +41,20 @@ class Function {
      * @param input A list of input sorts
      * @param output An output sort
      */
-    Function(String name, List<Sort> input, Sort output) {
+    public Function(String name, List<Sort> input, Sort output) {
         this(output, name);
         this.inputSorts.addAll(input);
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    Sort getOutputSort() {
+    public Sort getOutputSort() {
         return this.outputSort;
     }
 
-    List<Sort> getInputSorts() {
+    public List<Sort> getInputSorts() {
         return this.inputSorts;
     }
 

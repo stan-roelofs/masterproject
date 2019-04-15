@@ -1,13 +1,15 @@
+package core;
+
 import java.util.*;
 
 /**
  * Class that represents a variable
- * A variable is a Term and additionally has a name
+ * A variable is a core.Term and additionally has a name
  *
  * @author Stan Roelofs
  * @version 1.0
  */
-class Variable extends Term {
+public class Variable extends Term {
     private String name;
 
     /**
@@ -18,7 +20,7 @@ class Variable extends Term {
      * @see Sort
      * @see Term#Term(Sort)
      */
-    Variable(Sort sort, String name) {
+    public Variable(Sort sort, String name) {
         super(sort);
 
         if (name.isEmpty()) {
@@ -31,7 +33,7 @@ class Variable extends Term {
      * Returns the name of this variable
      * @return this.name
      */
-    String getName() {
+    public String getName() {
         return name;
     }
 

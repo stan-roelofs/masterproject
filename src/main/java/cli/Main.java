@@ -57,25 +57,21 @@ public class Main {
                     output = new FileOutputStream(outputFile);
                 }
 
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+                BufferedOutputWriter writer = new BufferedOutputWriter(new OutputStreamWriter(output));
 
-                int searchDepth = 5;
+                int searchDepth = 8;
                 if (commandLine.hasOption("d")) {
                     searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
                 }
 
-                try {
-                    Prover.induction(system, writer, searchDepth, 0, null);
-                } catch (IOException e) {
-                    Logger.e("IOException: " + e.getMessage());
-                }
-                writer.flush();
+                Prover.induction(system, writer, searchDepth, 0, null);
                 writer.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } catch(ParseException exp) {
             Logger.e("Parsing failed.  Reason: " + exp.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

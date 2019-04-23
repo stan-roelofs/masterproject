@@ -16,10 +16,10 @@ public class Prover {
     public static String constantName = "a";
     public static int maxDepth = 2;
 
-    public static boolean induction(EquationSystem system, BufferedWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
+    public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {
             Logger.i("Reached maximum recursion depth of " + maxDepth + ", returning false");
-            Util.writeLine(outputWriter, "Maximum recursion depth " + maxDepth + " reached, induction on " + inductionVar.toString() + " failed.");
+            outputWriter.writeLine("Maximum recursion depth " + maxDepth + " reached, induction on " + inductionVar.toString() + " failed.");
             return false;
         }
 
@@ -34,21 +34,21 @@ public class Prover {
         if (inductionVar == null) {
             for (Variable variable : allVariables) {
                 Logger.i("Induction on " + variable.toString());
-                Util.writeLine(outputWriter, "Trying induction variable: " + variable.toString());
+                outputWriter.writeLine("Trying induction variable: " + variable.toString());
                 if (induction(system, outputWriter, searchSteps, recursionDepth, variable)) {
                     return true;
                 }
             }
 
             Logger.i("Induction on all variables failed, returning false");
-            Util.writeLine(outputWriter, "Induction on all variables failed.");
+            outputWriter.writeLine("Induction on all variables failed.");
             return false;
         }
 
         // Check whether induction variable sort is the same as the sort of C
         if (!inductionVar.getSort().equals(system.getCSort())) {
             Logger.i("Skipping induction variable " + inductionVar.toString() + ", invalid sort");
-            Util.writeLine(outputWriter, "Skipping variable " + inductionVar.toString() + ", sort does not match sort of C");
+            outputWriter.writeLine("Skipping variable " + inductionVar.toString() + ", sort does not match sort of C");
             return false;
         }
 
@@ -65,7 +65,7 @@ public class Prover {
 
             Equation newGoal = goal.substitute(inductionVar, inductionTerm);
 
-            Util.writeLine(outputWriter, "To prove: " + newGoal.toString());
+            outputWriter.writeLine("To prove: " + newGoal.toString());
 
             if (hypotheses.size() > 0) {
                 StringBuilder sb = new StringBuilder();
@@ -73,7 +73,7 @@ public class Prover {
                     sb.append(hypothesis.toString());
                     sb.append(" ");
                 }
-                Util.writeLine(outputWriter, "Hypotheses: " + sb.toString());
+                outputWriter.writeLine("Hypotheses: " + sb.toString());
             }
 
             // Do BFS for convertibility
@@ -146,11 +146,11 @@ public class Prover {
                 // TODO: for now only double induction for s
                 if (!function.getName().equals("s") || function.getInputSorts().size() != 1) {
                     Logger.w("Skipping double induction");
-                    Util.writeLine(outputWriter, "Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
+                    outputWriter.writeLine("Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
                     return false;
                 }
 
-                Util.writeLine(outputWriter, "Trying double induction");
+                outputWriter.writeLine("Trying double induction");
 
                 // Create term f
                 List<Term> subterms = new ArrayList<>();
@@ -163,7 +163,7 @@ public class Prover {
             } else {
                 List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
                 String conversionString = getConversionString(conversion);
-                Util.writeLine(outputWriter, conversionString);
+                outputWriter.writeLine(conversionString);
             }
         }
         return true;
@@ -346,14 +346,19 @@ public class Prover {
         intersection.retainAll(right);
 
         Logger.d("Checking convergence");
+
+
         Logger.d("Left:");
         for (Term t : left) {
-            // core.Logger.d(t.toString());
+            if (t.toString().contains("head(zip(inv(B), inv(B)))")) {
+                Logger.e(t.toString());
+            }
         }
+        /*
         Logger.d("Right:");
         for (Term t : right) {
             //  core.Logger.d(t.toString());
-        }
+        }*/
 
         Logger.d("Intersection:");
         for (Term t : intersection) {

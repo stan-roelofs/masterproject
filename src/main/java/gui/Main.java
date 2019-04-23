@@ -30,25 +30,27 @@ class GUI extends JFrame {
 
 class ProofPanel extends JPanel {
 
-    private TextArea inputArea;
-    private TextArea outputArea;
+    private JTextArea inputArea;
+    private JTextArea outputArea;
     private JButton proofButton;
     private JTextField searchSteps;
 
     ProofPanel() {
         this.setLayout(new GridLayout(0, 2));
 
-        this.inputArea = new TextArea();
-        this.add(inputArea);
+        inputArea = new JTextArea();
+        JScrollPane sp = new JScrollPane(inputArea);
+        this.add(sp);
 
-        this.outputArea = new TextArea();
-        this.add(outputArea);
+        outputArea = new JTextArea();
+        JScrollPane sp2 = new JScrollPane(outputArea);
+        this.add(sp2);
 
-        this.searchSteps = new JTextField();
-        this.add(searchSteps);
+        searchSteps = new JTextField();
+        add(searchSteps);
 
-        this.proofButton = new JButton("Start");
-        this.proofButton.addActionListener(actionEvent -> {
+        proofButton = new JButton("Start");
+        proofButton.addActionListener(actionEvent -> {
 
             String[] split = inputArea.getText().split("\\n");
             List<String> input = new ArrayList<>(Arrays.asList(split));
@@ -61,24 +63,15 @@ class ProofPanel extends JPanel {
             }
             system.print();
 
-            // If no output file specified, use System.out
-            OutputStream output = System.out;
-
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            int searchDepth = Integer.parseInt(this.searchSteps.getText());
+            outputArea.setText("");
+            TextAreaOutputWriter writer = new TextAreaOutputWriter(outputArea);
+            int searchDepth = Integer.parseInt(searchSteps.getText());
 
             try {
                 Prover.induction(system, writer, searchDepth, 0, null);
-            } catch (IOException e) {
-                Logger.e("IOException: " + e.getMessage());
-            }
-
-            try {
-                writer.flush();
                 writer.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.e("IOException: " + e.getMessage());
             }
         });
         this.add(proofButton);

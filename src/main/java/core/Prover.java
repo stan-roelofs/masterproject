@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Class with static functions that can prove an core.EquationSystem
+ * Class with static functions that can prove an EquationSystem
  *
  * @author Stan Roelofs
  * @version 1.0

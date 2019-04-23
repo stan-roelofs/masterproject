@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Class that represents a variable
- * A variable is a core.Term and additionally has a name
+ * A variable is a Term and additionally has a name
  *
  * @author Stan Roelofs
  * @version 1.0

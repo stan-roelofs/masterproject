@@ -27,7 +27,7 @@ public class Function {
             throw new IllegalArgumentException("Name should not be empty or null");
         }
         if (sort == null) {
-            throw new IllegalArgumentException("core.Sort must not be null");
+            throw new IllegalArgumentException("Sort must not be null");
         }
 
         this.name = name;

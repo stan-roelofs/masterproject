@@ -3,7 +3,7 @@ package core;
 import java.util.*;
 
 /**
- * core.InputParser parses text input and returns a set of equations, functions, and a goal
+ * Parses text input and returns a set of equations, functions, and a goal
  *
  * @author Stan Roelofs
  * @version 1.0
@@ -78,10 +78,10 @@ public class InputParser {
     }
 
     /**
-     * Takes a string as input and constructs a core.Function object from this input
+     * Takes a string as input and constructs a Function object from this input
      *
      * @param line the input string
-     * @return A core.Function object based on the contents of the input string
+     * @return A Function object based on the contents of the input string
      * @throws IllegalArgumentException if {@code line} is null or is missing information
      * @see Function
      */
@@ -93,7 +93,7 @@ public class InputParser {
         String[] split = line.split(" ");
 
         if (split.length <= 1) {
-            throw new IllegalArgumentException("core.Function information missing: expected <name> <sort>* <sort>");
+            throw new IllegalArgumentException("Function information missing: expected <name> <sort>* <sort>");
         }
 
         String name = split[0];
@@ -127,10 +127,10 @@ public class InputParser {
     }
 
     /**
-     * Takes a string and a set of functions as input and constructs an core.Equation object from this input
+     * Takes a string and a set of functions as input and constructs an Equation object from this input
      * @param functions A set of functions that are necessary to recognize function symbols in the input string
      * @param line The input string
-     * @return An core.Equation object based on the contents of the input string and functions
+     * @return An Equation object based on the contents of the input string and functions
      * @throws IllegalArgumentException if {@code functions} is empty or null, {@code line} is null,
      *                                  {@code line} contains less or more than one "=", or {@code line}
      *                                  is empty left or right of "="
@@ -145,7 +145,7 @@ public class InputParser {
 
         String[] split = line.split("=");
         if (split.length > 2) {
-            throw new IllegalArgumentException("core.Equation contains more than one '='");
+            throw new IllegalArgumentException("Equation contains more than one '='");
         }
 
         String leftString = split[0];
@@ -172,7 +172,7 @@ public class InputParser {
 
     // TODO: if there are multiple functions with the same name but different sorts this doesnt work properly
     /**
-     * Takes a string and a set of functions as input and constructs a core.Term object from this input
+     * Takes a string and a set of functions as input and constructs a Term object from this input
      * @param functions A set of functions that are necessary to recognize function symbols in the input string
      * @param line The input string
      * @param varSort The expected sort of the variable if {@code line} represents a variable
@@ -222,7 +222,7 @@ public class InputParser {
             if (function.equals(f.getName())) {
                 int numArguments = f.getInputSorts().size();
                 if (numArguments == 0) {
-                    Logger.d("Parsed core.FunctionTerm " + f.toString());
+                    Logger.d("Parsed FunctionTerm " + f.toString());
                     return new FunctionTerm(f);
                 } else {
                     List<Term> subtermsList = new ArrayList<>();
@@ -257,19 +257,19 @@ public class InputParser {
                     }
 
                     FunctionTerm ft = new FunctionTerm(f, subtermsList);
-                    Logger.d("Parsed core.FunctionTerm " + ft.toString());
+                    Logger.d("Parsed FunctionTerm " + ft.toString());
                     return ft;
                 }
             }
         }
 
         if (varSort == null) {
-            throw new NoSortException("core.Term is not a function and no sort is given for variable");
+            throw new NoSortException("Term is not a function and no sort is given for variable");
         }
 
         // If none of the functions match, the symbol has to be a variable
         Variable v = new Variable(varSort, function);
-        Logger.d("Parsed core.Variable " + v.toString());
+        Logger.d("Parsed Variable " + v.toString());
         return v;
     }
 

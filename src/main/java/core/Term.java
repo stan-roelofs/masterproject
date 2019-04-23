@@ -20,7 +20,7 @@ public abstract class Term {
      */
     public Term(Sort sort) {
         if (sort == null) {
-            throw new IllegalArgumentException("core.Sort must not be null");
+            throw new IllegalArgumentException("Sort must not be null");
         }
         this.sort = sort;
     }
@@ -60,7 +60,7 @@ public abstract class Term {
      * Substitutes each occurrence of {@code term} in this term by the term {@code substitute}
      * @param term The term to be substituted
      * @param substitute The term that replaces the old term
-     * @return A new core.Term with each occurrence of {@code term} replaced by {@code substitute}
+     * @return A new Term with each occurrence of {@code term} replaced by {@code substitute}
      */
     public abstract Term substitute(Term term, Term substitute);
 

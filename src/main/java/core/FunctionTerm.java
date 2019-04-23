@@ -14,7 +14,7 @@ public class FunctionTerm extends Term {
     private Function function;
 
     /**
-     * Creates a new core.FunctionTerm from a constant
+     * Creates a new FunctionTerm from a constant
      * @param function A function with no inputs (a constant)
      * @throws IllegalArgumentException if {@code function} is not a constant or its sort is null
      * @see Term#Term(Sort)
@@ -31,7 +31,7 @@ public class FunctionTerm extends Term {
     }
 
     /**
-     * Creates a new core.FunctionTerm from a function and a list of arguments
+     * Creates a new FunctionTerm from a function and a list of arguments
      * @param function A function
      * @param subTerms A list of subterms that are used as arguments for {@code function}
      * @throws IllegalArgumentException if the sort of {@code function} is null,
@@ -100,7 +100,7 @@ public class FunctionTerm extends Term {
         } else if (term instanceof FunctionTerm) {
             FunctionTerm fterm = (FunctionTerm) term;
 
-            // core.Function must be equal
+            // Function must be equal
             if (this.function.equals(fterm.getFunction())) {
                 // All subterms of fterm must be an instance of all subterms of this.subterms
 

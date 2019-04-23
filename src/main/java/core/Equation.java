@@ -25,7 +25,7 @@ public class Equation {
             throw new IllegalArgumentException("l or r must not be null");
         }
         if (!(l.sort.equals(r.sort))) {
-            throw new IllegalArgumentException("core.Sort of the two terms should be the same");
+            throw new IllegalArgumentException("Sort of the two terms should be the same");
         }
 
         this.left = l;
@@ -61,7 +61,7 @@ public class Equation {
      * Substitutes each occurrence of {@code var} in this equation by the term {@code sub}
      * @param term The variable to be substituted
      * @param sub The term that replaces the variable
-     * @return A new core.Equation with each occurrence of {@code var} replaced by {@code sub}
+     * @return A new Equation with each occurrence of {@code var} replaced by {@code sub}
      * @throws IllegalArgumentException if any of the parameters is null
      * @see Variable
      * @see Term

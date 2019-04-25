@@ -1,0 +1,19 @@
+// Functions
+0 nat
+s nat nat
+d nat nat
+h nat nat
+
+// Equations
+h(0) = 0
+h(s(0)) = 0
+h(s(s(x))) = s(h(x))
+d(0) = 0
+d(s(x)) = s(s(d(x)))
+
+// C
+0
+s
+
+// Goal
+h(d(x)) = x

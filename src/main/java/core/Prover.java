@@ -15,6 +15,8 @@ public class Prover {
 
     public static String constantName = "a";
     public static int maxDepth = 2;
+    private static boolean rewriteRight = true;
+    private static boolean rewriteLeft = false;
 
     public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {
@@ -297,20 +299,25 @@ public class Prover {
             for (Equation eq : allEquations) {
                 for (Term subterm : term.getAllSubTerms()) {
                     // Try left
-                    Map<Variable, Term> sub = eq.getLeft().getSubstitution(subterm, new HashMap<>());
+                    if (rewriteRight) {
+                        // Try left
+                        Map<Variable, Term> sub = eq.getLeft().getSubstitution(subterm, new HashMap<>());
 
-                    if (sub != null) {
-                        Term rewriteGoal = eq.getRight();
-                        Term newT = rewriteTerm(steps, term, subterm, sub, rewriteGoal);
-                        toAdd.add(newT);
+                        if (sub != null) {
+                            Term rewriteGoal = eq.getRight();
+                            Term newT = rewriteTerm(steps, term, subterm, sub, rewriteGoal);
+                            toAdd.add(newT);
+                        }
                     }
 
-                    // Try right
-                    Map<Variable, Term> sub2 = eq.getRight().getSubstitution(subterm, new HashMap<>());
+                    if (rewriteLeft) {
+                        // Try right
+                        Map<Variable, Term> sub2 = eq.getRight().getSubstitution(subterm, new HashMap<>());
 
-                    if (sub2 != null) {
-                        Term newt = eq.getLeft();
-                        toAdd.add(rewriteTerm(steps, term, subterm, sub2, newt));
+                        if (sub2 != null) {
+                            Term newt = eq.getLeft();
+                            toAdd.add(rewriteTerm(steps, term, subterm, sub2, newt));
+                        }
                     }
                 }
             }

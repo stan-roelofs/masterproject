@@ -46,7 +46,7 @@ class ProofPanel extends JPanel {
         JScrollPane sp2 = new JScrollPane(outputArea);
         this.add(sp2);
 
-        searchSteps = new JTextField();
+        searchSteps = new JTextField("8");
         add(searchSteps);
 
         proofButton = new JButton("Start");

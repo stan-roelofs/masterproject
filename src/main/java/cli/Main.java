@@ -59,7 +59,7 @@ public class Main {
 
                 BufferedOutputWriter writer = new BufferedOutputWriter(new OutputStreamWriter(output));
 
-                int searchDepth = 8;
+                int searchDepth = 15;
                 if (commandLine.hasOption("d")) {
                     searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
                 }

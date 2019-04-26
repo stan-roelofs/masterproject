@@ -8,7 +8,7 @@ import java.util.*;
  * Parses text input and returns a set of equations, functions, and a goal
  *
  * @author Stan Roelofs
- * @version 1.0
+ * @version 1.02
  */
 public class InputParser {
     public static EquationSystem parseSystem(List<String> input) throws ParserException {
@@ -20,12 +20,13 @@ public class InputParser {
 
         int lineCount = 0;
         try {
-            int mode = 0;
+            Mode mode = Mode.SIGMA;
+
             for (String line : input) {
                 lineCount++;
                 // When empty line move to next mode
                 if (line.isEmpty()) {
-                    mode++;
+                    mode = mode.next();
                     continue;
                 }
 
@@ -34,25 +35,19 @@ public class InputParser {
                     continue;
                 }
 
+                // TODO: switch mode this way
+                if (line.startsWith("[[")) {
+
+                }
+
                 switch (mode) {
-                    case 0:
-                        // core.Function
-                        Sigma.add(parseFunction(line));
+                    case SIGMA:
+                        parseFunction(line, Sigma, C);
                         break;
-                    case 1:
-                        // core.Equation
+                    case EQUATIONS:
                         equations.add(parseEquation(Sigma, line));
                         break;
-                    case 2:
-                        // C
-                        line = line.replaceAll(" ", "");
-                        for (Function f : Sigma) {
-                            if (f.getName().equals(line)) {
-                                C.add(f);
-                            }
-                        }
-                        break;
-                    case 3:
+                    case GOAL:
                         // Goal
                         goal = parseEquation(Sigma, line);
                         break;
@@ -87,7 +82,7 @@ public class InputParser {
      * @throws IllegalArgumentException if {@code line} is null or is missing information
      * @see Function
      */
-    private static Function parseFunction(String line) throws IllegalArgumentException {
+    private static Function parseFunction(String line, Set<Function> Sigma, Set<Function> C) throws IllegalArgumentException {
         if (line == null) {
             throw new IllegalArgumentException("line must not be null");
         }
@@ -95,7 +90,13 @@ public class InputParser {
         String[] split = line.split(" ");
 
         if (split.length <= 1) {
-            throw new IllegalArgumentException("Function information missing: expected <name> <sort>* <sort>");
+            throw new IllegalArgumentException("Function information missing: expected <C>? <name> <sort>* <sort>");
+        }
+
+        boolean inC = split[0].equals("true");
+
+        if (inC) {
+            split = Arrays.copyOfRange(split, 1, split.length);
         }
 
         String name = split[0];
@@ -124,6 +125,12 @@ public class InputParser {
         Function f = new Function(name, inputs, output);
 
         Logger.d("Parsed function " + f.getName() + " : " + f.getInputSorts().toString() + " -> " + f.getOutputSort().toString());
+
+        Sigma.add(f);
+
+        if (inC) {
+            C.add(f);
+        }
 
         return f;
     }
@@ -219,6 +226,66 @@ public class InputParser {
         // The parsed outermost function symbol
         String function = symbol.toString();
 
+        Set<Function> fs = new HashSet<>();
+        for (Function f : functions) {
+            if (function.equals(f.getName())) {
+                fs.add(f);
+            }
+        }
+
+        if (fs.size() > 1) {
+            if (varSort == null) {
+                Logger.w("returning");
+                throw new NoSortException("dada");
+            } else {
+                // Try to match that function symbol to one of the parsed functions
+                for (Function f : functions) {
+                    if (function.equals(f.getName()) && f.getOutputSort().equals(varSort)) {
+                        int numArguments = f.getInputSorts().size();
+                        if (numArguments == 0) {
+                            Logger.d("Parsed FunctionTerm " + f.toString());
+                            return new FunctionTerm(f);
+                        } else {
+                            List<Term> subtermsList = new ArrayList<>();
+                            List<String> subtermsStrings = new ArrayList<>();
+
+                            int depth = 0;
+                            StringBuilder current = new StringBuilder();
+                            for (char c : subterms.toCharArray()) {
+                                if (c == '(') {
+                                    depth++;
+                                }
+                                if (c == ')') {
+                                    depth--;
+                                }
+                                if (c == ',' && depth == 0) {
+                                    subtermsStrings.add(current.toString());
+                                    current = new StringBuilder();
+                                } else {
+                                    current.append(c);
+                                }
+                            }
+                            subtermsStrings.add(current.toString());
+
+                            if (subtermsStrings.size() != numArguments) {
+                                throw new InvalidFunctionArgumentException("Invalid number of function arguments. Actual: " + subtermsStrings.size() + ", expected: " + numArguments);
+                            }
+
+                            int input = 0;
+                            for (String subtermString : subtermsStrings) {
+                                subtermsList.add(parseTerm(functions, subtermString, f.getInputSorts().get(input)));
+                                input++;
+                            }
+
+                            FunctionTerm ft = new FunctionTerm(f, subtermsList);
+                            Logger.d("Parsed FunctionTerm " + ft.toString());
+                            return ft;
+                        }
+                    }
+                }
+            }
+        }
+
         // Try to match that function symbol to one of the parsed functions
         for (Function f : functions) {
             if (function.equals(f.getName())) {
@@ -282,6 +349,16 @@ public class InputParser {
         if (line == null) {
             throw new IllegalArgumentException("line must not be null");
         }
+    }
+}
+
+enum Mode {
+    SIGMA, EQUATIONS, GOAL;
+
+    private static Mode[] vals = values();
+
+    public Mode next() {
+        return vals[(this.ordinal() + 1) % vals.length];
     }
 }
 

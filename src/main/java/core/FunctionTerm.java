@@ -7,7 +7,7 @@ import java.util.*;
  * arguments
  *
  * @author Stan Roelofs
- * @version 1.0
+ * @version 1.01
  */
 public class FunctionTerm extends Term {
     private List<Term> subterms;
@@ -162,7 +162,7 @@ public class FunctionTerm extends Term {
     }
 
     @Override
-    public Collection<Function> getFunctions() {
+    public Set<Function> getFunctions() {
         Set<Function> result = new HashSet<>();
         result.add(this.function);
 

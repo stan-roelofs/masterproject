@@ -1,6 +1,5 @@
 package core;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,7 +7,7 @@ import java.util.Set;
  * Abstract class that represents a term
  *
  * @author Stan Roelofs
- * @version 1.0
+ * @version 1.01
  */
 public abstract class Term {
     protected Sort sort;
@@ -64,17 +63,17 @@ public abstract class Term {
 
     /**
      * Returns all the variables that occur in this term
-     * @return A collection of variables that occur in this term
+     * @return A set of variables that occur in this term
      * @see Variable
      */
-    public abstract Collection<Variable> getVariables();
+    public abstract Set<Variable> getVariables();
 
     /**
      * Returns all functions that occur in this term
-     * @return A collection of functions that occur in this term
+     * @return A set of functions that occur in this term
      * @see Function
      */
-    public abstract Collection<Function> getFunctions();
+    public abstract Set<Function> getFunctions();
 
     public abstract String toString();
 

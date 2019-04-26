@@ -1,13 +1,16 @@
 package core;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Class that represents a variable
  * A variable is a Term and additionally has a name
  *
  * @author Stan Roelofs
- * @version 1.0
+ * @version 1.01
  */
 public class Variable extends Term {
     private String name;
@@ -85,14 +88,14 @@ public class Variable extends Term {
     }
 
     @Override
-    public Collection<Variable> getVariables() {
-        Collection<Variable> result = new ArrayList<>();
+    public Set<Variable> getVariables() {
+        Set<Variable> result = new HashSet<>();
         result.add(this);
         return result;
     }
 
     @Override
-    public Collection<Function> getFunctions() {
+    public Set<Function> getFunctions() {
         return new HashSet<>();
     }
 

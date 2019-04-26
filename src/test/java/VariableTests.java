@@ -239,9 +239,19 @@ public class VariableTests {
     @Test
     public void testGetVariables() {
         Variable v = new Variable(new Sort("x"), "x");
-        Collection<Variable> vs = new ArrayList<>();
+        Set<Variable> vs = new HashSet<>();
         vs.add(v);
         Assert.assertEquals(vs, v.getVariables());
+    }
+
+    /**
+     * getFunctions should return an empty set as a variable
+     * does not contain any functions
+     */
+    @Test
+    public void testGetFunctions() {
+        Variable v = new Variable(new Sort("x"), "x");
+        Assert.assertTrue(v.getFunctions().isEmpty());
     }
 
     @Test

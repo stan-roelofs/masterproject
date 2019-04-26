@@ -383,6 +383,66 @@ public class FunctionTermTests {
         Assert.assertEquals(vs, t3.getVariables());
     }
 
+    /**
+     * If t is a constant
+     */
+    @Test
+    public void testGetFunctionsSimple() {
+        Sort s = new Sort("nat");
+        Function f = new Function(s, "0");
+
+        Set<Function> expected = new HashSet<>();
+        expected.add(f);
+
+        FunctionTerm term = new FunctionTerm(f);
+
+        Assert.assertEquals(expected, term.getFunctions());
+    }
+
+    /**
+     * If t is a term with only variables as subterms
+     */
+    @Test
+    public void testGetFunctionsSimple2() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+
+        Set<Function> expected = new HashSet<>();
+        expected.add(f);
+        Assert.assertEquals(expected, t.getFunctions());
+    }
+
+    /**
+     * If t contains distinct functions in its subterms + itself
+     */
+    @Test
+    public void testGetFunctionsDeep() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function("f", inputs, s);
+        Function g = new Function("g", inputs, s);
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms); // f(x)
+        Term t2 = new FunctionTerm(g, subterms); // g(x)
+
+        Term t3 = t.substitute(x, t2); // f(g(x))
+
+        Set<Function> expected = new HashSet<>();
+        expected.add(f);
+        expected.add(g);
+
+        Assert.assertEquals(expected, t3.getFunctions());
+    }
+
     @Test
     public void testToStringConstant() {
         Sort s = new Sort("x");

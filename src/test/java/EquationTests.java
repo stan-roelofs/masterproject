@@ -2,6 +2,9 @@ import core.*;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class EquationTests {
 
     @Test(expected = IllegalArgumentException.class)
@@ -86,6 +89,24 @@ public class EquationTests {
 
         Assert.assertEquals(z, nnewEq.getLeft());
         Assert.assertEquals(z, nnewEq.getRight());
+    }
+
+    @Test
+    public void testGetFunctions() {
+        Sort s = new Sort("nat");
+        Function f = new Function(s, "0");
+        Function f2 = new Function(s, "1");
+
+        Term t = new FunctionTerm(f);
+        Term t2 = new FunctionTerm(f2);
+
+        Equation eq = new Equation(t, t2);
+
+        Set<Function> expected = new HashSet<>();
+        expected.add(f);
+        expected.add(f2);
+
+        Assert.assertEquals(expected, eq.getFunctions());
     }
 
     @Test

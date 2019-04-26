@@ -1,13 +1,15 @@
 package core;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Class that represents an equation
  * An equation is constructed from two terms of equal sort
  *
  * @author Stan Roelofs
- * @version 1.0
+ * @version 1.01
  */
 public class Equation {
     private Term left;
@@ -71,6 +73,18 @@ public class Equation {
             throw new IllegalArgumentException("var and sub must not be null");
         }
         return new Equation(left.substitute(term, sub), right.substitute(term, sub));
+    }
+
+    /**
+     * Returns all functions that occur in this equation
+     * @return A set of functions that occur in this equation
+     * @see Function
+     */
+    public Set<Function> getFunctions() {
+        Set<Function> result = new HashSet<>();
+        result.addAll(left.getFunctions());
+        result.addAll(right.getFunctions());
+        return result;
     }
 
     @Override

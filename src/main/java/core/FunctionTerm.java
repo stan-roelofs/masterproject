@@ -153,9 +153,23 @@ public class FunctionTerm extends Term {
     @Override
     public Set<Variable> getVariables() {
         Set<Variable> result = new HashSet<>(this.subterms.size());
+
         for (Term term : subterms) {
             result.addAll(term.getVariables());
         }
+
+        return result;
+    }
+
+    @Override
+    public Collection<Function> getFunctions() {
+        Set<Function> result = new HashSet<>();
+        result.add(this.function);
+
+        for (Term subterm : this.subterms) {
+            result.addAll(subterm.getFunctions());
+        }
+
         return result;
     }
 

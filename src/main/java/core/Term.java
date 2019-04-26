@@ -72,6 +72,8 @@ public abstract class Term {
      */
     public abstract Collection<Variable> getVariables();
 
+    public abstract Collection<Function> getFunctions();
+
     public abstract String toString();
 
     public abstract boolean equals(Object o);

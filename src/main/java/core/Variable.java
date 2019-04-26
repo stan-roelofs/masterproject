@@ -92,6 +92,11 @@ public class Variable extends Term {
     }
 
     @Override
+    public Collection<Function> getFunctions() {
+        return new HashSet<>();
+    }
+
+    @Override
     public String toString() {
         return this.name;
     }

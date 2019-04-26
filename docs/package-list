@@ -1,4 +1,5 @@
-
 cli
 core
+core.io
+core.parsing
 gui

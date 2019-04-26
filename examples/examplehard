@@ -1,0 +1,48 @@
+// Functions
+0 nat
+s nat nat
+O b
+1 b
+take nat i b
+head i b
+tail i i
+zip i i i
+inv i i
+not b b
+h nat nat
+d nat nat
+f nat nat
+alt i
+B i
+
+// Equations
+head(zip(x,y)) = head(x)
+tail(zip(x,y)) = zip(y,tail(x))
+h(0) = 0
+h(s(0)) = 0
+h(s(s(x))) = s(h(x))
+take(0, x) = head(x)
+take(s(x), y) = take(x, tail(y))
+h(d(x)) = x
+not(O) = 1
+not(1) = O
+f(0) = 0
+f(s(x)) = s(d(f(x)))
+d(0) = 0
+d(s(x)) = s(s(d(x)))
+head(inv(x)) = not(head(x))
+tail(inv(x)) = inv(tail(x))
+head(alt) = O
+head(tail(alt)) = 1
+tail(tail(alt)) = alt
+head(B) = O
+tail(B) = zip(inv(B), inv(B))
+take(x, zip(y,y)) = take(h(x), y)
+inv(zip(inv(x), inv(x))) = zip(x, x)
+
+// C
+0
+s
+
+// Goal
+take(f(x), B) = take(x, alt)

@@ -1,4 +1,4 @@
-package core;
+package core.parsing;
 
 /**
  * @author Stan Roelofs

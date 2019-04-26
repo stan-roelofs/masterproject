@@ -1,4 +1,4 @@
-package core;
+package core.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

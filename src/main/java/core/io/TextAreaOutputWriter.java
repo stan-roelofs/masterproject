@@ -1,4 +1,4 @@
-package core;
+package core.io;
 
 import javax.swing.*;
 import java.io.IOException;

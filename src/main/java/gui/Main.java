@@ -1,10 +1,15 @@
 package gui;
 
-import core.*;
+import core.EquationSystem;
+import core.Logger;
+import core.Prover;
+import core.io.TextAreaOutputWriter;
+import core.parsing.InputParser;
+import core.parsing.ParserException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

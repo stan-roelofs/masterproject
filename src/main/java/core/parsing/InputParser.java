@@ -1,4 +1,6 @@
-package core;
+package core.parsing;
+
+import core.*;
 
 import java.util.*;
 
@@ -283,14 +285,5 @@ public class InputParser {
     }
 }
 
-class NoSortException extends Exception {
-    public NoSortException(String errorMessage) {
-        super(errorMessage);
-    }
-}
 
-class InvalidFunctionArgumentException extends Exception {
-    public InvalidFunctionArgumentException(String errorMessage) {
-        super(errorMessage);
-    }
-}
+

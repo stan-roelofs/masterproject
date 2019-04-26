@@ -1,9 +1,9 @@
-package core;
+package core.io;
 
 import java.io.IOException;
 import java.util.Collection;
 
-abstract class OutputWriter {
+public abstract class OutputWriter {
 
     public abstract void write(String text) throws IOException;
 

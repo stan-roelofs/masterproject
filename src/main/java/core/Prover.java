@@ -1,6 +1,7 @@
 package core;
 
-import java.io.BufferedWriter;
+import core.io.OutputWriter;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ public class Prover {
     public static String constantName = "a";
     public static int maxDepth = 2;
     private static boolean rewriteRight = true;
-    private static boolean rewriteLeft = false;
+    private static boolean rewriteLeft = true;
 
     public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {
@@ -26,7 +27,10 @@ public class Prover {
         }
 
         Equation goal = system.getGoal();
-        //core.Util.writeLine(outputWriter, "Goal: " + goal.toString());
+
+        if (recursionDepth == 0) {
+            outputWriter.writeLine("Goal: " + goal.toString());
+        }
 
         // Try induction for each variable in function
         Set<Variable> allVariables = new HashSet<>(goal.getLeft().getVariables());

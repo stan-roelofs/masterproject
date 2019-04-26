@@ -1,6 +1,11 @@
 package cli;
 
-import core.*;
+import core.EquationSystem;
+import core.Logger;
+import core.Prover;
+import core.io.BufferedOutputWriter;
+import core.parsing.InputParser;
+import core.parsing.ParserException;
 import org.apache.commons.cli.*;
 
 import java.io.*;

@@ -89,6 +89,16 @@ public class EquationTests {
     }
 
     @Test
+    public void testToString() {
+        Sort s = new Sort("sort");
+        Variable var = new Variable(s, "x");
+        Variable var2 = new Variable(s, "y");
+        Equation eq = new Equation(var, var2);
+
+        Assert.assertEquals("x = y", eq.toString());
+    }
+
+    @Test
     public void testEqualsNull() {
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");

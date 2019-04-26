@@ -1,7 +1,7 @@
 package core;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class that represents an instance of the inductive theorem, which consists of a set equations over a signature
@@ -11,12 +11,12 @@ import java.util.HashSet;
  * @version 1.01
  */
 public class EquationSystem {
-    private Collection<Equation> equations;
-    private Collection<Function> sigma;
-    private Collection<Function> C;
+    private Set<Equation> equations;
+    private Set<Function> sigma;
+    private Set<Function> C;
     private Equation goal;
 
-    public EquationSystem(Collection<Equation> eq, Collection<Function> sigma, Collection<Function> C, Equation goal) {
+    public EquationSystem(Set<Equation> eq, Set<Function> sigma, Set<Function> C, Equation goal) {
         if (eq == null || sigma == null || C == null || goal == null) {
             throw new IllegalArgumentException("Eq, Sigma, C, Goal must not be null");
         }
@@ -62,15 +62,15 @@ public class EquationSystem {
         this.goal = goal;
     }
 
-    public Collection<Equation> getEquations() {
+    public Set<Equation> getEquations() {
         return equations;
     }
 
-    public Collection<Function> getSigma() {
+    public Set<Function> getSigma() {
         return sigma;
     }
 
-    public Collection<Function> getC() {
+    public Set<Function> getC() {
         return C;
     }
 

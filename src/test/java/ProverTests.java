@@ -2,8 +2,9 @@ import core.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProverTests {
 
@@ -16,11 +17,11 @@ public class ProverTests {
         inputs.add(nat);
         Function successor = new Function("s", inputs, nat);
 
-        List<Function> C = new ArrayList<>();
+        Set<Function> C = new HashSet<>();
         C.add(zero);
         C.add(successor);
 
-        List<Function> Sigma = new ArrayList<>(C);
+        Set<Function> Sigma = new HashSet<>(C);
         inputs.add(nat);
         Function plus = new Function("+", inputs, nat);
         Sigma.add(plus);
@@ -53,7 +54,7 @@ public class ProverTests {
 
         Equation eq2 = new Equation(l, r);
 
-        Collection<Equation> eqs = new ArrayList<>();
+        Set<Equation> eqs = new HashSet<>();
         eqs.add(eq1);
         eqs.add(eq2);
 

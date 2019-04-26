@@ -184,6 +184,7 @@ public class Prover {
         // Add hypotheses
         for (Sort s : function.getInputSorts()) {
             Function cnst = new Function(s, constantName + count);
+            system.getSigma().add(cnst);
 
             for (Function f : system.getSigma()) {
                 if (f.equals(cnst)) {

@@ -82,9 +82,9 @@ public class InputParser {
      * @throws IllegalArgumentException if {@code line} is null or is missing information
      * @see Function
      */
-    private static Function parseFunction(String line, Set<Function> Sigma, Set<Function> C) throws IllegalArgumentException {
-        if (line == null) {
-            throw new IllegalArgumentException("line must not be null");
+    public static Function parseFunction(String line, Set<Function> Sigma, Set<Function> C) throws IllegalArgumentException {
+        if (line == null || line.isEmpty() || Sigma == null || C == null) {
+            throw new IllegalArgumentException("Line most not be null or empty, Sigma and C must not be null");
         }
 
         String[] split = line.split(" ");
@@ -146,7 +146,7 @@ public class InputParser {
      * @see Equation
      * @see Function
      */
-    private static Equation parseEquation(Set<Function> functions, String line) throws IllegalArgumentException, InvalidFunctionArgumentException, NoSortException {
+    public static Equation parseEquation(Set<Function> functions, String line) throws IllegalArgumentException, InvalidFunctionArgumentException, NoSortException {
         checkParameters(functions, line);
         if (!line.contains("=")) {
             throw new IllegalArgumentException("line does not contain '=', therefore is not an equation");
@@ -179,7 +179,7 @@ public class InputParser {
         return eq;
     }
 
-    // TODO: if there are multiple functions with the same name but different sorts this doesnt work properly
+    // TODO: clean up this mess..
     /**
      * Takes a string and a set of functions as input and constructs a Term object from this input
      * @param functions A set of functions that are necessary to recognize function symbols in the input string
@@ -192,7 +192,7 @@ public class InputParser {
      * @see Variable
      * @see FunctionTerm
      */
-    private static Term parseTerm(Set<Function> functions, String line, Sort varSort) throws InvalidFunctionArgumentException, NoSortException {
+    public static Term parseTerm(Set<Function> functions, String line, Sort varSort) throws InvalidFunctionArgumentException, NoSortException {
         checkParameters(functions, line);
 
         String normalized = line.replaceAll(" ", "");

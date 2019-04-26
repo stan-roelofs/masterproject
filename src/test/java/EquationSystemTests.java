@@ -2,16 +2,17 @@ import core.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EquationSystemTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorEqNull() {
-        Collection<Equation> eq = null;
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
 
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
@@ -23,9 +24,9 @@ public class EquationSystemTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorSigmaNull() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = null;
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = null;
+        Set<Function> C = new HashSet<>();
 
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
@@ -37,9 +38,9 @@ public class EquationSystemTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorCNull() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = null;
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = null;
 
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
@@ -51,9 +52,9 @@ public class EquationSystemTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorGoalNull() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Equation goal = null;
 
         EquationSystem system = new EquationSystem(eq, Sigma, C, goal);
@@ -61,9 +62,9 @@ public class EquationSystemTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorCEmpty() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Variable var2 = new Variable(sort, "y");
@@ -78,9 +79,9 @@ public class EquationSystemTests {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorCMultipleSorts() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Variable var2 = new Variable(sort, "y");
@@ -103,9 +104,9 @@ public class EquationSystemTests {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorCNotSubsetSigma() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Variable var2 = new Variable(sort, "y");
@@ -124,9 +125,9 @@ public class EquationSystemTests {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorSigmaIncompleteGoal() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Function f = new Function(sort, "0");
@@ -147,9 +148,9 @@ public class EquationSystemTests {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorSigmaIncompleteEq() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Variable var2 = new Variable(sort, "y");
@@ -170,9 +171,9 @@ public class EquationSystemTests {
 
     @Test
     public void testGetEquations() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Function f = new Function(sort, "0");
@@ -191,9 +192,9 @@ public class EquationSystemTests {
 
     @Test
     public void testGetSigma() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Function f = new Function(sort, "0");
@@ -212,9 +213,9 @@ public class EquationSystemTests {
 
     @Test
     public void testGetC() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Function f = new Function(sort, "0");
@@ -233,9 +234,9 @@ public class EquationSystemTests {
 
     @Test
     public void testGetGoal() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Function f = new Function(sort, "0");
@@ -254,9 +255,9 @@ public class EquationSystemTests {
 
     @Test
     public void testGetCSort() {
-        Collection<Equation> eq = new ArrayList<>();
-        Collection<Function> Sigma = new ArrayList<>();
-        Collection<Function> C = new ArrayList<>();
+        Set<Equation> eq = new HashSet<>();
+        Set<Function> Sigma = new HashSet<>();
+        Set<Function> C = new HashSet<>();
         Sort sort = new Sort("nat");
         Variable var = new Variable(sort, "x");
         Function f = new Function(sort, "0");

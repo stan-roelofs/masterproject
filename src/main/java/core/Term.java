@@ -44,14 +44,12 @@ public abstract class Term {
      * @param substitution A substitution which replaces variables by terms
      * @return A new term such that all variables in {@code substitution} im this term
      *          are replaced by substitution.get(variable)
-     * @see Term
      * @see Variable
      */
     public abstract Term applySubstitution(Map<Variable, Term> substitution);
 
     /**
      * Returns all subterms of this term, including the term itself
-     *
      * @return a Set of terms that are subterms of this term (including this term)
      */
     public abstract Set<Term> getAllSubTerms();
@@ -68,10 +66,14 @@ public abstract class Term {
      * Returns all the variables that occur in this term
      * @return A collection of variables that occur in this term
      * @see Variable
-     * @see Collection
      */
     public abstract Collection<Variable> getVariables();
 
+    /**
+     * Returns all functions that occur in this term
+     * @return A collection of functions that occur in this term
+     * @see Function
+     */
     public abstract Collection<Function> getFunctions();
 
     public abstract String toString();

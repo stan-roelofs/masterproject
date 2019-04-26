@@ -1,13 +1,14 @@
 package core;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Class that represents an instance of the inductive theorem, which consists of a set equations over a signature
  * Sigma, a subset of Sigma called C (constructors) and an equation that should be proven
  *
  * @author Stan Roelofs
- * @version 1.0
+ * @version 1.01
  */
 public class EquationSystem {
     private Collection<Equation> equations;
@@ -29,7 +30,6 @@ public class EquationSystem {
             // Take sort of f if it is currently null
             if (sort == null) {
                 sort = f.getOutputSort();
-                continue;
             }
             // Check sorts are the same
             if (!f.getOutputSort().equals(sort)) {
@@ -42,9 +42,23 @@ public class EquationSystem {
             }
         }
 
-        this.equations = eq;
-        this.sigma = sigma;
-        this.C = C;
+        for (Function f : goal.getFunctions()) {
+            if (!sigma.contains(f)) {
+                throw new IllegalArgumentException("Function used in goal that does not occur in Sigma: " + f.toString());
+            }
+        }
+
+        for (Equation equation : eq) {
+            for (Function f : equation.getFunctions()) {
+                if (!sigma.contains(f)) {
+                    throw new IllegalArgumentException("Function used in equations that does not occur in Sigma: " + f.toString());
+                }
+            }
+        }
+
+        this.equations = new HashSet<>(eq);
+        this.sigma = new HashSet<>(sigma);
+        this.C = new HashSet<>(C);
         this.goal = goal;
     }
 

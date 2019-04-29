@@ -1,6 +1,6 @@
 // Functions
-0 nat
-s nat nat
+** 0 nat
+** s nat nat
 + nat nat nat
 * nat nat nat
 
@@ -11,10 +11,6 @@ s nat nat
 *(s(x),y) = +(y,*(x,y))
 *(x,y) = *(y,x)
 *(x,+(y,z)) = +(*(x,y),*(x,z))
-
-// C
-0
-s
 
 // Goal
 *(x,*(y,z)) = *(*(x,y),z)

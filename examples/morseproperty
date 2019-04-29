@@ -1,6 +1,6 @@
 // Functions
-0 nat
-s nat nat
+** 0 nat
+** s nat nat
 O b
 take nat i b
 head i b
@@ -27,10 +27,6 @@ head(tail(f(x))) = not(head(x))
 tail(tail(f(x))) = f(tail(x))
 head(inv(x)) = not(head(x))
 tail(inv(x)) = inv(tail(x))
-
-// C
-0
-s
 
 // Goal
 take(x,zip(y,inv(y))) = take(x,f(y))

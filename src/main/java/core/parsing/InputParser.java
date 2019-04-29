@@ -227,62 +227,23 @@ public class InputParser {
             }
         }
 
+        boolean matchSort = false;
         if (fs.size() > 1) {
             if (varSort == null) {
-                Logger.w("returning");
-                throw new NoSortException("dada");
+                throw new NoSortException("Found more than one function for string " + symbol + " and no sort was specified");
             } else {
-                // Try to match that function symbol to one of the parsed functions
-                for (Function f : functions) {
-                    if (function.equals(f.getName()) && f.getOutputSort().equals(varSort)) {
-                        int numArguments = f.getInputSorts().size();
-                        if (numArguments == 0) {
-                            Logger.d("Parsed FunctionTerm " + f.toString());
-                            return new FunctionTerm(f);
-                        } else {
-                            List<Term> subtermsList = new ArrayList<>();
-                            List<String> subtermsStrings = new ArrayList<>();
-
-                            int depth = 0;
-                            StringBuilder current = new StringBuilder();
-                            for (char c : subterms.toCharArray()) {
-                                if (c == '(') {
-                                    depth++;
-                                }
-                                if (c == ')') {
-                                    depth--;
-                                }
-                                if (c == ',' && depth == 0) {
-                                    subtermsStrings.add(current.toString());
-                                    current = new StringBuilder();
-                                } else {
-                                    current.append(c);
-                                }
-                            }
-                            subtermsStrings.add(current.toString());
-
-                            if (subtermsStrings.size() != numArguments) {
-                                throw new InvalidFunctionArgumentException("Invalid number of function arguments. Actual: " + subtermsStrings.size() + ", expected: " + numArguments);
-                            }
-
-                            int input = 0;
-                            for (String subtermString : subtermsStrings) {
-                                subtermsList.add(parseTerm(functions, subtermString, f.getInputSorts().get(input)));
-                                input++;
-                            }
-
-                            FunctionTerm ft = new FunctionTerm(f, subtermsList);
-                            Logger.d("Parsed FunctionTerm " + ft.toString());
-                            return ft;
-                        }
-                    }
-                }
+                matchSort = true;
             }
         }
 
         // Try to match that function symbol to one of the parsed functions
         for (Function f : functions) {
             if (function.equals(f.getName())) {
+                if (matchSort) {
+                    if (!f.getOutputSort().equals(varSort)) {
+                        continue;
+                    }
+                }
                 int numArguments = f.getInputSorts().size();
                 if (numArguments == 0) {
                     Logger.d("Parsed FunctionTerm " + f.toString());
@@ -325,7 +286,7 @@ public class InputParser {
                 }
             }
         }
-
+        
         if (varSort == null) {
             throw new NoSortException("Term is not a function and no sort is given for variable");
         }

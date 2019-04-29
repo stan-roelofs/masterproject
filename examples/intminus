@@ -1,7 +1,7 @@
 // Functions
-0 nat
-s nat nat
-p nat nat
+** 0 nat
+** s nat nat
+** p nat nat
 - nat nat nat
 
 // Equations
@@ -10,11 +10,6 @@ p nat nat
 -(x,p(y)) = s(-(x,y))
 s(p(x)) = x
 p(s(x)) = x
-
-// C
-0
-s
-p
 
 // Goal
 -(0,-(0,x)) = x

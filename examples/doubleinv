@@ -6,20 +6,17 @@
 take nat i b
 head i b
 tail i i
-zip i i i
 inv i i
 not b b
 
 // Equations
-head(zip(x,y)) = head(x)
-tail(zip(x,y)) = zip(y,tail(x))
+take(0, x) = head(x)
+take(s(x), y) = take(x, tail(y))
 not(0) = 1
 not(1) = 0
-take(0,x) = head(x)
-take(s(x),y) = take(x,tail(y))
 head(inv(x)) = not(head(x))
 tail(inv(x)) = inv(tail(x))
 not(not(x)) = x
 
 // Goal
-take(x, inv(zip(inv(y), inv(y)))) = take(x, zip(y, y))
+take(x, inv(inv(y))) = take(x, y)

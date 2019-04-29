@@ -1,15 +1,11 @@
 // Functions
-0 nat
-s nat nat
+** 0 nat
+** s nat nat
 + nat nat nat
 
 // Equations
 +(0, x) = x
 +(s(x), y) = s(+(x, y))
-
-// C
-0
-s
 
 // Goal
 +(x, +(y,z)) = +(+(x,y),z)

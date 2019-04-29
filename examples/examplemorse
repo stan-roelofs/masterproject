@@ -1,7 +1,7 @@
 // Functions
-0 nat
-s nat nat
-O b
+** 0 nat
+** s nat nat
+0 b
 take nat i b
 head i b
 tail i i
@@ -22,13 +22,9 @@ f(x) = :(head(x),:(not(head(x)),f(tail(x))))
 take(0,x) = head(x)
 take(s(x),y) = take(x,tail(y))
 inv(x) = :(not(head(x)),inv(tail(x)))
-head(morse) = O
+head(morse) = 0
 tail(morse) = zip(inv(morse),tail(morse))
 take(x,f(y)) = take(x,zip(y,inv(y)))
-
-// C
-0
-s
 
 // Goal
 take(x,f(morse)) = take(x,morse)

@@ -1,8 +1,8 @@
 // Functions
-0 nat
-O bool
+** 0 nat
+** s nat nat
+0 bool
 1 bool
-s nat nat
 take nat i bool
 head i bool
 tail i i
@@ -16,17 +16,13 @@ head(zip(x,y)) = head(x)
 tail(zip(x,y)) = zip(y, tail(x))
 take(0,x) = head(x)
 take(s(x),y) = take(x, tail(y))
-head(alt) = O
+head(alt) = 0
 head(tail(alt)) = 1
 tail(tail(alt)) = alt
-head(zeros) = O
+head(zeros) = 0
 tail(zeros) = zeros
 head(ones) = 1
 tail(ones) = ones
-
-// C
-0
-s
 
 // Goal
 take(x, zip(zeros,ones)) = take(x, alt)

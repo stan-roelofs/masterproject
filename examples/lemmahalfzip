@@ -1,6 +1,6 @@
 // Functions
-0 nat
-s nat nat
+** 0 nat
+** s nat nat
 take nat i bool
 head i bool
 tail i i
@@ -15,10 +15,6 @@ take(s(x),y) = take(x, tail(y))
 h(0) = 0
 h(s(0)) = 0
 h(s(s(x))) = s(h(x))
-
-// C
-0
-s
 
 // Goal
 take(x, zip(y, y)) = take(h(x), y)

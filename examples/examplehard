@@ -1,7 +1,7 @@
 // Functions
-0 nat
-s nat nat
-O b
+** 0 nat
+** s nat nat
+0 b
 1 b
 take nat i b
 head i b
@@ -24,25 +24,22 @@ h(s(s(x))) = s(h(x))
 take(0, x) = head(x)
 take(s(x), y) = take(x, tail(y))
 h(d(x)) = x
-not(O) = 1
-not(1) = O
+not(0) = 1
+not(1) = 0
 f(0) = 0
 f(s(x)) = s(d(f(x)))
 d(0) = 0
 d(s(x)) = s(s(d(x)))
 head(inv(x)) = not(head(x))
 tail(inv(x)) = inv(tail(x))
-head(alt) = O
+head(alt) = 0
 head(tail(alt)) = 1
 tail(tail(alt)) = alt
-head(B) = O
+head(B) = 0
 tail(B) = zip(inv(B), inv(B))
 take(x, zip(y,y)) = take(h(x), y)
-inv(zip(inv(x), inv(x))) = zip(x, x)
-
-// C
-0
-s
+inv(zip(x,y)) = zip(inv(x), inv(y))
+inv(inv(x)) = x
 
 // Goal
 take(f(x), B) = take(x, alt)

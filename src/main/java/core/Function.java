@@ -37,11 +37,11 @@ public class Function {
 
     /**
      * Creates a function
-     * @param name The name of the function
-     * @param input A list of input sorts
      * @param output An output sort
+     * @param input A list of input sorts
+     * @param name The name of the function
      */
-    public Function(String name, List<Sort> input, Sort output) {
+    public Function(Sort output, List<Sort> input, String name) {
         this(output, name);
         this.inputSorts.addAll(input);
     }

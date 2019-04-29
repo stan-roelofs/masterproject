@@ -15,7 +15,7 @@ public class ProverTests {
 
         List<Sort> inputs = new ArrayList<>();
         inputs.add(nat);
-        Function successor = new Function("s", inputs, nat);
+        Function successor = new Function(nat, inputs, "s");
 
         Set<Function> C = new HashSet<>();
         C.add(zero);
@@ -23,7 +23,7 @@ public class ProverTests {
 
         Set<Function> Sigma = new HashSet<>(C);
         inputs.add(nat);
-        Function plus = new Function("+", inputs, nat);
+        Function plus = new Function(nat, inputs, "+");
         Sigma.add(plus);
 
         List<Term> subterms = new ArrayList<>();

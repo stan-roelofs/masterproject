@@ -17,7 +17,7 @@ public class Prover {
     public static String constantName = "a";
     public static int maxDepth = 2;
     private static boolean rewriteRight = true;
-    private static boolean rewriteLeft = true;
+    private static boolean rewriteLeft = false;
 
     public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {
@@ -359,13 +359,13 @@ public class Prover {
 
         Logger.d("Checking convergence");
 
-
+/*
         Logger.d("Left:");
         for (Term t : left) {
             if (t.toString().contains("head(zip(inv(B), inv(B)))")) {
                 Logger.e(t.toString());
             }
-        }
+        }*/
         /*
         Logger.d("Right:");
         for (Term t : right) {

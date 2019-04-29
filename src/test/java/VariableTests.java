@@ -218,7 +218,7 @@ public class VariableTests {
         // Create a function "f" of this sort with one input
         List<Sort> input = new ArrayList<>();
         input.add(nat);
-        Function f = new Function("f", input, nat);
+        Function f = new Function(nat, input, "f");
 
         // Create a term 0, then a term f(0)
         Term zeroo = new FunctionTerm(zero);

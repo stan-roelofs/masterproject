@@ -35,11 +35,6 @@ public class InputParser {
                     continue;
                 }
 
-                // TODO: switch mode this way
-                if (line.startsWith("[[")) {
-
-                }
-
                 switch (mode) {
                     case SIGMA:
                         parseFunction(line, Sigma, C);
@@ -89,16 +84,15 @@ public class InputParser {
 
         String[] split = line.split(" ");
 
-        if (split.length <= 1) {
-            throw new IllegalArgumentException("Function information missing: expected <C>? <name> <sort>* <sort>");
-        }
-
-        boolean inC = split[0].equals("true");
+        boolean inC = split[0].equals("**");
 
         if (inC) {
             split = Arrays.copyOfRange(split, 1, split.length);
         }
 
+        if (split.length <= 1) {
+            throw new IllegalArgumentException("Function information missing: expected <C>? <name> <sort>* <sort>");
+        }
         String name = split[0];
 
         // Get all sorts
@@ -122,7 +116,7 @@ public class InputParser {
         // Take the last sort as output sort
         Sort output = sorts.get(split[split.length - 1]);
 
-        Function f = new Function(name, inputs, output);
+        Function f = new Function(output, inputs, name);
 
         Logger.d("Parsed function " + f.getName() + " : " + f.getInputSorts().toString() + " -> " + f.getOutputSort().toString());
 
@@ -157,12 +151,12 @@ public class InputParser {
             throw new IllegalArgumentException("Equation contains more than one '='");
         }
 
+        if (split.length < 2) {
+            throw new IllegalArgumentException("Left or right side is empty");
+        }
+
         String leftString = split[0];
         String rightString = split[1];
-
-        if (leftString.isEmpty() || rightString.isEmpty()) {
-            throw new IllegalArgumentException("Left or right cannot be empty");
-        }
 
         Term left;
         Term right;
@@ -171,7 +165,7 @@ public class InputParser {
             right = parseTerm(functions, rightString, left.getSort());
         } catch (NoSortException e) {
             right = parseTerm(functions, rightString, null);
-            left = parseTerm(functions, rightString, right.getSort());
+            left = parseTerm(functions, leftString, right.getSort());
         }
 
         Equation eq = new Equation(left, right);
@@ -343,11 +337,11 @@ public class InputParser {
     }
 
     private static void checkParameters(Set<Function> functions, String line) {
-        if (functions == null || functions.isEmpty()) {
+        if (functions == null) {
             throw new IllegalArgumentException("functions must not be empty or null");
         }
-        if (line == null) {
-            throw new IllegalArgumentException("line must not be null");
+        if (line == null || line.isEmpty()) {
+            throw new IllegalArgumentException("line must not be null or empty");
         }
     }
 }

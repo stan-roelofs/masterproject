@@ -15,7 +15,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         inputs.add(new Sort("x"));
         inputs.add(new Sort("y"));
-        Function f = new Function("f", inputs, new Sort("z"));
+        Function f = new Function(new Sort("z"), inputs, "f");
         Term t = new FunctionTerm(f);
     }
 
@@ -27,7 +27,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         inputs.add(new Sort("x"));
         inputs.add(new Sort("y"));
-        Function f = new Function("f", inputs, new Sort("z"));
+        Function f = new Function(new Sort("z"), inputs, "f");
         Term t = new FunctionTerm(f, null);
     }
 
@@ -40,7 +40,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         inputs.add(new Sort("x"));
         inputs.add(new Sort("z"));
-        Function f = new Function("f", inputs, new Sort("x"));
+        Function f = new Function(new Sort("x"), inputs, "f");
         Term t = new FunctionTerm(f, new ArrayList<>());
     }
 
@@ -56,7 +56,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -69,7 +69,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -139,7 +139,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort nat = new Sort("nat");
         inputs.add(nat);
-        Function s = new Function("s", inputs, nat);
+        Function s = new Function(nat, inputs, "s");
         Function zero = new Function(nat, "0");
         FunctionTerm t = new FunctionTerm(zero); // 0
         List<Term> subterms = new ArrayList<>();
@@ -161,7 +161,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort nat = new Sort("nat");
         inputs.add(nat);
-        Function s = new Function("s", inputs, nat);
+        Function s = new Function(nat, inputs, "s");
         Function zero = new Function(nat, "0");
         FunctionTerm t = new FunctionTerm(zero); // 0
         List<Term> subterms = new ArrayList<>();
@@ -199,7 +199,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -224,7 +224,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -245,7 +245,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -258,7 +258,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -271,7 +271,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -284,7 +284,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -297,7 +297,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -326,7 +326,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -344,7 +344,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -366,7 +366,7 @@ public class FunctionTermTests {
         Sort s = new Sort("x");
         inputs.add(s);
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         Variable y = new Variable(s, "y");
@@ -407,7 +407,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -426,8 +426,8 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
-        Function g = new Function("g", inputs, s);
+        Function f = new Function(s, inputs, "f");
+        Function g = new Function(s, inputs, "g");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -456,7 +456,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -469,7 +469,7 @@ public class FunctionTermTests {
         List<Sort> inputs = new ArrayList<>();
         Sort s = new Sort("x");
         inputs.add(s);
-        Function f = new Function("f", inputs, s);
+        Function f = new Function(s, inputs, "f");
         List<Term> subterms = new ArrayList<>();
         Variable x = new Variable(s, "x");
         subterms.add(x);
@@ -508,7 +508,7 @@ public class FunctionTermTests {
         Sort s = new Sort("x");
         List<Sort> sorts = new ArrayList<>();
         sorts.add(s);
-        Function f = new Function("f", sorts, s);
+        Function f = new Function(s, sorts, "f");
 
         List<Term> terms = new ArrayList<>();
         terms.add(new Variable(s, "x"));
@@ -548,7 +548,7 @@ public class FunctionTermTests {
         Sort s = new Sort("x");
         List<Sort> sorts = new ArrayList<>();
         sorts.add(s);
-        Function f = new Function("f", sorts, s);
+        Function f = new Function(s, sorts, "f");
 
         List<Term> terms = new ArrayList<>();
         terms.add(new Variable(s, "x"));
@@ -565,10 +565,10 @@ public class FunctionTermTests {
         Sort s = new Sort("x");
         List<Sort> sorts = new ArrayList<>();
         sorts.add(s);
-        Function f = new Function("f", sorts, s);
+        Function f = new Function(s, sorts, "f");
 
         sorts.add(s);
-        Function f2 = new Function("f", sorts, s);
+        Function f2 = new Function(s, sorts, "f");
 
         List<Term> terms = new ArrayList<>();
         terms.add(new Variable(s, "x"));

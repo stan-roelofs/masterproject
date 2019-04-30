@@ -28,7 +28,7 @@ public class Prover {
 
         Equation goal = system.getGoal();
 
-        if (recursionDepth == 0) {
+        if (recursionDepth == 0 && inductionVar == null) {
             outputWriter.writeLine("Goal: " + goal.toString());
         }
 

@@ -173,7 +173,6 @@ public class InputParser {
         return eq;
     }
 
-    // TODO: clean up this mess..
     /**
      * Takes a string and a set of functions as input and constructs a Term object from this input
      * @param functions A set of functions that are necessary to recognize function symbols in the input string

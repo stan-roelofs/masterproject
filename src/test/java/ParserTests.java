@@ -166,4 +166,252 @@ public class ParserTests {
         Assert.assertEquals(y, eq.getLeft());
         Assert.assertEquals(fx, eq.getRight());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseTermFunctionsNull() throws NoSortException, InvalidFunctionArgumentException {
+        InputParser.parseTerm(null, "x", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseTermLineNull() throws NoSortException, InvalidFunctionArgumentException {
+        InputParser.parseTerm(new HashSet<>(), null, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseTermLineEmpty() throws NoSortException, InvalidFunctionArgumentException {
+        InputParser.parseTerm(new HashSet<>(), "", null);
+    }
+
+    @Test(expected = NoSortException.class)
+    public void testParseTermVariableNoSort() throws NoSortException, InvalidFunctionArgumentException {
+        InputParser.parseTerm(new HashSet<>(), "x", null);
+    }
+
+    @Test
+    public void testParseTermVariable() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+        Term parsed = InputParser.parseTerm(new HashSet<>(), "x", nat);
+        Variable expected = new Variable(nat, "x");
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testParseTermConstant() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+        Function zero = new Function(nat, "0");
+        Set<Function> functions = new HashSet<>();
+        functions.add(zero);
+
+        Term parsed = InputParser.parseTerm(functions, "0", null);
+        Term expected = new FunctionTerm(zero);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseTermFunctionTermInvalidFormat() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+
+        Function f = new Function(nat, inputs,"f");
+        Set<Function> functions = new HashSet<>();
+        functions.add(f);
+
+        Variable x = new Variable(nat, "x");
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(x);
+
+        Term expected = new FunctionTerm(f, subterms);
+        Term parsed = InputParser.parseTerm(functions, "f(x", null);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test(expected = NoSortException.class)
+    public void testParseTermFunctionTermDuplicateFunctionNoSort() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+        Sort nat2 = new Sort("nat2");
+
+        Function zero = new Function(nat, "0");
+        Function zero2 = new Function(nat2, "0");
+
+        Set<Function> functions = new HashSet<>();
+        functions.add(zero);
+        functions.add(zero2);
+
+        InputParser.parseTerm(functions, "0", null);
+    }
+
+    @Test
+    public void testParseTermFunctionTermDuplicateFunction() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+        Sort nat2 = new Sort("nat2");
+
+        Function zero = new Function(nat, "0");
+        Function zero2 = new Function(nat2, "0");
+
+        Set<Function> functions = new HashSet<>();
+        functions.add(zero);
+        functions.add(zero2);
+
+        Term parsed = InputParser.parseTerm(functions, "0", nat);
+        Term expected = new FunctionTerm(zero);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testParseTermFunctionTermDuplicateFunctionNested() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+        Sort nat2 = new Sort("nat2");
+
+        Function zero = new Function(nat, "0");
+        Function zero2 = new Function(nat2, "0");
+
+        Set<Function> functions = new HashSet<>();
+        functions.add(zero);
+        functions.add(zero2);
+
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+
+        Function f = new Function(nat, inputs,"f");
+        functions.add(f);
+
+        FunctionTerm zeroTerm = new FunctionTerm(zero);
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(zeroTerm);
+
+        Term expected = new FunctionTerm(f, subterms);
+        Term parsed = InputParser.parseTerm(functions, "f(0)", null);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testParseTermFunctionTermVariable() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+
+        Function f = new Function(nat, inputs,"f");
+        Set<Function> functions = new HashSet<>();
+        functions.add(f);
+
+        Variable x = new Variable(nat, "x");
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(x);
+
+        Term expected = new FunctionTerm(f, subterms);
+        Term parsed = InputParser.parseTerm(functions, "f(x)", null);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testParseTermFunctionTermConstant() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+
+        Function zero = new Function(nat, "0");
+
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+
+        Function f = new Function(nat, inputs,"f");
+        Set<Function> functions = new HashSet<>();
+        functions.add(f);
+        functions.add(zero);
+
+        FunctionTerm zeroTerm = new FunctionTerm(zero);
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(zeroTerm);
+
+        Term expected = new FunctionTerm(f, subterms);
+        Term parsed = InputParser.parseTerm(functions, "f(0)", null);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testParseTermFunctionTermNestedVariable() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+
+        Function f = new Function(nat, inputs,"f");
+        Set<Function> functions = new HashSet<>();
+        functions.add(f);
+
+        Variable x = new Variable(nat, "x");
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(x);
+
+        Term fx = new FunctionTerm(f, subterms);
+        subterms.clear();
+        subterms.add(fx);
+        Term expected = new FunctionTerm(f, subterms);
+
+        Term parsed = InputParser.parseTerm(functions, "f(f(x))", null);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testParseTermFunctionTermNestedConstant() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+        Function zero = new Function(nat, "0");
+
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+
+        Function f = new Function(nat, inputs,"f");
+        Set<Function> functions = new HashSet<>();
+        functions.add(f);
+        functions.add(zero);
+
+        FunctionTerm zeroTerm = new FunctionTerm(zero);
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(zeroTerm);
+
+        Term f0 = new FunctionTerm(f, subterms);
+        subterms.clear();
+        subterms.add(f0);
+        Term expected = new FunctionTerm(f, subterms);
+
+        Term parsed = InputParser.parseTerm(functions, "f(f(0))", null);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testParseTermFunctionTermMultipleSubterms() throws NoSortException, InvalidFunctionArgumentException {
+        Sort nat = new Sort("nat");
+
+        Function zero = new Function(nat, "0");
+
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+        inputs.add(nat);
+
+        Function f = new Function(nat, inputs,"f");
+        Set<Function> functions = new HashSet<>();
+        functions.add(f);
+        functions.add(zero);
+
+        FunctionTerm zeroTerm = new FunctionTerm(zero);
+        Variable x = new Variable(nat, "x");
+        List<Term> subterms = new ArrayList<>();
+        subterms.add(zeroTerm);
+        subterms.add(x);
+
+        Term expected = new FunctionTerm(f, subterms);
+        Term parsed = InputParser.parseTerm(functions, "f(0, x)", null);
+
+        Assert.assertEquals(expected, parsed);
+    }
+
 }

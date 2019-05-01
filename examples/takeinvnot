@@ -10,8 +10,6 @@ inv i i
 not b b
 
 // Equations
-head(zip(x,y)) = head(x)
-tail(zip(x,y)) = zip(y,tail(x))
 take(0, x) = head(x)
 take(s(x), y) = take(x, tail(y))
 not(0) = 1

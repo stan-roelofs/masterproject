@@ -1,0 +1,11 @@
+// Functions
+** 0 b
+** 1 b
+not b b
+
+// Equations
+not(0) = 1
+not(1) = 0
+
+// Goal
+not(not(x)) = x

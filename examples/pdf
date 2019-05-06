@@ -1,0 +1,41 @@
+** 0 nat
+** s nat nat
+0 b
+1 b
+and b b b
+diff i i
+head i b
+tail i i
+take nat i b
+ones i
+pd i
+not b b
+f i i
+morse i
+zip i i i
+inv i i
+
+not(0) = 1
+not(1) = 0
+and(0, 0) = 1
+and(0, 1) = 0
+and(1, 0) = 0
+and(1, 1) = 1
+head(diff(x)) = and(head(x), head(tail(x)))
+tail(diff(x)) = diff(tail(x))
+head(ones) = 1
+tail(ones) = ones
+take(0, x) = head(x)
+take(s(x), y) = take(x, tail(y))
+pd = diff(morse)
+head(f(x)) = 0
+head(tail(f(x))) = not(head(x))
+tail(tail(f(x))) = f(tail(x))
+head(morse) = 0
+tail(morse) = zip(inv(morse), tail(morse))
+head(zip(x, y)) = head(x)
+tail(zip(x, y)) = zip(y, tail(x))
+head(inv(x)) = not(head(x))
+tail(inv(x)) = inv(tail(x))
+
+take(x, pd) = take(x, f(pd))

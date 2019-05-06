@@ -1,0 +1,23 @@
+** 0 nat
+** s nat nat
+0 b
+1 b
+and b b b
+diff i i
+head i b
+tail i i
+take nat i b
+ones i
+
+and(0, 0) = 1
+and(0, 1) = 0
+and(1, 0) = 0
+and(1, 1) = 1
+head(diff(x)) = and(head(x), head(tail(x)))
+tail(diff(x)) = diff(tail(x))
+head(ones) = 1
+tail(ones) = ones
+take(0, x) = head(x)
+take(s(x), y) = take(x, tail(y))
+
+take(x, diff(ones)) = take(x, ones)

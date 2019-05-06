@@ -1,5 +1,4 @@
 import core.*;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,7 +7,6 @@ import java.util.Set;
 
 public class ProverTests {
 
-    @Test
     public void testInduction() {
         Sort nat = new Sort("nat");
         Function zero = new Function(nat, "0");

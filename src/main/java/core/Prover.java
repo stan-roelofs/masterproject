@@ -359,10 +359,11 @@ public class Prover {
 
         Logger.d("Checking convergence");
 
-/*
+
+        /*
         Logger.d("Left:");
         for (Term t : left) {
-            if (t.toString().contains("head(zip(inv(B), inv(B)))")) {
+            if (t.toString().contains("and(0, head(tail(morse)))")) {
                 Logger.e(t.toString());
             }
         }*/

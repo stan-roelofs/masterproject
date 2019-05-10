@@ -1,0 +1,16 @@
+** 0 nat
+** s nat nat
+S i i
+N nat i
+take nat i nat
+head i nat
+tail i i
+
+take(0, x) = head(x)
+take(s(x), y) = take(x, tail(y))
+head(S(x)) = s(head(x))
+tail(S(x)) = S(tail(x))
+head(N(x)) = x
+tail(N(x)) = N(s(x))
+
+take(x, tail(N(y))) = take(x, S(N(y)))

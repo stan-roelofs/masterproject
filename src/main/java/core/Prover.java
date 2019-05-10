@@ -17,7 +17,7 @@ public class Prover {
     public static String constantName = "a";
     public static int maxDepth = 2;
     private static boolean rewriteRight = true;
-    private static boolean rewriteLeft = false;
+    private static boolean rewriteLeft = true;
 
     public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {

@@ -175,7 +175,7 @@ public class Prover {
         return true;
     }
 
-    /**
+    /*
      * modifies newconstants, hypotheses
      */
     private static void generateHypotheses(Function function, Variable inductionVar, EquationSystem system, List<Term> newConstants, List<Equation> hypotheses) {

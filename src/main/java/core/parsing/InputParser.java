@@ -73,8 +73,11 @@ public class InputParser {
      * Takes a string as input and constructs a Function object from this input
      *
      * @param line the input string
+     * @param Sigma A set of functions that have been parsed already, the parsed function will be added
+     * @param C A set of functions (constructors) that have been parsed already, the parsed function will be added if
+     *          {@code line} begins with **
      * @return A Function object based on the contents of the input string
-     * @throws IllegalArgumentException if {@code line} is null or is missing information
+     * @throws IllegalArgumentException if any of the parameters are null, or {@code line} is incorrectly structured
      * @see Function
      */
     public static Function parseFunction(String line, Set<Function> Sigma, Set<Function> C) throws IllegalArgumentException {
@@ -137,6 +140,8 @@ public class InputParser {
      * @throws IllegalArgumentException if {@code functions} is empty or null, {@code line} is null,
      *                                  {@code line} contains less or more than one "=", or {@code line}
      *                                  is empty left or right of "="
+     * @throws InvalidFunctionArgumentException if parsing the left or right term throws an InvalidFunctionArgumentException
+     * @throws NoSortException if the sort of left AND right cannot be deduced
      * @see Equation
      * @see Function
      */
@@ -179,7 +184,10 @@ public class InputParser {
      * @param line The input string
      * @param varSort The expected sort of the variable if {@code line} represents a variable
      * @return A term object that represents the same term as {@code line}
-     * @throws IllegalArgumentException if {@code functions} is empty or null,
+     * @throws IllegalArgumentException if {@code functions} is null, {@code line} is null or empty, or has an invalid format which cannot be parsed
+     * @throws InvalidFunctionArgumentException if the arguments of a function are invalid
+     * @throws NoSortException if a sort should be specified to parse this term (for example if it's a variable, or there are two functions with equal names
+     *                          but different sorts) but {@code varSort} is null
      * @see Function
      * @see Term
      * @see Variable

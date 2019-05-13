@@ -1,0 +1,21 @@
+// Functions
+** 0 nat
+** s nat nat
+0 b
+1 b
+take nat i b
+head i b
+tail i i
+zip i i i
+even i i
+
+// Equations
+head(zip(x,y)) = head(x)
+tail(zip(x,y)) = zip(y,tail(x))
+take(0,x) = head(x)
+take(s(x),y) = take(x,tail(y))
+head(even(x)) = head(x)
+tail(even(x)) = even(tail(tail(x)))
+
+// Goal
+take(x, even(zip(y, z))) = take(x, y)

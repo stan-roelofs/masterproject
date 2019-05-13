@@ -49,12 +49,12 @@ public class FunctionTerm extends Term {
         this.subterms = new ArrayList<>();
 
         if (subTerms == null || subTerms.size() != function.getInputSorts().size()) {
-            throw new IllegalArgumentException("Number of arguments does not match the number of function inputs");
+            throw new IllegalArgumentException("Number of arguments does not match the number of function inputs of function" + function.toString());
         }
 
         for (int i = 0; i < subTerms.size(); i++) {
             if (!function.getInputSorts().get(i).equals(subTerms.get(i).getSort())) {
-                throw new IllegalArgumentException("Input sort at position " + i + " does not match subterm sort");
+                throw new IllegalArgumentException("Input sort at position " + i + " does not match subterm sort of function " + function.toString());
             }
         }
 

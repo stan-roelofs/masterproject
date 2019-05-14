@@ -73,7 +73,7 @@ class ProofPanel extends JPanel {
             int searchDepth = Integer.parseInt(searchSteps.getText());
 
             try {
-                Prover.induction(system, writer, searchDepth, 0, null);
+                Prover.induction(system, writer, searchDepth, true,0, null);
                 writer.close();
             } catch (IOException e) {
                 Logger.e("IOException: " + e.getMessage());

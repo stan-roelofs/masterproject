@@ -16,10 +16,8 @@ public class Prover {
 
     public static String constantName = "a";
     public static int maxDepth = 2;
-    private static boolean rewriteRight = true;
-    private static boolean rewriteLeft = true;
 
-    public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, int recursionDepth, Variable inductionVar) throws IOException {
+    public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {
             Logger.i("Reached maximum recursion depth of " + maxDepth + ", returning false");
             outputWriter.writeLine("Maximum recursion depth " + maxDepth + " reached, induction on " + inductionVar.toString() + " failed.");
@@ -41,7 +39,7 @@ public class Prover {
             for (Variable variable : allVariables) {
                 Logger.i("Induction on " + variable.toString());
                 outputWriter.writeLine("Trying induction variable: " + variable.toString());
-                if (induction(system, outputWriter, searchSteps, recursionDepth, variable)) {
+                if (induction(system, outputWriter, searchSteps, rewriteLeft, recursionDepth, variable)) {
                     return true;
                 }
             }
@@ -124,7 +122,7 @@ public class Prover {
                 RewriteThread[] rewriteThreads = new RewriteThread[numThreads];
                 Thread[] threads = new Thread[numThreads];
                 for (int i = 0; i < numThreads; i++) {
-                    rewriteThreads[i] = new RewriteThread(i, leftTerms, rightTerms, threadEquations.get(i), leftSteps, rightSteps);
+                    rewriteThreads[i] = new RewriteThread(i, leftTerms, rightTerms, threadEquations.get(i), leftSteps, rightSteps, true, rewriteLeft);
                     threads[i] = new Thread(rewriteThreads[i]);
                     threads[i].start();
                 }
@@ -165,7 +163,7 @@ public class Prover {
 
                 Equation newGoalll = system.getGoal().substitute(inductionVar, newInductionTerm);
                 EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);
-                return induction(newSystem, outputWriter, searchSteps, recursionDepth + 1, inductionVar);
+                return induction(newSystem, outputWriter, searchSteps, rewriteLeft, recursionDepth + 1, inductionVar);
             } else {
                 List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
                 String conversionString = getConversionString(conversion);
@@ -297,7 +295,7 @@ public class Prover {
      *
      * Returns a set of terms created as a result of this procedure
      */
-    public static Set<Term> rewriteAll(Set<Term> terms, Set<Equation> allEquations, Map<Term, Term> steps) {
+    public static Set<Term> rewriteAll(Set<Term> terms, Set<Equation> allEquations, Map<Term, Term> steps, boolean rewriteRight, boolean rewriteLeft) {
         Set<Term> toAdd = new HashSet<>();
 
         for (Term term : terms) {

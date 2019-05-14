@@ -20,20 +20,25 @@ class RewriteThread implements Runnable {
     private Map<Term, Term> leftSteps;
     private Map<Term, Term> rightSteps;
     private int threadNumber;
+    private boolean rewriteLeft;
+    private boolean rewriteRight;
 
-    RewriteThread(int thread, Set<Term> leftTerms, Set<Term> rightTerms, Set<Equation> equations, Map<Term, Term> leftSteps, Map<Term, Term> rightSteps) {
+    RewriteThread(int thread, Set<Term> leftTerms, Set<Term> rightTerms, Set<Equation> equations,
+                  Map<Term, Term> leftSteps, Map<Term, Term> rightSteps, boolean rewriteRight, boolean rewriteLeft) {
         this.leftTerms = leftTerms;
         this.rightTerms = rightTerms;
         this.equations = equations;
         this.leftSteps = leftSteps;
         this.rightSteps = rightSteps;
         this.threadNumber = thread;
+        this.rewriteLeft = rewriteLeft;
+        this.rewriteRight = rewriteRight;
     }
 
     @Override
     public void run() {
-        resultLeft.addAll(Prover.rewriteAll(leftTerms, equations, leftSteps));
-        resultRight.addAll(Prover.rewriteAll(rightTerms, equations, rightSteps));
+        resultLeft.addAll(Prover.rewriteAll(leftTerms, equations, leftSteps, rewriteRight, rewriteLeft));
+        resultRight.addAll(Prover.rewriteAll(rightTerms, equations, rightSteps, rewriteRight, rewriteLeft));
 
         Logger.d("Thread " + threadNumber + " done");
     }

@@ -21,6 +21,7 @@ public class Main {
         options.addOption(Option.builder("i").longOpt("input").hasArg().desc("File name of input file").argName("file").required().build());
         options.addOption(Option.builder("o").longOpt("output").hasArg().desc("File name of output file").argName("file").build());
         options.addOption(Option.builder("d").longOpt("depth").hasArg().desc("The maximum depth when using BFS to search for a conversion").build());
+        options.addOption(Option.builder("rl").longOpt("rewriteLeft").desc("Enables rewriting in both directions, rather than only left to right").build());
 
         try {
             // parse the command line arguments
@@ -69,7 +70,12 @@ public class Main {
                     searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
                 }
 
-                Prover.induction(system, writer, searchDepth, 0, null);
+                boolean rewriteLeft = false;
+                if (commandLine.hasOption("rl")) {
+                    rewriteLeft = true;
+                }
+
+                Prover.induction(system, writer, searchDepth, rewriteLeft, 0, null);
                 writer.close();
 
             } catch (IOException e) {

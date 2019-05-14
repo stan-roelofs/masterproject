@@ -2,11 +2,11 @@
 ** 0 nat
 ** s nat nat
 0 b
+1 b
 take nat i b
 head i b
 tail i i
 zip i i i
-: b i i
 f i i
 inv i i
 not b b
@@ -15,16 +15,19 @@ morse i
 // Equations
 head(zip(x,y)) = head(x)
 tail(zip(x,y)) = zip(y,tail(x))
-head(:(x,y)) = x
-tail(:(x,y)) = y
 not(not(x)) = x
-f(x) = :(head(x),:(not(head(x)),f(tail(x))))
+head(f(x)) = head(x)
+head(tail(f(x))) = not(head(x))
+tail(tail(f(x))) = f(tail(x))
 take(0,x) = head(x)
 take(s(x),y) = take(x,tail(y))
-inv(x) = :(not(head(x)),inv(tail(x)))
+head(inv(x)) = not(head(x))
+tail(inv(x)) = inv(tail(x))
 head(morse) = 0
 tail(morse) = zip(inv(morse),tail(morse))
-take(x,f(y)) = take(x,zip(y,inv(y)))
+not(0) = 1
+not(1) = 0
+zip(y,inv(y)) = f(y)
 
 // Goal
 take(x,f(morse)) = take(x,morse)

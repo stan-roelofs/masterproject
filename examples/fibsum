@@ -1,0 +1,37 @@
+// take(x, Acc(Fib)) = take(s(s(x)), -(Fib, 1)
+** 0 nat
+** s nat nat
+head i nat
+tail i i
+take nat i nat
+fib nat nat
+fibseq nat i
++ nat nat nat
+Acc i i
+Pl i i i
+one i
+a1 nat
+
+take(0, x) = head(x)
+take(s(x), y) = take(x, tail(y))
+fib(0) = 0
+fib(s(0)) = s(0)
+fib(s(s(x))) = +(fib(x), fib(s(x)))
+head(fibseq(x)) = fib(x)
+tail(fibseq(x)) = fibseq(s(x))
+head(one) = s(0)
+tail(one) = one
+head(Acc(x)) = head(x)
+tail(Acc(x)) = Pl(Acc(x), tail(x))
+head(Pl(x, y)) = +(head(x), head(y))
+tail(Pl(x, y)) = Pl(tail(x), tail(y))
++(0, x) = x
++(s(x), y) = s(+(x, y))
+take(s(a1), Pl(Pl(Acc(fibseq(0)), one), x)) = take(s(a1), Pl(fibseq(s(s(0))), x))
+Pl(Pl(x, y), z) = Pl(x, Pl(y, z))
+Pl(x, Pl(y, z)) = Pl(Pl(x, y), z)
+Pl(x, y) = Pl(y, x)
+Pl(fibseq(x), fibseq(s(x))) = fibseq(s(s(x)))
+fibseq(s(x)) = tail(fibseq(x))
+
+take(x, Pl(Acc(fibseq(0)), one)) = take(x, fibseq(s(s(0))))

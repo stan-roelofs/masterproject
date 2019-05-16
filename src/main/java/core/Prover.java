@@ -77,7 +77,7 @@ public class Prover {
                     sb.append(hypothesis.toString());
                     sb.append(" ");
                 }
-                outputWriter.writeLine("Hypotheses: " + sb.toString());
+                outputWriter.writeLine("Added hypotheses: " + sb.toString());
             }
 
             // Do BFS for convertibility

@@ -39,7 +39,6 @@ head(inv(x)) = not(head(x))
 tail(inv(x)) = inv(tail(x))
 f(x) = zip(zeroes, inv(x))
 diff(zip(x, inv(x))) = zip(zeroes, inv(diff(x)))
-diff(inv(x)) = diff(x)
 head(zeroes) = 0
 tail(zeroes) = zeroes
 

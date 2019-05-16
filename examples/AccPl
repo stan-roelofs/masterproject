@@ -1,0 +1,23 @@
+// Functions
+** 0 nat
+** s nat nat
+take nat i nat
+head i nat
+tail i i
+Acc i i
+Pl i i i
++ nat nat nat
+
+// Equations
+take(0,x) = head(x)
+take(s(x),y) = take(x,tail(y))
+head(Acc(x)) = head(x)
+tail(Acc(x)) = Pl(Acc(x), tail(x))
+head(Pl(x, y)) = +(head(x), head(y))
+tail(Pl(x, y)) = Pl(tail(x), tail(y))
++(0, x) = x
++(s(x), y) = s(+(x, y))
+
+
+// Goal
+take(x, Pl(Acc(y), Acc(z))) = take(x, Acc(Pl(y, z)))

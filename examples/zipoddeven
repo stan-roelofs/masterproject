@@ -1,0 +1,18 @@
+** 0 nat
+** s nat nat
+zip i i i
+odd i i
+even i i
+head i d
+tail i i
+take nat i d
+
+take(0, x) = head(x)
+take(s(x), xs) = take(x, tail(xs))
+head(zip(xs, ys)) = head(xs)
+tail(zip(xs, ys)) = zip(ys, tail(xs))
+head(odd(xs)) = head(xs)
+tail(odd(xs)) = even(tail(xs))
+even(xs) = odd(tail(xs))
+
+take(x, zip(odd(xs), even(xs))) = take(x, xs)

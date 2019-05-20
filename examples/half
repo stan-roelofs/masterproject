@@ -1,0 +1,13 @@
+** 0 nat
+** s nat nat
+h nat nat
+f nat nat
+
+h(0) = 0
+h(s(0)) = 0
+h(s(s(x))) = s(h(x))
+f(0) = 0
+f(s(x)) = f(h(x))
+f(h(a1)) = 0
+
+f(x) = 0

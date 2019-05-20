@@ -10,13 +10,11 @@ f i i
 inv i i
 not b b
 morse i
-: b i i
 
 // Equations
 head(zip(x,y)) = head(x)
 tail(zip(x,y)) = zip(y,tail(x))
 not(not(x)) = x
-tail(f(x)) = :(not(head(x)),f(tail(x)))
 take(0,x) = head(x)
 take(s(x),y) = take(x,tail(y))
 head(inv(x)) = not(head(x))

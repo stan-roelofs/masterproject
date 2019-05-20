@@ -1,0 +1,17 @@
+** 0 nat
+** s nat nat
++ nat nat nat
+fib nat nat
+S nat nat
+
++(0, x) = x
++(s(x), y) = s(+(x, y))
++(x, +(y, z)) = +(+(x, y), z)
++(x, y) = +(y, x)
+fib(0) = 0
+fib(s(0)) = s(0)
+fib(s(s(x))) = +(fib(x), fib(s(x)))
+S(0) = 0
+S(s(x)) = +(s(x), S(x))
+
++(S(fib(x)), s(0)) = fib(s(s(x)))

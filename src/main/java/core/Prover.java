@@ -197,6 +197,7 @@ public class Prover {
                 Equation hypothesis = system.getGoal().substitute(inductionVar, a);
                 hypotheses.add(hypothesis);
             }
+            count++;
         }
     }
 

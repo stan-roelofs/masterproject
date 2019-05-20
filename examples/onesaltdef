@@ -1,0 +1,30 @@
+// Functions
+** 0 nat
+** s nat nat
+1 b
+0 b
+ones i
+take nat i b
+head i b
+tail i i
+zip i i i
+h nat nat
+: b i i
+
+// Equations
+head(zip(x,y)) = head(x)
+tail(zip(x,y)) = zip(y,tail(x))
+take(0,x) = head(x)
+take(s(x),y) = take(x,tail(y))
+head(ones) = 1
+tail(ones) = zip(ones, ones)
+take(x, zip(y, y)) = take(h(x), y)
+h(0) = 0
+h(s(0)) = 0
+h(s(s(x))) = s(h(x))
+head(:(x, xs)) = x
+tail(:(x, xs)) = xs
+take(x, ones) = 1
+
+// Goal
+take(x, ones) = take(x, :(1, ones))

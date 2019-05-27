@@ -18,6 +18,5 @@ tail(Pl(x, y)) = Pl(tail(x), tail(y))
 +(0, x) = x
 +(s(x), y) = s(+(x, y))
 
-
 // Goal
 take(x, Pl(Acc(y), Acc(z))) = take(x, Acc(Pl(y, z)))

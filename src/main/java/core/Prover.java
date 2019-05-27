@@ -147,8 +147,13 @@ public class Prover {
             if (convergence == null) {
                 Logger.w("Convergence null");
 
-                // TODO: for now only double induction for s
-                if (!function.getName().equals("s") || function.getInputSorts().size() != 1) {
+                Function successor = null;
+                for (Function f : system.getC()) {
+                    if (f.getName().equals("s") && f.getInputSorts().size() == 1) {
+                        successor = f;
+                    }
+                }
+                if (successor == null || successor.getOutputSort() != inductionVar.getSort()) {
                     Logger.w("Skipping double induction");
                     outputWriter.writeLine("Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
                     return false;
@@ -159,7 +164,7 @@ public class Prover {
                 // Create term f
                 List<Term> subterms = new ArrayList<>();
                 subterms.add(inductionVar);
-                Term newInductionTerm = new FunctionTerm(function, subterms);
+                Term newInductionTerm = new FunctionTerm(successor, subterms);
 
                 Equation newGoalll = system.getGoal().substitute(inductionVar, newInductionTerm);
                 EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);

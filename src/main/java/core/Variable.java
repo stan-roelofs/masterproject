@@ -10,7 +10,7 @@ import java.util.Set;
  * A variable is a Term and additionally has a name
  *
  * @author Stan Roelofs
- * @version 1.01
+ * @version 1.02
  */
 public class Variable extends Term {
     private String name;
@@ -95,8 +95,18 @@ public class Variable extends Term {
     }
 
     @Override
-    public Set<Function> getFunctions() {
+    public Set<Function> getUniqueFunctions() {
         return new HashSet<>();
+    }
+
+    @Override
+    public int functionsAmount() {
+        return 0;
+    }
+
+    @Override
+    public int variablesAmountDistinct() {
+        return 1;
     }
 
     @Override

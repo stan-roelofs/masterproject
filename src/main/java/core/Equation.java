@@ -82,8 +82,8 @@ public class Equation {
      */
     public Set<Function> getFunctions() {
         Set<Function> result = new HashSet<>();
-        result.addAll(left.getFunctions());
-        result.addAll(right.getFunctions());
+        result.addAll(left.getUniqueFunctions());
+        result.addAll(right.getUniqueFunctions());
         return result;
     }
 

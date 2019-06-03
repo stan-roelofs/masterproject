@@ -396,7 +396,7 @@ public class FunctionTermTests {
 
         FunctionTerm term = new FunctionTerm(f);
 
-        Assert.assertEquals(expected, term.getFunctions());
+        Assert.assertEquals(expected, term.getUniqueFunctions());
     }
 
     /**
@@ -415,7 +415,7 @@ public class FunctionTermTests {
 
         Set<Function> expected = new HashSet<>();
         expected.add(f);
-        Assert.assertEquals(expected, t.getFunctions());
+        Assert.assertEquals(expected, t.getUniqueFunctions());
     }
 
     /**
@@ -440,7 +440,7 @@ public class FunctionTermTests {
         expected.add(f);
         expected.add(g);
 
-        Assert.assertEquals(expected, t3.getFunctions());
+        Assert.assertEquals(expected, t3.getUniqueFunctions());
     }
 
     @Test

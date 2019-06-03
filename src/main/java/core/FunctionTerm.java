@@ -7,7 +7,7 @@ import java.util.*;
  * arguments
  *
  * @author Stan Roelofs
- * @version 1.01
+ * @version 1.02
  */
 public class FunctionTerm extends Term {
     private List<Term> subterms;
@@ -162,12 +162,34 @@ public class FunctionTerm extends Term {
     }
 
     @Override
-    public Set<Function> getFunctions() {
+    public Set<Function> getUniqueFunctions() {
         Set<Function> result = new HashSet<>();
         result.add(this.function);
 
         for (Term subterm : this.subterms) {
-            result.addAll(subterm.getFunctions());
+            result.addAll(subterm.getUniqueFunctions());
+        }
+
+        return result;
+    }
+
+    @Override
+    public int functionsAmount() {
+        int result = 1;
+
+        for (Term subterm : this.subterms) {
+            result += subterm.functionsAmount();
+        }
+
+        return result;
+    }
+
+    @Override
+    public int variablesAmountDistinct() {
+        int result = 0;
+
+        for (Term subterm : this.subterms) {
+            result += subterm.variablesAmountDistinct();
         }
 
         return result;

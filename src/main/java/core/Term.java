@@ -7,7 +7,7 @@ import java.util.Set;
  * Abstract class that represents a term
  *
  * @author Stan Roelofs
- * @version 1.01
+ * @version 1.02
  */
 public abstract class Term {
     protected Sort sort;
@@ -73,7 +73,21 @@ public abstract class Term {
      * @return A set of functions that occur in this term
      * @see Function
      */
-    public abstract Set<Function> getFunctions();
+    public abstract Set<Function> getUniqueFunctions();
+
+    /**
+     * Returns the number of functions that occur in this term
+     * @return The total number of functions that occur in this term
+     * @see Function
+     */
+    public abstract int functionsAmount();
+
+    /**
+     * Returns the number of distinct variables that occur in this term
+     * @return The number of distinct variables that occur in this term and its subterms
+     * @see Variable
+     */
+    public abstract int variablesAmountDistinct();
 
     public abstract String toString();
 

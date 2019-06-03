@@ -245,13 +245,13 @@ public class VariableTests {
     }
 
     /**
-     * getFunctions should return an empty set as a variable
+     * getUniqueFunctions should return an empty set as a variable
      * does not contain any functions
      */
     @Test
     public void testGetFunctions() {
         Variable v = new Variable(new Sort("x"), "x");
-        Assert.assertTrue(v.getFunctions().isEmpty());
+        Assert.assertTrue(v.getUniqueFunctions().isEmpty());
     }
 
     @Test

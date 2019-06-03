@@ -392,4 +392,40 @@ public class Prover {
 
         return intersection.isEmpty() ? null : intersection.iterator().next();
     }
+
+    public static EquationSystem generateLemmas(EquationSystem system, OutputWriter outputWriter, int maxLemmas, int maxAttempts, int searchSteps, boolean rewriteLeft, int recursionDepth, Variable inductionVar) throws IOException {
+        Set<Equation> result = new HashSet<>(system.getEquations());
+
+        Logger.i("Searching for a maximum of " + maxLemmas + " lemmas, terminating after " + maxAttempts + " attempts...");
+
+        // Stop when either the maximum number of lemmas is reached, or the maximum number of attempts is reached
+        int found = 0;
+        int attempts = 0;
+        while (found < maxLemmas && attempts < maxAttempts) {
+            // Create an equation
+            Term left = null;
+            Term right = null;
+            Equation lemma = new Equation(left, right);
+
+            // Test whether it is likely correct by verifying it holds on small terms
+
+            // If proven, add it to result
+            if (induction(new EquationSystem(result, system.getSigma(), system.getC(), lemma), outputWriter, searchSteps, rewriteLeft, recursionDepth, inductionVar)) {
+                result.add(lemma);
+                found++;
+            }
+
+
+            attempts++;
+        }
+
+        return new EquationSystem(result, system.getSigma(), system.getC(), system.getGoal());
+    }
+
+    private static double getWeight(Term term, double epsilon) {
+        int numFunctions = term.functionsAmount();
+        int numVariables = term.variablesAmountDistinct();
+
+        return numFunctions - epsilon * numVariables;
+    }
 }

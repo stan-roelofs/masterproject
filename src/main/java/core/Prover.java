@@ -393,10 +393,83 @@ public class Prover {
         return intersection.isEmpty() ? null : intersection.iterator().next();
     }
 
+    private static Set<Term> generateTerms(Set<Term> terms, FunctionTerm f) {
+        Set<Term> result = new HashSet<>();
+
+        if (f.getVariables().isEmpty()) {
+            result.add(f);
+            return result;
+        }
+
+        //TODO
+        return result;
+    }
+
     public static EquationSystem generateLemmas(EquationSystem system, OutputWriter outputWriter, int maxLemmas, int maxAttempts, int searchSteps, boolean rewriteLeft, int recursionDepth, Variable inductionVar) throws IOException {
         Set<Equation> result = new HashSet<>(system.getEquations());
 
         Logger.i("Searching for a maximum of " + maxLemmas + " lemmas, terminating after " + maxAttempts + " attempts...");
+
+        Map<Sort, Integer> numVariables = new HashMap<>();
+        for (Function f : system.getSigma()) {
+
+            Map<Sort, Integer> numSorts = new HashMap<>(f.getInputSorts().size());
+            for (Sort s : f.getInputSorts()) {
+                int current = numSorts.get(s) == null ? 0 : numSorts.get(s);
+                numSorts.put(s, current + 1);
+            }
+
+            for (Sort s : f.getInputSorts()) {
+                int max = numVariables.get(s) == null ? 0 : numVariables.get(s);
+                if (numSorts.get(s) > max) {
+                    numVariables.put(s, numSorts.get(s));
+                }
+            }
+        }
+
+        Map<Sort, List<Term>> variables = new HashMap<>();
+        int variableCounter = 0;
+        for (Map.Entry<Sort, Integer> entry : numVariables.entrySet()) {
+            Logger.d(entry.getKey().toString() + " : " + entry.getValue());
+            variables.put(entry.getKey(), new ArrayList<>());
+
+            for (int i = 0; i < entry.getValue(); i++) {
+                Variable v = new Variable(entry.getKey(), "x" + variableCounter);
+                variables.get(entry.getKey()).add(v);
+
+                Logger.d("Generated variable: " + v.toString() + " : " + v.getSort().toString());
+
+                variableCounter++;
+            }
+        }
+
+        Set<Term> terms = new HashSet<>();
+        for (Sort s : variables.keySet()) {
+            terms.addAll(variables.get(s));
+        }
+        for (int i = 0; i < 1; i++) {
+            for (Function f : system.getSigma()) {
+                List<Term> inputs = new ArrayList<>();
+
+                Set<Sort> uniqueInputSorts = new HashSet<>(f.getInputSorts());
+
+                Map<Sort, Integer> indexes = new HashMap<>();
+                for (Sort s : uniqueInputSorts) {
+                    indexes.put(s, 0);
+                }
+
+                for (int j = 0; j < f.getInputSorts().size(); j++) {
+                    Sort s = f.getInputSorts().get(j);
+                    inputs.add(variables.get(s).get(indexes.get(s)));
+                    indexes.put(s, indexes.get(s) + 1);
+                }
+
+                FunctionTerm term = new FunctionTerm(f, inputs);
+                Logger.d("TERM: " + term.toString());
+            }
+        }
+
+
 
         // Stop when either the maximum number of lemmas is reached, or the maximum number of attempts is reached
         int found = 0;
@@ -422,9 +495,16 @@ public class Prover {
         return new EquationSystem(result, system.getSigma(), system.getC(), system.getGoal());
     }
 
+    private static boolean checkLikelyEqual(EquationSystem system, int attempts) {
+
+
+
+        return true;
+    }
+
     private static double getWeight(Term term, double epsilon) {
         int numFunctions = term.functionsAmount();
-        int numVariables = term.variablesAmountDistinct();
+        int numVariables = term.getVariables().size();
 
         return numFunctions - epsilon * numVariables;
     }

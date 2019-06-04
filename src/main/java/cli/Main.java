@@ -75,7 +75,8 @@ public class Main {
                     rewriteLeft = true;
                 }
 
-                Prover.induction(system, writer, searchDepth, rewriteLeft, 0, null);
+                //Prover.induction(system, writer, searchDepth, rewriteLeft, 0, null);
+                Prover.generateLemmas(system, writer, 10, 100, searchDepth, rewriteLeft, 0, null);
                 writer.close();
 
             } catch (IOException e) {

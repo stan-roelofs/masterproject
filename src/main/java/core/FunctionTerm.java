@@ -186,13 +186,7 @@ public class FunctionTerm extends Term {
 
     @Override
     public int variablesAmountDistinct() {
-        int result = 0;
-
-        for (Term subterm : this.subterms) {
-            result += subterm.variablesAmountDistinct();
-        }
-
-        return result;
+        return this.getVariables().size();
     }
 
     @Override

@@ -384,6 +384,94 @@ public class FunctionTermTests {
     }
 
     /**
+     * If t contains no variables, expect 0
+     */
+    @Test
+    public void testVariablesAmountDistinctNone() {
+        Sort s = new Sort("x");
+        Function f = new Function(s, "f");
+        Term t = new FunctionTerm(f);
+        Assert.assertEquals(0, t.variablesAmountDistinct());
+    }
+
+    /**
+     * If t has a single variable as direct subterm
+     */
+    @Test
+    public void testVariablesAmountDistinctSingle() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Assert.assertEquals(1, t.variablesAmountDistinct());
+    }
+
+    /**
+     * If t has a single variable as subterm of a subterm
+     */
+    @Test
+    public void testVariablesAmountDistinctDeep() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Term t2 = t.substitute(x, t);
+
+        Assert.assertEquals(1, t2.variablesAmountDistinct());
+    }
+
+    /**
+     * If t has multiple distinct variables in subterms
+     */
+    @Test
+    public void testVariablesAmountDistinctDeepMultiple() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        Variable y = new Variable(s, "y");
+        subterms.add(x);
+        subterms.add(y);
+        Term t = new FunctionTerm(f, subterms);
+        Term t2 = t.substitute(x, t);
+        Term t3 = t2.substitute(y, t);
+
+        Assert.assertEquals(2, t3.variablesAmountDistinct());
+    }
+
+    /**
+     * If t has multiple of the same variables in subterms
+     */
+    @Test
+    public void testVariablesAmountDistinctDeepMultipleEqual() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms);
+        Term t2 = t.substitute(x, t);
+        Term t3 = t2.substitute(x, t);
+
+        Assert.assertEquals(1, t3.variablesAmountDistinct());
+    }
+
+    /**
      * If t is a constant
      */
     @Test
@@ -442,6 +530,60 @@ public class FunctionTermTests {
 
         Assert.assertEquals(expected, t3.getUniqueFunctions());
     }
+
+    /**
+     * If t is a constant
+     */
+    @Test
+    public void testFunctionsAmountConstant() {
+        Sort s = new Sort("nat");
+        Function f = new Function(s, "0");
+
+        FunctionTerm term = new FunctionTerm(f);
+
+        Assert.assertEquals(1, term.functionsAmount());
+    }
+
+    /**
+     * If t contains functions in its subterms + itself
+     */
+    @Test
+    public void testFunctionsAmountDeepDistinct() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        Function g = new Function(s, inputs, "g");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms); // f(x)
+        Term t2 = new FunctionTerm(g, subterms); // g(x)
+
+        Term t3 = t.substitute(x, t2); // f(g(x))
+
+        Assert.assertEquals(2, t3.functionsAmount());
+    }
+
+    /**
+     * If t contains functions in its subterms + itself
+     */
+    @Test
+    public void testFunctionsAmountDeepEqual() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("x");
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms); // f(x)
+
+        Term t3 = t.substitute(x, t); // f(f(x))
+
+        Assert.assertEquals(2, t3.functionsAmount());
+    }
+
 
     @Test
     public void testToStringConstant() {

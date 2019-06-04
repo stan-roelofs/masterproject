@@ -86,6 +86,7 @@ public abstract class Term {
      * Returns the number of distinct variables that occur in this term
      * @return The number of distinct variables that occur in this term and its subterms
      * @see Variable
+     * @deprecated
      */
     public abstract int variablesAmountDistinct();
 

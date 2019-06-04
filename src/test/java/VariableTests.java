@@ -254,6 +254,24 @@ public class VariableTests {
         Assert.assertTrue(v.getUniqueFunctions().isEmpty());
     }
 
+    /**
+     * getVariables should return 1 for a variable
+     */
+    @Test
+    public void testVariablesAmountDistinct() {
+        Variable v = new Variable(new Sort("x"), "x");
+        Assert.assertEquals(v.variablesAmountDistinct(), 1);
+    }
+
+    /**
+     * functionsAmount should return 0 a variable does not contain any functions
+     */
+    @Test
+    public void testFunctionsAmount() {
+        Variable v = new Variable(new Sort("x"), "x");
+        Assert.assertEquals(0, v.functionsAmount());
+    }
+
     @Test
     public void testToString() {
         Variable v = new Variable(new Sort("x"), "name123");

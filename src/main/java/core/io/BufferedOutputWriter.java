@@ -14,11 +14,17 @@ public class BufferedOutputWriter extends OutputWriter {
 
     @Override
     public void write(String line) throws IOException {
+        if (!enabled) {
+            return;
+        }
         writer.write(line);
     }
 
     @Override
     public void writeLine(String line) throws IOException {
+        if (!enabled) {
+            return;
+        }
         writer.write(line);
         writer.newLine();
     }

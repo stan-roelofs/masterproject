@@ -5,6 +5,8 @@ import java.util.Collection;
 
 public abstract class OutputWriter {
 
+    protected boolean enabled = true;
+
     public abstract void write(String text) throws IOException;
 
     public abstract void writeLine(String text) throws IOException;
@@ -22,4 +24,8 @@ public abstract class OutputWriter {
     }
 
     public abstract void close() throws IOException;
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 }

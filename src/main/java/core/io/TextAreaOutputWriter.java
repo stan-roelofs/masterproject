@@ -1,7 +1,6 @@
 package core.io;
 
 import javax.swing.*;
-import java.io.IOException;
 
 public class TextAreaOutputWriter extends OutputWriter {
 
@@ -12,18 +11,24 @@ public class TextAreaOutputWriter extends OutputWriter {
     }
 
     @Override
-    public void write(String text) throws IOException {
+    public void write(String text) {
+        if (!enabled) {
+            return;
+        }
         this.textArea.append(text);
     }
 
     @Override
-    public void writeLine(String text) throws IOException {
+    public void writeLine(String text) {
+        if (!enabled) {
+            return;
+        }
         write(text);
         write("\n");
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 }

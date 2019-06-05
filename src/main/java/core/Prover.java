@@ -393,15 +393,25 @@ public class Prover {
         return intersection.isEmpty() ? null : intersection.iterator().next();
     }
 
-    private static Set<Term> generateTerms(Set<Term> terms, FunctionTerm f) {
+    private static Set<Term> generateTerms(Set<Term> terms, Term term) {
         Set<Term> result = new HashSet<>();
 
-        if (f.getVariables().isEmpty()) {
-            result.add(f);
+        if (term.getVariables().isEmpty()) {
+            result.add(term);
             return result;
         }
 
-        //TODO
+        Set<Variable> vars = term.getVariables();
+        for (Variable var : vars) {
+            for (Term t : terms) {
+                if (var.getSort().equals(t.getSort())) {
+                    Term temp = term.substitute(var, t);
+                    //result.addAll(generateTerms(terms, temp));
+                    result.add(temp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -447,29 +457,47 @@ public class Prover {
         for (Sort s : variables.keySet()) {
             terms.addAll(variables.get(s));
         }
-        for (int i = 0; i < 1; i++) {
-            for (Function f : system.getSigma()) {
-                List<Term> inputs = new ArrayList<>();
 
-                Set<Sort> uniqueInputSorts = new HashSet<>(f.getInputSorts());
+        for (Function f : system.getSigma()) {
+            List<Term> inputs = new ArrayList<>();
 
-                Map<Sort, Integer> indexes = new HashMap<>();
-                for (Sort s : uniqueInputSorts) {
-                    indexes.put(s, 0);
-                }
+            Set<Sort> uniqueInputSorts = new HashSet<>(f.getInputSorts());
 
-                for (int j = 0; j < f.getInputSorts().size(); j++) {
-                    Sort s = f.getInputSorts().get(j);
-                    inputs.add(variables.get(s).get(indexes.get(s)));
-                    indexes.put(s, indexes.get(s) + 1);
-                }
-
-                FunctionTerm term = new FunctionTerm(f, inputs);
-                Logger.d("TERM: " + term.toString());
+            Map<Sort, Integer> indexes = new HashMap<>();
+            for (Sort s : uniqueInputSorts) {
+                indexes.put(s, 0);
             }
+
+            for (int j = 0; j < f.getInputSorts().size(); j++) {
+                Sort s = f.getInputSorts().get(j);
+                inputs.add(variables.get(s).get(indexes.get(s)));
+                indexes.put(s, indexes.get(s) + 1);
+            }
+
+            FunctionTerm term = new FunctionTerm(f, inputs);
+            terms.add(term);
+            Logger.d("TERM: " + term.toString());
         }
 
 
+        for (int i = 0; i < 1; i++) {
+            Set<Term> temp = new HashSet<>();
+            for (Term term : terms) {
+                temp.addAll(generateTerms(terms, term));
+            }
+            terms.addAll(temp);
+        }
+
+        List<Term> temp = new ArrayList<>(terms);
+        temp.sort((o1, o2) -> {
+            double w1 = getWeight(o1, 0.1);
+            double w2 = getWeight(o2, 0.1);
+            return Double.compare(w1, w2);
+        });
+
+        for (Term term : temp) {
+            System.out.println(term.toString());
+        }
 
         // Stop when either the maximum number of lemmas is reached, or the maximum number of attempts is reached
         int found = 0;

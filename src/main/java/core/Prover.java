@@ -350,7 +350,7 @@ public class Prover {
         Term newTerm = term.substitute(subterm, subtermSubstitute);
 
         // Add this step to steps
-        if (!steps.containsKey(newTerm)) {
+        if (steps != null && !steps.containsKey(newTerm)) {
             steps.put(newTerm, term);
         }
 
@@ -495,10 +495,46 @@ public class Prover {
             return Double.compare(w1, w2);
         });
 
+        Logger.d("Generated terms:");
         for (Term term : temp) {
-            System.out.println(term.toString());
+            Logger.d(term.toString());
         }
 
+        for (Term t1 : temp) {
+            for (Term t2 : temp) {
+                if (t1.equals(t2)) {
+                    continue;
+                }
+
+                if (!t1.getSort().equals(t2.getSort())) {
+                    continue;
+                }
+
+                Set<Variable> variables1 = t1.getVariables();
+                Set<Variable> variables2 = t2.getVariables();
+                if (variables1.size() != variables2.size()) {
+                    continue;
+                }
+
+                if (!(variables1.containsAll(variables2) && variables2.containsAll(variables1))) {
+                    continue;
+                }
+
+                Equation eq = new Equation(t1, t2);
+                Logger.i("Trying lemma: " + eq.toString());
+
+                EquationSystem newSystem = new EquationSystem(result, system.getSigma(), system.getC(), eq);
+                // Check whether the equation holds on small terms
+                if (checkLikelyEqual(newSystem, 5)) {
+                    if (induction(newSystem, outputWriter, 3, rewriteLeft, recursionDepth, inductionVar)) {
+                        result.add(eq);
+                        Logger.i("Found lemma " + eq.toString());
+                    }
+                }
+            }
+        }
+
+        /*
         // Stop when either the maximum number of lemmas is reached, or the maximum number of attempts is reached
         int found = 0;
         int attempts = 0;
@@ -518,14 +554,55 @@ public class Prover {
 
 
             attempts++;
-        }
+        }*/
 
         return new EquationSystem(result, system.getSigma(), system.getC(), system.getGoal());
     }
 
     private static boolean checkLikelyEqual(EquationSystem system, int attempts) {
+        int searchDepth = 0;
+        Term convergence = null;
 
 
+        Set<Term> smallTerms = new HashSet<>();
+
+        Sort nat = new Sort("nat");
+        Function zero = new Function(nat, "0");
+        smallTerms.add(new FunctionTerm(zero));
+
+        for (Term term : smallTerms) {
+            Set<Term> leftTerms = new HashSet<>();
+
+            Term left = system.getGoal().getLeft();
+            for (Variable var : left.getVariables()) {
+                left = left.substitute(var, term); //TODO: doesn't work for many sorted terms
+            }
+
+            leftTerms.add(left);
+
+            Set<Term> rightTerms = new HashSet<>();
+
+            Term right = system.getGoal().getRight();
+            for (Variable var : right.getVariables()) {
+                right = right.substitute(var, term); //TODO: doesn't work for many sorted terms
+            }
+
+            rightTerms.add(right);
+
+            Logger.d("Checking convergence of " + left.toString() + " to " + right.toString());
+
+            while (convergence == null && searchDepth < 5) {
+                leftTerms.addAll(Prover.rewriteAll(leftTerms, system.getEquations(), null, true, true));
+                rightTerms.addAll(Prover.rewriteAll(rightTerms, system.getEquations(), null, true, true));
+
+                searchDepth++;
+                convergence = checkConvergence(leftTerms, rightTerms);
+            }
+
+            if (convergence == null) {
+                return false;
+            }
+        }
 
         return true;
     }

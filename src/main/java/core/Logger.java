@@ -10,7 +10,7 @@ package core;
 
 public class Logger {
 
-    private static Level level = Level.DEBUG;
+    private static Level level = Level.INFO;
 
     public static void w(String msg) {
         if (level.ordinal() <= Level.WARNING.ordinal()) {

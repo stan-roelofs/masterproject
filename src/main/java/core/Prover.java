@@ -118,7 +118,7 @@ public class Prover {
             int searchDepth = 0;
             Term convergence = null;
             while (convergence == null && searchDepth < searchSteps) {
-                Logger.i("Rewriting step " + searchDepth + ", using " + numThreads + " threads");
+                Logger.d("Rewriting step " + searchDepth + ", using " + numThreads + " threads");
 
                 RewriteThread[] rewriteThreads = new RewriteThread[numThreads];
                 Thread[] threads = new Thread[numThreads];
@@ -146,7 +146,7 @@ public class Prover {
 
             //core.Term convergence = checkConvergence(leftTerms, rightTerms);
             if (convergence == null) {
-                Logger.w("Convergence null");
+                Logger.d("Convergence null");
 
                 Function successor = null;
                 for (Function f : system.getC()) {
@@ -155,7 +155,7 @@ public class Prover {
                     }
                 }
                 if (successor == null || successor.getOutputSort() != inductionVar.getSort()) {
-                    Logger.w("Skipping double induction");
+                    Logger.d("Skipping double induction");
                     outputWriter.writeLine("Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
                     return false;
                 }
@@ -358,6 +358,13 @@ public class Prover {
         return newTerm;
     }
 
+    /**
+     * Checks convergence between two terms by checking whether the set of terms created from a term
+     * has a term in common by the set of terms created from a second term
+     * @param left The first set of terms
+     * @param right The second set of terms
+     * @return A term that is common between {@code left} and {@code right}, or null if no such term exists
+     */
     private static Term checkConvergence(Set<Term> left, Set<Term> right) {
         Set<Term> intersection = new HashSet<>(left);
         intersection.retainAll(right);
@@ -388,12 +395,22 @@ public class Prover {
         }
 
         if (intersection.size() > 1) {
-            Logger.w("Intersection size > 1, choosing the first term");
+            //Logger.w("Intersection size > 1, choosing the first term");
         }
 
         return intersection.isEmpty() ? null : intersection.iterator().next();
     }
 
+    /**
+     * Generates all possible terms that can be obtained by substituting the variables in {@code term}
+     * by the terms in {@code terms}.
+     *
+     * @param terms A set of terms
+     * @param term A term with 0 or more variables
+     * @return The set of terms that can be created by substituting variables in {@code term}
+     *         by any of the terms in {@code terms}, including the term itself
+     * @see Term
+     */
     private static Set<Term> generateTerms(Set<Term> terms, Term term) {
         Set<Term> result = new HashSet<>();
 
@@ -407,7 +424,6 @@ public class Prover {
             for (Term t : terms) {
                 if (var.getSort().equals(t.getSort())) {
                     Term temp = term.substitute(var, t);
-                    //result.addAll(generateTerms(terms, temp));
                     result.add(temp);
                 }
             }
@@ -547,7 +563,7 @@ public class Prover {
 
                     EquationSystem newSystem = new EquationSystem(result, system.getSigma(), system.getC(), eq);
                     // Check whether the equation holds on small terms
-                    if (checkLikelyEqual(newSystem, 5)) {
+                    if (checkLikelyEqual(newSystem, 1)) {
                         // TODO: if a conversion exists without induction we should skip the lemma since it is not useful
                         if (induction(newSystem, outputWriter, 3, rewriteLeft, recursionDepth, inductionVar)) {
                             result.add(eq);
@@ -568,19 +584,22 @@ public class Prover {
         int searchDepth = 0;
         Term convergence = null;
 
-
-        Set<Term> smallTerms = new HashSet<>();
-
         Sort nat = new Sort("nat");
-        Function zero = new Function(nat, "0");
-        smallTerms.add(new FunctionTerm(zero));
+        Sort inf = new Sort("i");
 
-        for (Term term : smallTerms) {
+        Map<Sort, List<Term>> smallTerms = new HashMap<>();
+        smallTerms.put(nat, new ArrayList<>());
+
+        // Nat
+        Function zero = new Function(nat, "0");
+        smallTerms.get(nat).add(new FunctionTerm(zero));
+
+        for (int i = 0; i < attempts; i++) {
             Set<Term> leftTerms = new HashSet<>();
 
             Term left = system.getGoal().getLeft();
             for (Variable var : left.getVariables()) {
-                left = left.substitute(var, term); //TODO: doesn't work for many sorted terms
+                left = left.substitute(var, smallTerms.get(var.getSort()).get(i));
             }
 
             leftTerms.add(left);
@@ -589,7 +608,7 @@ public class Prover {
 
             Term right = system.getGoal().getRight();
             for (Variable var : right.getVariables()) {
-                right = right.substitute(var, term); //TODO: doesn't work for many sorted terms
+                right = right.substitute(var, smallTerms.get(var.getSort()).get(i));
             }
 
             rightTerms.add(right);

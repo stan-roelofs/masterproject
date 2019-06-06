@@ -2,7 +2,9 @@ import core.*;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class EquationTests {
@@ -157,6 +159,100 @@ public class EquationTests {
         Equation eq2 = new Equation(var, var2);
 
         Assert.assertEquals(eq2, eq);
+    }
+
+    @Test
+    public void testEquivalentSimpleBidirectional() {
+        Sort sort = new Sort("nat");
+        Variable var = new Variable(sort, "x");
+        Variable var2 = new Variable(sort, "y");
+        Variable var3 = new Variable(sort, "a");
+        Variable var4 = new Variable(sort, "b");
+        Equation eq = new Equation(var, var2);
+        Equation eq2 = new Equation(var3, var4);
+
+        Assert.assertTrue(eq.equivalent(eq2, true));
+    }
+
+    @Test
+    public void testEquivalentSimple() {
+        Sort sort = new Sort("nat");
+        Variable var = new Variable(sort, "x");
+        Variable var2 = new Variable(sort, "y");
+        Variable var3 = new Variable(sort, "a");
+        Variable var4 = new Variable(sort, "b");
+        Equation eq = new Equation(var, var2);
+        Equation eq2 = new Equation(var3, var4);
+
+        Assert.assertTrue(eq.equivalent(eq2, false));
+    }
+
+    @Test
+    public void testEquivalentBidirectional() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("nat");
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        Function g = new Function(s, inputs, "g");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms); // f(x)
+        Term t2 = new FunctionTerm(g, subterms); // g(x)
+
+        Equation eq = new Equation(t, t2); // f(x) = g(x)
+
+        Variable y = new Variable(s, "y");
+        subterms.clear();
+        subterms.add(y);
+        Term t3 = new FunctionTerm(f, subterms); // f(y)
+        Term t4 = new FunctionTerm(g, subterms); // g(y)
+        Equation eq2 = new Equation(t3, t4); // f(y) = g(y)
+
+        Equation eq3 = new Equation(t4, t3); //g(y) = f(y)
+
+        Assert.assertTrue(eq.equivalent(eq2, true));
+        Assert.assertTrue(eq.equivalent(eq3, true));
+    }
+
+    @Test
+    public void testEquivalentUnidirectional() {
+        List<Sort> inputs = new ArrayList<>();
+        Sort s = new Sort("nat");
+        inputs.add(s);
+        Function f = new Function(s, inputs, "f");
+        Function g = new Function(s, inputs, "g");
+        List<Term> subterms = new ArrayList<>();
+        Variable x = new Variable(s, "x");
+        subterms.add(x);
+        Term t = new FunctionTerm(f, subterms); // f(x)
+        Term t2 = new FunctionTerm(g, subterms); // g(x)
+
+        Equation eq = new Equation(t, t2); // f(x) = g(x)
+
+        Variable y = new Variable(s, "y");
+        subterms.clear();
+        subterms.add(y);
+        Term t3 = new FunctionTerm(f, subterms); // f(y)
+        Term t4 = new FunctionTerm(g, subterms); // g(y)
+        Equation eq2 = new Equation(t3, t4); // f(y) = g(y)
+        Equation eq3 = new Equation(t4, t3); //g(y) = f(y)
+
+        Assert.assertTrue(eq.equivalent(eq2, false));
+        Assert.assertFalse(eq.equivalent(eq3, false));
+    }
+
+    @Test
+    public void testEquivalentFalse() {
+        Sort sort = new Sort("nat");
+        Variable var = new Variable(sort, "x");
+        Variable var2 = new Variable(sort, "y");
+        Variable var3 = new Variable(sort, "a");
+        Equation eq = new Equation(var, var2);
+        Equation eq2 = new Equation(var3, var3);
+
+        Assert.assertTrue(eq.equivalent(eq2, true));
+        Assert.assertFalse(eq2.equivalent(eq, true));
     }
 }
 

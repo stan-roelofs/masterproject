@@ -1,10 +1,10 @@
 package gui;
 
 import core.EquationSystem;
-import core.Logger;
 import core.Prover;
 import core.io.BufferedOutputWriter;
 import core.io.TextAreaOutputWriter;
+import core.logging.Logger;
 import core.parsing.InputParser;
 import core.parsing.ParserException;
 

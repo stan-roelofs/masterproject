@@ -1,15 +1,13 @@
 package core;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class that represents an equation
  * An equation is constructed from two terms of equal sort
  *
  * @author Stan Roelofs
- * @version 1.01
+ * @version 1.02
  */
 public class Equation {
     private Term left;
@@ -113,5 +111,36 @@ public class Equation {
         result = 31 * result + left.hashCode();
         result = 31 * result + right.hashCode();
         return result;
+    }
+
+    public boolean equivalent(Equation eq2, boolean bidirectional) {
+        if (bidirectional) {
+            Map<Variable, Term> sub1 = this.left.getSubstitution(eq2.getLeft(), new HashMap<>());
+
+            if (sub1 != null) {
+                Map<Variable, Term> sub2 = this.right.getSubstitution(eq2.getRight(), sub1);
+                if (sub2 != null) {
+                    return true;
+                }
+            }
+
+            sub1 = this.left.getSubstitution(eq2.getRight(), new HashMap<>());
+            if (sub1 != null) {
+                Map<Variable, Term> sub2 = this.right.getSubstitution(eq2.getLeft(), sub1);
+                return sub2 != null;
+            }
+
+        } else {
+            Map<Variable, Term> sub1 = this.left.getSubstitution(eq2.getLeft(), new HashMap<>());
+
+            if (sub1 == null) {
+                return false;
+            }
+
+            Map<Variable, Term> sub2 = this.right.getSubstitution(eq2.getRight(), sub1);
+            return sub2 != null;
+        }
+
+        return false;
     }
 }

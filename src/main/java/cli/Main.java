@@ -1,9 +1,10 @@
 package cli;
 
+import core.Equation;
 import core.EquationSystem;
-import core.Logger;
 import core.Prover;
 import core.io.BufferedOutputWriter;
+import core.logging.Logger;
 import core.parsing.InputParser;
 import core.parsing.ParserException;
 import org.apache.commons.cli.*;
@@ -75,8 +76,13 @@ public class Main {
                     rewriteLeft = true;
                 }
 
-                //Prover.induction(system, writer, searchDepth, rewriteLeft, 0, null);
-                Prover.generateLemmas(system, writer, 10, 100, searchDepth, rewriteLeft, 0, null);
+                EquationSystem newSystem = Prover.generateLemmas(system, writer, 2, 100, searchDepth, rewriteLeft, 0, null);
+
+                for (Equation eq : newSystem.getEquations()) {
+                    Logger.i(eq.toString());
+                }
+
+                Prover.induction(newSystem, writer, searchDepth, rewriteLeft, 0, null);
                 writer.close();
 
             } catch (IOException e) {

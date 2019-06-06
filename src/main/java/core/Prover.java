@@ -1,6 +1,7 @@
 package core;
 
 import core.io.OutputWriter;
+import core.logging.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Class with static functions that can prove an EquationSystem
  *
  * @author Stan Roelofs
- * @version 1.0
+ * @version 1.1
  */
 public class Prover {
 
@@ -418,6 +419,8 @@ public class Prover {
     public static EquationSystem generateLemmas(EquationSystem system, OutputWriter outputWriter, int maxLemmas, int maxAttempts, int searchSteps, boolean rewriteLeft, int recursionDepth, Variable inductionVar) throws IOException {
         Set<Equation> result = new HashSet<>(system.getEquations());
 
+        outputWriter.setEnabled(false);
+
         Logger.i("Searching for a maximum of " + maxLemmas + " lemmas, terminating after " + maxAttempts + " attempts...");
 
         Map<Sort, Integer> numVariables = new HashMap<>();
@@ -500,61 +503,63 @@ public class Prover {
             Logger.d(term.toString());
         }
 
-        for (Term t1 : temp) {
-            for (Term t2 : temp) {
-                if (t1.equals(t2)) {
-                    continue;
-                }
+        int lemmasFound = 0;
+        searchLemmas:
+        {
+            for (Term t1 : temp) {
+                for (Term t2 : temp) {
+                    if (lemmasFound == maxLemmas) {
+                        break searchLemmas;
+                    }
+                    if (t1.equals(t2)) {
+                        continue;
+                    }
 
-                if (!t1.getSort().equals(t2.getSort())) {
-                    continue;
-                }
+                    if (!t1.getSort().equals(t2.getSort())) {
+                        continue;
+                    }
 
-                Set<Variable> variables1 = t1.getVariables();
-                Set<Variable> variables2 = t2.getVariables();
-                if (variables1.size() != variables2.size()) {
-                    continue;
-                }
+                    Set<Variable> variables1 = t1.getVariables();
+                    Set<Variable> variables2 = t2.getVariables();
+                    if (variables1.size() != variables2.size()) {
+                        continue;
+                    }
 
-                if (!(variables1.containsAll(variables2) && variables2.containsAll(variables1))) {
-                    continue;
-                }
+                    if (!(variables1.containsAll(variables2) && variables2.containsAll(variables1))) {
+                        continue;
+                    }
 
-                Equation eq = new Equation(t1, t2);
-                Logger.i("Trying lemma: " + eq.toString());
+                    Equation eq = new Equation(t1, t2);
 
-                EquationSystem newSystem = new EquationSystem(result, system.getSigma(), system.getC(), eq);
-                // Check whether the equation holds on small terms
-                if (checkLikelyEqual(newSystem, 5)) {
-                    if (induction(newSystem, outputWriter, 3, rewriteLeft, recursionDepth, inductionVar)) {
-                        result.add(eq);
-                        Logger.i("Found lemma " + eq.toString());
+                    boolean addLemma = true;
+                    for (Equation equation : system.getEquations()) {
+                        if (equation.equivalent(eq, rewriteLeft)) {
+                            addLemma = false;
+                            break;
+                        }
+                    }
+
+                    if (!addLemma) {
+                        Logger.i("Skipping lemma: " + eq.toString() + ", equation already exists");
+                        continue;
+                    }
+                    Logger.i("Trying lemma: " + eq.toString());
+
+                    EquationSystem newSystem = new EquationSystem(result, system.getSigma(), system.getC(), eq);
+                    // Check whether the equation holds on small terms
+                    if (checkLikelyEqual(newSystem, 5)) {
+                        // TODO: if a conversion exists without induction we should skip the lemma since it is not useful
+                        if (induction(newSystem, outputWriter, 3, rewriteLeft, recursionDepth, inductionVar)) {
+                            result.add(eq);
+                            Logger.i("Found lemma " + eq.toString());
+                            lemmasFound++;
+                        }
                     }
                 }
             }
         }
 
-        /*
-        // Stop when either the maximum number of lemmas is reached, or the maximum number of attempts is reached
-        int found = 0;
-        int attempts = 0;
-        while (found < maxLemmas && attempts < maxAttempts) {
-            // Create an equation
-            Term left = null;
-            Term right = null;
-            Equation lemma = new Equation(left, right);
-
-            // Test whether it is likely correct by verifying it holds on small terms
-
-            // If proven, add it to result
-            if (induction(new EquationSystem(result, system.getSigma(), system.getC(), lemma), outputWriter, searchSteps, rewriteLeft, recursionDepth, inductionVar)) {
-                result.add(lemma);
-                found++;
-            }
-
-
-            attempts++;
-        }*/
+        outputWriter.setEnabled(true);
 
         return new EquationSystem(result, system.getSigma(), system.getC(), system.getGoal());
     }
@@ -591,7 +596,7 @@ public class Prover {
 
             Logger.d("Checking convergence of " + left.toString() + " to " + right.toString());
 
-            while (convergence == null && searchDepth < 5) {
+            while (convergence == null && searchDepth < 3) {
                 leftTerms.addAll(Prover.rewriteAll(leftTerms, system.getEquations(), null, true, true));
                 rightTerms.addAll(Prover.rewriteAll(rightTerms, system.getEquations(), null, true, true));
 

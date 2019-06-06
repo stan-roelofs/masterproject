@@ -1,4 +1,4 @@
-package core;
+package core.logging;
 
 /**
  * A simple logging class.
@@ -35,11 +35,4 @@ public class Logger {
             System.err.println("ERROR: " + msg);
         }
     }
-}
-
-/**
- * Represents different logging levels in increasing order of importance.
- */
-enum Level {
-    DEBUG, INFO, WARNING, ERROR
 }

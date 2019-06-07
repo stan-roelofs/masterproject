@@ -1,6 +1,5 @@
 package cli;
 
-import core.Equation;
 import core.EquationSystem;
 import core.Prover;
 import core.io.BufferedOutputWriter;
@@ -76,13 +75,15 @@ public class Main {
                     rewriteLeft = true;
                 }
 
-                EquationSystem newSystem = Prover.generateLemmas(system, writer, 2, 100, searchDepth, rewriteLeft, 0, null);
+                //EquationSystem newSystem = Prover.generateLemmas(system, writer, 2, 100, searchDepth, rewriteLeft, 0, null);
 
-                for (Equation eq : newSystem.getEquations()) {
-                    Logger.i(eq.toString());
+                //for (Equation eq : newSystem.getEquations()) {
+                //    Logger.i(eq.toString());
+                //}
+
+                if (!Prover.convertible(system, writer, searchDepth, rewriteLeft)) {
+                    Prover.induction(system, writer, searchDepth, rewriteLeft, 0, null);
                 }
-
-                Prover.induction(newSystem, writer, searchDepth, rewriteLeft, 0, null);
                 writer.close();
 
             } catch (IOException e) {

@@ -11,12 +11,89 @@ import java.util.concurrent.ConcurrentHashMap;
  * Class with static functions that can prove an EquationSystem
  *
  * @author Stan Roelofs
- * @version 1.1
+ * @version 1.2
  */
 public class Prover {
 
     public static String constantName = "a";
     public static int maxDepth = 2;
+
+    public static boolean convertible(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft) throws IOException {
+        Map<Term, Term> leftSteps = new ConcurrentHashMap<>();
+        Map<Term, Term> rightSteps = new ConcurrentHashMap<>();
+
+
+        outputWriter.writeLine("Seeking conversion between " + system.getGoal().getLeft().toString() + " and " + system.getGoal().getRight().toString());
+
+        Term conversion = findConversion(system, outputWriter, searchSteps, rewriteLeft, leftSteps, rightSteps);
+
+        outputWriter.writeLine("Conversion not found");
+
+        return conversion != null;
+    }
+
+    public static Term findConversion(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, Map<Term, Term> leftSteps, Map<Term, Term> rightSteps) throws IOException {
+        // Do BFS for convertibility
+        Set<Term> leftTerms = new HashSet<>();
+        Set<Term> rightTerms = new HashSet<>();
+
+        Equation goal = system.getGoal();
+
+        leftTerms.add(goal.getLeft());
+        rightTerms.add(goal.getRight());
+
+        // Maximum of 4 threads
+        int numThreads = Math.min(4, system.getEquations().size());
+
+        // Calculate the number of equations each thread should get
+        int[] numEquations = new int[numThreads];
+        for (int i = 0; i < system.getEquations().size(); i++) {
+            numEquations[i % numThreads]++;
+        }
+
+        // Create the set of equations for each thread
+        ArrayList<Set<Equation>> threadEquations = new ArrayList<>(numThreads);
+        Iterator<Equation> it = system.getEquations().iterator();
+        for (int i = 0; i < numThreads; i++) {
+            Set<Equation> tmp = new HashSet<>();
+            threadEquations.add(tmp);
+
+            for (int j = 0; j < numEquations[i]; j++) {
+                tmp.add(it.next());
+            }
+        }
+
+        int searchDepth = 0;
+        Term convergence = null;
+        while (convergence == null && searchDepth < searchSteps) {
+            Logger.d("Rewriting step " + searchDepth + ", using " + numThreads + " threads");
+
+            RewriteThread[] rewriteThreads = new RewriteThread[numThreads];
+            Thread[] threads = new Thread[numThreads];
+            for (int i = 0; i < numThreads; i++) {
+                rewriteThreads[i] = new RewriteThread(i, leftTerms, rightTerms, threadEquations.get(i), leftSteps, rightSteps, true, rewriteLeft);
+                threads[i] = new Thread(rewriteThreads[i]);
+                threads[i].start();
+            }
+
+            for (int i = 0; i < numThreads; i++) {
+                try {
+                    threads[i].join();
+                } catch (InterruptedException e) {
+                    Logger.e("Thread " + i + " interrupted " + e.getMessage());
+                }
+            }
+
+            for (int i = 0; i < numThreads; i++) {
+                leftTerms.addAll(rewriteThreads[i].getResultLeft());
+                rightTerms.addAll(rewriteThreads[i].getResultRight());
+            }
+            searchDepth++;
+            convergence = checkConvergence(leftTerms, rightTerms);
+        }
+
+        return convergence;
+    }
 
     public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, int recursionDepth, Variable inductionVar) throws IOException {
         if (recursionDepth >= maxDepth) {
@@ -28,7 +105,7 @@ public class Prover {
         Equation goal = system.getGoal();
 
         if (recursionDepth == 0 && inductionVar == null) {
-            outputWriter.writeLine("Goal: " + goal.toString());
+            outputWriter.writeLine("Goal to prove with induction: " + goal.toString());
         }
 
         // Try induction for each variable in function
@@ -81,70 +158,16 @@ public class Prover {
                 outputWriter.writeLine("Added hypotheses: " + sb.toString());
             }
 
-            // Do BFS for convertibility
-            Set<Term> leftTerms = new HashSet<>();
-            Set<Term> rightTerms = new HashSet<>();
-
-            leftTerms.add(newGoal.getLeft());
-            rightTerms.add(newGoal.getRight());
+            Map<Term, Term> leftSteps = new ConcurrentHashMap<>();
+            Map<Term, Term> rightSteps = new ConcurrentHashMap<>();
 
             Set<Equation> allEquations = new HashSet<>(system.getEquations());
             allEquations.addAll(hypotheses);
 
-            Map<Term, Term> leftSteps = new ConcurrentHashMap<>();
-            Map<Term, Term> rightSteps = new ConcurrentHashMap<>();
+            EquationSystem temp = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoal);
 
-            // Maximum of 4 threads
-            int numThreads = Math.min(4, allEquations.size());
+            Term convergence = findConversion(temp, outputWriter, searchSteps, rewriteLeft, leftSteps, rightSteps);
 
-            // Calculate the number of equations each thread should get
-            int[] numEquations = new int[numThreads];
-            for (int i = 0; i < allEquations.size(); i++) {
-                numEquations[i % numThreads]++;
-            }
-
-            // Create the set of equations for each thread
-            ArrayList<Set<Equation>> threadEquations = new ArrayList<>(numThreads);
-            Iterator<Equation> it = allEquations.iterator();
-            for (int i = 0; i < numThreads; i++) {
-                Set<Equation> tmp = new HashSet<>();
-                threadEquations.add(tmp);
-
-                for (int j = 0; j < numEquations[i]; j++) {
-                    tmp.add(it.next());
-                }
-            }
-
-            int searchDepth = 0;
-            Term convergence = null;
-            while (convergence == null && searchDepth < searchSteps) {
-                Logger.d("Rewriting step " + searchDepth + ", using " + numThreads + " threads");
-
-                RewriteThread[] rewriteThreads = new RewriteThread[numThreads];
-                Thread[] threads = new Thread[numThreads];
-                for (int i = 0; i < numThreads; i++) {
-                    rewriteThreads[i] = new RewriteThread(i, leftTerms, rightTerms, threadEquations.get(i), leftSteps, rightSteps, true, rewriteLeft);
-                    threads[i] = new Thread(rewriteThreads[i]);
-                    threads[i].start();
-                }
-
-                for (int i = 0; i < numThreads; i++) {
-                    try {
-                        threads[i].join();
-                    } catch (InterruptedException e) {
-                        Logger.e("Thread " + i + " interrupted " + e.getMessage());
-                    }
-                }
-
-                for (int i = 0; i < numThreads; i++) {
-                    leftTerms.addAll(rewriteThreads[i].getResultLeft());
-                    rightTerms.addAll(rewriteThreads[i].getResultRight());
-                }
-                searchDepth++;
-                convergence = checkConvergence(leftTerms, rightTerms);
-            }
-
-            //core.Term convergence = checkConvergence(leftTerms, rightTerms);
             if (convergence == null) {
                 Logger.d("Convergence null");
 

@@ -115,32 +115,34 @@ public class Equation {
 
     public boolean equivalent(Equation eq2, boolean bidirectional) {
         if (bidirectional) {
-            Map<Variable, Term> sub1 = this.left.getSubstitution(eq2.getLeft(), new HashMap<>());
-
-            if (sub1 != null) {
-                Map<Variable, Term> sub2 = this.right.getSubstitution(eq2.getRight(), sub1);
-                if (sub2 != null) {
-                    return true;
-                }
+            if (checkEquivalent(this.left, this.right, eq2.getLeft(), eq2.getRight())) {
+                return true;
             }
 
-            sub1 = this.left.getSubstitution(eq2.getRight(), new HashMap<>());
-            if (sub1 != null) {
-                Map<Variable, Term> sub2 = this.right.getSubstitution(eq2.getLeft(), sub1);
-                return sub2 != null;
-            }
+            return checkEquivalent(this.left, this.right, eq2.getRight(), eq2.getLeft());
 
         } else {
-            Map<Variable, Term> sub1 = this.left.getSubstitution(eq2.getLeft(), new HashMap<>());
-
-            if (sub1 == null) {
-                return false;
-            }
-
-            Map<Variable, Term> sub2 = this.right.getSubstitution(eq2.getRight(), sub1);
-            return sub2 != null;
+            return checkEquivalent(this.left, this.right, eq2.getLeft(), eq2.getRight());
         }
 
+    }
+
+    private boolean checkEquivalent(Term l1, Term r1, Term l2, Term r2) {
+        Map<Variable, Term> subs1 = l1.getSubstitution(l2, new HashMap<>());
+
+        if (subs1 != null) {
+            Map<Variable, Term> subs2 = r1.getSubstitution(r2, subs1);
+
+            if (subs2 != null) {
+                Map<Variable, Term> subs3 = l2.getSubstitution(l1, new HashMap<>());
+
+                if (subs3 != null) {
+                    Map<Variable, Term> subs4 = r2.getSubstitution(r1, subs3);
+
+                    return subs4 != null;
+                }
+            }
+        }
         return false;
     }
 }

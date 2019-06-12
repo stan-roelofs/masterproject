@@ -251,8 +251,7 @@ public class EquationTests {
         Equation eq = new Equation(var, var2);
         Equation eq2 = new Equation(var3, var3);
 
-        Assert.assertTrue(eq.equivalent(eq2, true));
-        Assert.assertFalse(eq2.equivalent(eq, true));
+        Assert.assertFalse(eq.equivalent(eq2, true));
     }
 }
 

@@ -116,16 +116,12 @@ public class Variable extends Term {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
         if (!(o instanceof Variable)) {
             return false;
         }
 
         Variable var = (Variable) o;
-        return Objects.equals(this.sort, var.getSort()) && Objects.equals(this.name, var.getName());
+        return this.isEquivalent(var) && Objects.equals(this.name, var.getName());
     }
 
     @Override
@@ -134,5 +130,19 @@ public class Variable extends Term {
         result = 31 * result + this.sort.hashCode();
         result = 31 * result + this.name.hashCode();
         return result;
+    }
+
+    @Override
+    public boolean isEquivalent(Term other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof Variable)) {
+            return false;
+        }
+
+        Variable var = (Variable) other;
+        return Objects.equals(this.sort, var.getSort());
     }
 }

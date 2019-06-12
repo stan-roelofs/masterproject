@@ -99,4 +99,6 @@ public abstract class Term {
     public Sort getSort() {
         return sort;
     }
+
+    public abstract boolean isEquivalent(Term other);
 }

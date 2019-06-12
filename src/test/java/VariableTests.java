@@ -139,7 +139,7 @@ public class VariableTests {
     @Test
     public void testGetAllSubTerms() {
         Variable v1 = new Variable(new Sort("x"), "x");
-        Assert.assertTrue(v1.getAllSubTerms().isEmpty());
+        Assert.assertTrue(v1.getUniqueSubterms().isEmpty());
     }
 
     /**

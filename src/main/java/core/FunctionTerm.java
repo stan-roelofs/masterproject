@@ -78,12 +78,23 @@ public class FunctionTerm extends Term {
     }
 
     @Override
-    public Set<Term> getAllSubTerms() {
+    public Set<Term> getUniqueSubterms() {
         Set<Term> result = new HashSet<>(this.subterms);
         result.add(this);
 
         for (Term subterm : this.subterms) {
-            result.addAll(subterm.getAllSubTerms());
+            result.addAll(subterm.getUniqueSubterms());
+        }
+
+        return result;
+    }
+
+    @Override
+    public int subtermsAmount() {
+        int result = 1;
+
+        for (Term subterm : this.subterms) {
+            result += subterm.subtermsAmount();
         }
 
         return result;

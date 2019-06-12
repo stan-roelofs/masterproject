@@ -68,8 +68,13 @@ public class Variable extends Term {
     }
 
     @Override
-    public Set<Term> getAllSubTerms() {
+    public Set<Term> getUniqueSubterms() {
         return new HashSet<>();
+    }
+
+    @Override
+    public int subtermsAmount() {
+        return 1;
     }
 
     @Override

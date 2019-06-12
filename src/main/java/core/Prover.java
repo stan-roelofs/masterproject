@@ -105,6 +105,7 @@ public class Prover {
         Equation goal = system.getGoal();
 
         if (recursionDepth == 0 && inductionVar == null) {
+            Logger.i("Proving " + goal.toString() + " with induction");
             outputWriter.writeLine("Goal to prove with induction: " + goal.toString());
         }
 
@@ -330,7 +331,7 @@ public class Prover {
 
         for (Term term : terms) {
             for (Equation eq : allEquations) {
-                for (Term subterm : term.getAllSubTerms()) {
+                for (Term subterm : term.getUniqueSubterms()) {
                     // Try left
                     if (rewriteRight) {
                         // Try left
@@ -434,20 +435,28 @@ public class Prover {
      *         by any of the terms in {@code terms}, including the term itself
      * @see Term
      */
-    private static Set<Term> generateTerms(Set<Term> terms, Term term) {
-        Set<Term> result = new HashSet<>();
+    private static Set<Term> generateTerms(Set<Term> terms, Set<Term> result, Term term, Set<Variable> taken) {
+        result.add(term);
 
-        if (term.getVariables().isEmpty()) {
-            result.add(term);
+        if (term instanceof Variable) {
             return result;
         }
 
         Set<Variable> vars = term.getVariables();
+
         for (Variable var : vars) {
-            for (Term t : terms) {
-                if (var.getSort().equals(t.getSort())) {
-                    Term temp = term.substitute(var, t);
-                    result.add(temp);
+            if (!taken.contains(var)) {
+                for (Term t : terms) {
+                    if (var.getSort().equals(t.getSort())) {
+                        Term temp = term.substitute(var, t);
+                        if (terms.contains(temp) || result.contains(temp)) {
+                            continue;
+                        }
+
+                        taken.add(var);
+                        result.addAll(generateTerms(terms, result, temp, taken));
+                        //taken.remove(var);
+                    }
                 }
             }
         }
@@ -455,13 +464,9 @@ public class Prover {
         return result;
     }
 
-    public static EquationSystem generateLemmas(EquationSystem system, OutputWriter outputWriter, int maxLemmas, int maxAttempts, int searchSteps, boolean rewriteLeft, int recursionDepth, Variable inductionVar) throws IOException {
-        Set<Equation> result = new HashSet<>(system.getEquations());
+    private static List<Term> getTerms(EquationSystem system) {
 
-        outputWriter.setEnabled(false);
-
-        Logger.i("Searching for a maximum of " + maxLemmas + " lemmas, terminating after " + maxAttempts + " attempts...");
-
+        /*
         Map<Sort, Integer> numVariables = new HashMap<>();
         for (Function f : system.getSigma()) {
 
@@ -493,13 +498,14 @@ public class Prover {
 
                 variableCounter++;
             }
-        }
+        }*/
 
         Set<Term> terms = new HashSet<>();
-        for (Sort s : variables.keySet()) {
-            terms.addAll(variables.get(s));
-        }
+        //for (Sort s : variables.keySet()) {
+            //terms.addAll(variables.get(s));
+        //}
 
+        int varCount = 0;
         for (Function f : system.getSigma()) {
             List<Term> inputs = new ArrayList<>();
 
@@ -512,7 +518,11 @@ public class Prover {
 
             for (int j = 0; j < f.getInputSorts().size(); j++) {
                 Sort s = f.getInputSorts().get(j);
-                inputs.add(variables.get(s).get(indexes.get(s)));
+                Variable var = new Variable(s, "x" + varCount);
+                //Term var = variables.get(s).get(j);
+                inputs.add(var);
+                terms.add(var);
+                varCount++;
                 indexes.put(s, indexes.get(s) + 1);
             }
 
@@ -522,15 +532,28 @@ public class Prover {
         }
 
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 2; i++) {
             Set<Term> temp = new HashSet<>();
             for (Term term : terms) {
-                temp.addAll(generateTerms(terms, term));
+                temp.addAll(generateTerms(terms, new HashSet<>(), term, new HashSet<>()));
             }
             terms.addAll(temp);
         }
-
         List<Term> temp = new ArrayList<>(terms);
+
+        for (int i = 0; i < temp.size(); i++) {
+            Term t1 = temp.get(i);
+
+            for (int j = i + 1; j < temp.size(); j++) {
+                Term t2 = temp.get(j);
+
+                if (t1.isEquivalent(t2) || t2.subtermsAmount() > 7 || !t2.toString().startsWith("take")) {
+                    temp.remove(j);
+                    j--;
+                }
+            }
+        }
+
         temp.sort((o1, o2) -> {
             double w1 = getWeight(o1, 0.1);
             double w2 = getWeight(o2, 0.1);
@@ -542,70 +565,18 @@ public class Prover {
             Logger.d(term.toString());
         }
 
-        int lemmasFound = 0;
-        searchLemmas:
-        {
-            for (Term t1 : temp) {
-                for (Term t2 : temp) {
-                    if (lemmasFound == maxLemmas) {
-                        break searchLemmas;
-                    }
-                    if (t1.equals(t2)) {
-                        continue;
-                    }
-
-                    if (!t1.getSort().equals(t2.getSort())) {
-                        continue;
-                    }
-
-                    Set<Variable> variables1 = t1.getVariables();
-                    Set<Variable> variables2 = t2.getVariables();
-                    if (variables1.size() != variables2.size()) {
-                        continue;
-                    }
-
-                    if (!(variables1.containsAll(variables2) && variables2.containsAll(variables1))) {
-                        continue;
-                    }
-
-                    Equation eq = new Equation(t1, t2);
-
-                    boolean addLemma = true;
-                    for (Equation equation : system.getEquations()) {
-                        if (equation.equivalent(eq, rewriteLeft)) {
-                            addLemma = false;
-                            break;
-                        }
-                    }
-
-                    if (!addLemma) {
-                        Logger.i("Skipping lemma: " + eq.toString() + ", equation already exists");
-                        continue;
-                    }
-                    Logger.i("Trying lemma: " + eq.toString());
-
-                    EquationSystem newSystem = new EquationSystem(result, system.getSigma(), system.getC(), eq);
-                    // Check whether the equation holds on small terms
-                    if (checkLikelyEqual(newSystem, 1)) {
-                        // TODO: if a conversion exists without induction we should skip the lemma since it is not useful
-                        if (induction(newSystem, outputWriter, 3, rewriteLeft, recursionDepth, inductionVar)) {
-                            result.add(eq);
-                            Logger.i("Found lemma " + eq.toString());
-                            lemmasFound++;
-                        }
-                    }
-                }
-            }
-        }
-
-        outputWriter.setEnabled(true);
-
-        return new EquationSystem(result, system.getSigma(), system.getC(), system.getGoal());
+        return temp;
     }
 
-    private static boolean checkLikelyEqual(EquationSystem system, int attempts) {
-        int searchDepth = 0;
-        Term convergence = null;
+    public static boolean inductionLemmaSearch(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft) throws IOException {
+        outputWriter.setEnabled(false);
+
+        List<Term> terms = getTerms(system);
+
+        /*
+        Generate some small terms
+         */
+        //int attempts = 5;
 
         Sort nat = new Sort("nat");
         Sort inf = new Sort("i");
@@ -614,31 +585,128 @@ public class Prover {
         smallTerms.put(nat, new ArrayList<>());
 
         // Nat
-        Function zero = new Function(nat, "0");
-        smallTerms.get(nat).add(new FunctionTerm(zero));
 
-        for (int i = 0; i < attempts; i++) {
-            Set<Term> leftTerms = new HashSet<>();
+        Function zerof = new Function(nat, "0");
 
-            Term left = system.getGoal().getLeft();
-            for (Variable var : left.getVariables()) {
-                left = left.substitute(var, smallTerms.get(var.getSort()).get(i));
+        List<Sort> inputs = new ArrayList<>();
+        inputs.add(nat);
+        Function successor = new Function(nat, inputs, "s");
+        FunctionTerm zero = new FunctionTerm(zerof);
+        smallTerms.get(nat).add(zero);
+
+        Term previous = zero;
+        for (int i = 1; i < 2; i++) {
+            List<Term> subterms = new ArrayList<>();
+            subterms.add(previous);
+            FunctionTerm newTerm = new FunctionTerm(successor, subterms);
+            previous = newTerm;
+            smallTerms.get(nat).add(newTerm);
+        }
+
+        // inf
+        Function randStream = new Function(inf, "temp");
+        FunctionTerm rand = new FunctionTerm(randStream);
+
+        int totalLemmas = 10;
+        Queue<Equation> addedLemmas = new LinkedList<>();
+        for (Term t1 : terms) {
+            for (Term t2 : terms) {
+                if (t1.equals(t2)) {
+                    continue;
+                }
+
+                if (!t1.getSort().equals(t2.getSort())) {
+                    continue;
+                }
+
+                Set<Variable> variables1 = t1.getVariables();
+                Set<Variable> variables2 = t2.getVariables();
+                if (variables1.size() != variables2.size()) {
+                    continue;
+                }
+
+                if (!(variables1.containsAll(variables2) && variables2.containsAll(variables1))) {
+                    continue;
+                }
+
+                Equation eq = new Equation(t1, t2);
+
+                boolean addLemma = true;
+                for (Equation equation : system.getEquations()) {
+                    if (equation.equivalent(eq, rewriteLeft)) {
+                        addLemma = false;
+                        break;
+                    }
+                }
+
+                if (!addLemma) {
+                    Logger.d("Skipping lemma: " + eq.toString() + ", equation already exists");
+                    continue;
+                }
+
+                EquationSystem newSystem = new EquationSystem(system.getEquations(), system.getSigma(), system.getC(), eq);
+
+                if (convertible(newSystem, outputWriter, searchSteps, rewriteLeft)) {
+                    continue;
+                }
+
+                // Check whether the equation holds on small terms
+                if (checkLikelyEqual(newSystem, smallTerms)) {
+
+                    Logger.d("Trying lemma: " + eq.toString());
+                    if (induction(newSystem, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+                        system.getEquations().add(eq);
+
+                        if (addedLemmas.size() > totalLemmas) {
+                            Equation toRemove = addedLemmas.poll();
+                            system.getEquations().remove(toRemove);
+
+                            Logger.d("Removing lemma" + toRemove.toString());
+
+                        }
+                        addedLemmas.offer(eq);
+
+                        Logger.i("Found lemma " + eq.toString());
+
+                        outputWriter.setEnabled(true);
+                        if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+                            return true;
+                        }
+                        outputWriter.setEnabled(false);
+                    }
+                }
             }
+        }
 
-            leftTerms.add(left);
+        outputWriter.setEnabled(true);
+        return false;
+    }
 
+    private static boolean checkLikelyEqual(EquationSystem system, Map<Sort, List<Term>> smallTerms) {
+        int searchDepth = 0;
+        Term convergence = null;
+
+        return true;
+        /*
+
+        for (int i = 0; i < 2; i++) {
+            Set<Term> leftTerms = new HashSet<>();
             Set<Term> rightTerms = new HashSet<>();
 
+            Term left = system.getGoal().getLeft();
             Term right = system.getGoal().getRight();
-            for (Variable var : right.getVariables()) {
+
+            for (Variable var : left.getVariables()) {
+                left = left.substitute(var, smallTerms.get(var.getSort()).get(i));
                 right = right.substitute(var, smallTerms.get(var.getSort()).get(i));
             }
 
+            leftTerms.add(left);
             rightTerms.add(right);
 
             Logger.d("Checking convergence of " + left.toString() + " to " + right.toString());
 
-            while (convergence == null && searchDepth < 3) {
+            while (convergence == null && searchDepth < 5) {
                 leftTerms.addAll(Prover.rewriteAll(leftTerms, system.getEquations(), null, true, true));
                 rightTerms.addAll(Prover.rewriteAll(rightTerms, system.getEquations(), null, true, true));
 
@@ -651,7 +719,7 @@ public class Prover {
             }
         }
 
-        return true;
+        return true;*/
     }
 
     private static double getWeight(Term term, double epsilon) {

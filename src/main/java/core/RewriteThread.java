@@ -1,7 +1,5 @@
 package core;
 
-import core.logging.Logger;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +40,7 @@ class RewriteThread implements Runnable {
         resultLeft.addAll(Prover.rewriteAll(leftTerms, equations, leftSteps, rewriteRight, rewriteLeft));
         resultRight.addAll(Prover.rewriteAll(rightTerms, equations, rightSteps, rewriteRight, rewriteLeft));
 
-        Logger.d("Thread " + threadNumber + " done");
+        //Logger.d("Thread " + threadNumber + " done");
     }
 
     public Set<Term> getResultLeft() {

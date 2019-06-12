@@ -83,7 +83,7 @@ public class FunctionTermTests {
         expected.add(t);
         expected.add(t2);
 
-        Assert.assertEquals(expected, t2.getAllSubTerms());
+        Assert.assertEquals(expected, t2.getUniqueSubterms());
     }
 
     /**

@@ -51,7 +51,9 @@ public abstract class Term {
      * Returns all subterms of this term, including the term itself
      * @return a Set of terms that are subterms of this term (including this term)
      */
-    public abstract Set<Term> getAllSubTerms();
+    public abstract Set<Term> getUniqueSubterms();
+
+    public abstract int subtermsAmount();
 
     /**
      * Substitutes each occurrence of {@code term} in this term by the term {@code substitute}

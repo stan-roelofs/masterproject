@@ -258,4 +258,39 @@ public class FunctionTerm extends Term {
 
         return result;
     }
+
+    @Override
+    public boolean isEquivalent(Term other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof FunctionTerm)) {
+            return false;
+        }
+
+        FunctionTerm term = (FunctionTerm) other;
+
+        if (!(Objects.equals(this.sort, term.getSort()))) {
+            return false;
+        }
+
+        if (!(Objects.equals(this.function, term.getFunction()))) {
+            return false;
+        }
+
+        if (!(Objects.equals(this.subterms.size(), term.getSubTerms().size()))) {
+            return false;
+        }
+
+        if (this.getSubstitution(other, new HashMap<>()) == null) {
+            return false;
+        }
+
+        if (other.getSubstitution(this, new HashMap<>()) == null) {
+            return false;
+        }
+
+        return true;
+    }
 }

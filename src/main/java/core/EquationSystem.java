@@ -101,4 +101,10 @@ public class EquationSystem {
         Logger.i("Goal:");
         Logger.i(goal.toString());
     }
+
+    public void printEquations() {
+        for (Equation eq : equations) {
+            Logger.i(eq.toString());
+        }
+    }
 }

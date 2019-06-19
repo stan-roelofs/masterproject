@@ -1,0 +1,16 @@
+** 0 nat
+** s nat nat
+Pl i i i
+take nat i nat
+head i nat
+tail i i
++ nat nat nat
+
+take(0, x) = head(x)
+take(s(x), y) = take(x, tail(y))
++(0, x) = x
++(s(x), y) = s(+(x, y))
+head(Pl(x, y)) = +(head(x), head(y))
+tail(Pl(x, y)) = Pl(tail(x), tail(y))
+
+take(b, Pl(x, Pl(y, z))) = take(b, Pl(Pl(x, y), z))

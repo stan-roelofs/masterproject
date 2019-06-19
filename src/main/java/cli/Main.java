@@ -72,7 +72,7 @@ public class Main {
 
                 boolean rewriteLeft = false;
                 if (commandLine.hasOption("rl")) {
-                    rewriteLeft = true;
+                   // rewriteLeft = true;
                 }
 
                 Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft);

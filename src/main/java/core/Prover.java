@@ -435,31 +435,32 @@ public class Prover {
      *         by any of the terms in {@code terms}, including the term itself
      * @see Term
      */
-    private static Set<Term> generateTerms(Set<Term> terms, Set<Term> result, Term term, Set<Variable> taken) {
-        result.add(term);
-
+    private static Set<Term> generateTerms(Set<Term> terms, Set<Term> result, Term term, Map<Variable, Term> subs) {
         if (term instanceof Variable) {
             return result;
         }
 
         Set<Variable> vars = term.getVariables();
-
         for (Variable var : vars) {
-            if (!taken.contains(var)) {
+            if (!subs.containsKey(var)) {
                 for (Term t : terms) {
                     if (var.getSort().equals(t.getSort())) {
-                        Term temp = term.substitute(var, t);
-                        if (terms.contains(temp) || result.contains(temp)) {
+
+                        Map<Variable, Term> newSubs = new HashMap<>(subs);
+                        newSubs.put(var, t);
+
+                        int depth = term.applySubstitution(newSubs).subtermsAmount();
+                        if (depth > 6) {
                             continue;
                         }
 
-                        taken.add(var);
-                        result.addAll(generateTerms(terms, result, temp, taken));
-                        //taken.remove(var);
+                        result.addAll(generateTerms(terms, result, term, newSubs));
                     }
                 }
             }
         }
+
+        result.add(term.applySubstitution(subs));
 
         return result;
     }
@@ -533,26 +534,22 @@ public class Prover {
 
 
         for (int i = 0; i < 2; i++) {
-            Set<Term> temp = new HashSet<>();
+            List<Term> temp = new ArrayList<>();
             for (Term term : terms) {
-                temp.addAll(generateTerms(terms, new HashSet<>(), term, new HashSet<>()));
+                temp.addAll(generateTerms(terms, new HashSet<>(), term, new HashMap<>()));
             }
-            terms.addAll(temp);
-        }
-        List<Term> temp = new ArrayList<>(terms);
-
-        for (int i = 0; i < temp.size(); i++) {
-            Term t1 = temp.get(i);
-
-            for (int j = i + 1; j < temp.size(); j++) {
-                Term t2 = temp.get(j);
-
-                if (t1.isEquivalent(t2) || t2.subtermsAmount() > 7 || !t2.toString().startsWith("take")) {
+            /*
+            for (int j = 0; j < temp.size(); j++) {
+                Term term = temp.get(j);
+                if (term.subtermsAmount() > 5) {
                     temp.remove(j);
                     j--;
                 }
             }
+            */
+            terms.addAll(temp);
         }
+        List<Term> temp = new ArrayList<>(terms);
 
         temp.sort((o1, o2) -> {
             double w1 = getWeight(o1, 0.1);
@@ -569,6 +566,11 @@ public class Prover {
     }
 
     public static boolean inductionLemmaSearch(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft) throws IOException {
+        // Try induction first
+        if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+            return true;
+        }
+
         outputWriter.setEnabled(false);
 
         List<Term> terms = getTerms(system);
@@ -607,18 +609,23 @@ public class Prover {
         Function randStream = new Function(inf, "temp");
         FunctionTerm rand = new FunctionTerm(randStream);
 
-        int totalLemmas = 10;
+        int totalLemmas = 1000;
         Queue<Equation> addedLemmas = new LinkedList<>();
-        for (Term t1 : terms) {
-            for (Term t2 : terms) {
-                if (t1.equals(t2)) {
+        for (int i = 0; i < terms.size(); i++) {
+            Term t1 = terms.get(i);
+
+            for (int j = 0; j < terms.size(); j++) {
+                Term t2 = terms.get(j);
+
+                if (t1 instanceof Variable || t2 instanceof Variable) {
                     continue;
                 }
 
-                if (!t1.getSort().equals(t2.getSort())) {
+                if (!(t1.getSort().equals(t2.getSort()))) {
                     continue;
                 }
 
+                /*
                 Set<Variable> variables1 = t1.getVariables();
                 Set<Variable> variables2 = t2.getVariables();
                 if (variables1.size() != variables2.size()) {
@@ -627,7 +634,7 @@ public class Prover {
 
                 if (!(variables1.containsAll(variables2) && variables2.containsAll(variables1))) {
                     continue;
-                }
+                }*/
 
                 Equation eq = new Equation(t1, t2);
 

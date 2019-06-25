@@ -65,14 +65,14 @@ public class Main {
 
                 BufferedOutputWriter writer = new BufferedOutputWriter(new OutputStreamWriter(output));
 
-                int searchDepth = 5;
+                int searchDepth = 14;
                 if (commandLine.hasOption("d")) {
                     searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
                 }
 
                 boolean rewriteLeft = false;
                 if (commandLine.hasOption("rl")) {
-                   // rewriteLeft = true;
+                    //rewriteLeft = true;
                 }
 
                 Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft);

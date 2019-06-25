@@ -145,4 +145,8 @@ public class Equation {
         }
         return false;
     }
+
+    Equation reverse() {
+        return new Equation(this.getRight(), this.getLeft());
+    }
 }

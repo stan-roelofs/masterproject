@@ -7,28 +7,24 @@ take nat i b
 head i b
 tail i i
 zip i i i
-f i i
 inv i i
 not b b
 morse i
+even i i
 
 // Equations
 head(zip(x,y)) = head(x)
 tail(zip(x,y)) = zip(y,tail(x))
-not(not(x)) = x
-head(f(x)) = head(x)
-head(tail(f(x))) = not(head(x))
-tail(tail(f(x))) = f(tail(x))
 take(0,x) = head(x)
 take(s(x),y) = take(x,tail(y))
-head(inv(x)) = not(head(x))
-tail(inv(x)) = inv(tail(x))
 head(morse) = 0
 tail(morse) = zip(inv(morse),tail(morse))
+head(inv(x)) = not(head(x))
+tail(inv(x)) = inv(tail(x))
 not(0) = 1
 not(1) = 0
-zip(y,inv(y)) = f(y)
-inv(inv(y)) = y
+head(even(x)) = head(x)
+tail(even(x)) = even(tail(tail(x)))
 
 // Goal
-take(x,f(morse)) = take(x,morse)
+take(x, even(morse)) = take(x, morse)

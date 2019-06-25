@@ -96,13 +96,15 @@ public class Prover {
     }
 
     public static boolean induction(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, int recursionDepth, Variable inductionVar) throws IOException {
+        EquationSystem sys = new EquationSystem(system);
+
         if (recursionDepth >= maxDepth) {
             Logger.i("Reached maximum recursion depth of " + maxDepth + ", returning false");
             outputWriter.writeLine("Maximum recursion depth " + maxDepth + " reached, induction on " + inductionVar.toString() + " failed.");
             return false;
         }
 
-        Equation goal = system.getGoal();
+        Equation goal = sys.getGoal();
 
         if (recursionDepth == 0 && inductionVar == null) {
             Logger.i("Proving " + goal.toString() + " with induction");
@@ -118,7 +120,7 @@ public class Prover {
             for (Variable variable : allVariables) {
                 Logger.i("Induction on " + variable.toString());
                 outputWriter.writeLine("Trying induction variable: " + variable.toString());
-                if (induction(system, outputWriter, searchSteps, rewriteLeft, recursionDepth, variable)) {
+                if (induction(sys, outputWriter, searchSteps, rewriteLeft, recursionDepth, variable)) {
                     return true;
                 }
             }
@@ -129,19 +131,19 @@ public class Prover {
         }
 
         // Check whether induction variable sort is the same as the sort of C
-        if (!inductionVar.getSort().equals(system.getCSort())) {
+        if (!inductionVar.getSort().equals(sys.getCSort())) {
             Logger.i("Skipping induction variable " + inductionVar.toString() + ", invalid sort");
             outputWriter.writeLine("Skipping variable " + inductionVar.toString() + ", sort does not match sort of C");
             return false;
         }
 
         // For each function in C
-        for (Function function : system.getC()) {
+        for (Function function : sys.getC()) {
 
             List<Term> newConstants = new ArrayList<>();
             List<Equation> hypotheses = new ArrayList<>();
 
-            generateHypotheses(function, inductionVar, system, newConstants, hypotheses);
+            generateHypotheses(function, inductionVar, sys, newConstants, hypotheses);
 
             // Create term f(a1, ..., an)
             FunctionTerm inductionTerm = new FunctionTerm(function, newConstants);
@@ -162,10 +164,10 @@ public class Prover {
             Map<Term, Term> leftSteps = new ConcurrentHashMap<>();
             Map<Term, Term> rightSteps = new ConcurrentHashMap<>();
 
-            Set<Equation> allEquations = new HashSet<>(system.getEquations());
+            Set<Equation> allEquations = new HashSet<>(sys.getEquations());
             allEquations.addAll(hypotheses);
 
-            EquationSystem temp = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoal);
+            EquationSystem temp = new EquationSystem(allEquations, sys.getSigma(), sys.getC(), newGoal);
 
             Term convergence = findConversion(temp, outputWriter, searchSteps, rewriteLeft, leftSteps, rightSteps);
 
@@ -173,12 +175,12 @@ public class Prover {
                 Logger.d("Convergence null");
 
                 Function successor = null;
-                for (Function f : system.getC()) {
+                for (Function f : sys.getC()) {
                     if (f.getName().equals("s") && f.getInputSorts().size() == 1) {
                         successor = f;
                     }
                 }
-                if (successor == null || successor.getOutputSort() != inductionVar.getSort()) {
+                if (successor == null || !successor.getOutputSort().equals(inductionVar.getSort())) {
                     Logger.d("Skipping double induction");
                     outputWriter.writeLine("Failed to prove " + newGoal.toString() + " induction on " + inductionVar.toString() + " failed.");
                     return false;
@@ -191,8 +193,8 @@ public class Prover {
                 subterms.add(inductionVar);
                 Term newInductionTerm = new FunctionTerm(successor, subterms);
 
-                Equation newGoalll = system.getGoal().substitute(inductionVar, newInductionTerm);
-                EquationSystem newSystem = new EquationSystem(allEquations, system.getSigma(), system.getC(), newGoalll);
+                Equation newGoalll = sys.getGoal().substitute(inductionVar, newInductionTerm);
+                EquationSystem newSystem = new EquationSystem(allEquations, sys.getSigma(), sys.getC(), newGoalll);
                 return induction(newSystem, outputWriter, searchSteps, rewriteLeft, recursionDepth + 1, inductionVar);
             } else {
                 List<Term> conversion = getConversionSequence(newGoal.getLeft(), newGoal.getRight(), convergence, leftSteps, rightSteps);
@@ -614,7 +616,7 @@ public class Prover {
         for (int i = 0; i < terms.size(); i++) {
             Term t1 = terms.get(i);
 
-            for (int j = 0; j < terms.size(); j++) {
+            for (int j = i; j < terms.size(); j++) {
                 Term t2 = terms.get(j);
 
                 if (t1 instanceof Variable || t2 instanceof Variable) {
@@ -637,6 +639,30 @@ public class Prover {
                 }*/
 
                 Equation eq = new Equation(t1, t2);
+
+                Sort si = new Sort("i");
+                Sort snat = new Sort("nat");
+                if (eq.getSort().equals(si)) {
+                    Function take = null;
+                    for (Function fn : system.getSigma()) {
+                        if (fn.toString().contains("take") && fn.getInputSorts().size() == 2) {
+                            take = fn;
+                            break;
+                        }
+                    }
+                    if (take != null) {
+                        Variable y = new Variable(snat, "y");
+                        List<Term> input = new ArrayList<>();
+                        input.add(y);
+                        input.add(t1);
+                        Term tt1 = new FunctionTerm(take, input);
+                        input.clear();
+                        input.add(y);
+                        input.add(t2);
+                        Term tt2 = new FunctionTerm(take, input);
+                        eq = new Equation(tt1, tt2);
+                    }
+                }
 
                 boolean addLemma = true;
                 for (Equation equation : system.getEquations()) {
@@ -662,7 +688,7 @@ public class Prover {
 
                     Logger.d("Trying lemma: " + eq.toString());
                     if (induction(newSystem, outputWriter, searchSteps, rewriteLeft, 0, null)) {
-                        system.getEquations().add(eq);
+                        system.getEquations().add(new Equation(t1, t2));
 
                         if (addedLemmas.size() > totalLemmas) {
                             Equation toRemove = addedLemmas.poll();
@@ -680,6 +706,55 @@ public class Prover {
                             return true;
                         }
                         outputWriter.setEnabled(false);
+                    }
+                }
+
+                if (!rewriteLeft) {
+                    Equation eq2 = eq.reverse();
+
+                    boolean addLemma2 = true;
+                    for (Equation equation : system.getEquations()) {
+                        if (equation.equivalent(eq2, rewriteLeft)) {
+                            addLemma = false;
+                            break;
+                        }
+                    }
+
+                    if (!addLemma) {
+                        Logger.d("Skipping lemma: " + eq.toString() + ", equation already exists");
+                        continue;
+                    }
+
+                    EquationSystem newSystem2 = new EquationSystem(system.getEquations(), system.getSigma(), system.getC(), eq2);
+
+                    if (convertible(newSystem2, outputWriter, searchSteps, rewriteLeft)) {
+                        continue;
+                    }
+
+                    // Check whether the equation holds on small terms
+                    if (checkLikelyEqual(newSystem2, smallTerms)) {
+
+                        Logger.d("Trying lemma: " + eq2.toString());
+                        if (induction(newSystem2, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+                            system.getEquations().add(new Equation(t2, t1));
+
+                            if (addedLemmas.size() > totalLemmas) {
+                                Equation toRemove = addedLemmas.poll();
+                                system.getEquations().remove(toRemove);
+
+                                Logger.d("Removing lemma" + toRemove.toString());
+
+                            }
+                            addedLemmas.offer(eq2);
+
+                            Logger.i("Found lemma " + eq2.toString());
+
+                            outputWriter.setEnabled(true);
+                            if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+                                return true;
+                            }
+                            outputWriter.setEnabled(false);
+                        }
                     }
                 }
             }

@@ -1,7 +1,7 @@
 // Functions
 ** 0 nat
 ** s nat nat
-O b
+0 b
 take nat i b
 head i b
 tail i i

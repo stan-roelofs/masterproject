@@ -18,6 +18,13 @@ public class EquationSystem {
     private Set<Function> C;
     private Equation goal;
 
+    public EquationSystem(EquationSystem system) {
+        this.equations = new HashSet<>(system.getEquations());
+        this.sigma = new HashSet<>(system.getSigma());
+        this.C = new HashSet<>(system.getC());
+        this.goal = new Equation(system.getGoal().getLeft(), system.getGoal().getRight());
+    }
+
     public EquationSystem(Set<Equation> eq, Set<Function> sigma, Set<Function> C, Equation goal) {
         if (eq == null || sigma == null || C == null || goal == null) {
             throw new IllegalArgumentException("Eq, Sigma, C, Goal must not be null");

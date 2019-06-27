@@ -1,5 +1,6 @@
 cli
 core
 core.io
+core.logging
 core.parsing
 gui

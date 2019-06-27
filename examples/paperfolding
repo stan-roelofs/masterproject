@@ -1,22 +1,6 @@
 ** 0 nat
 ** s nat nat
-0 bool
-1 bool
-a temp
-b temp
-c temp
-d temp
-tau temp bool
-TAU i i
-f i i
-: bool i i
-R i
-head i bool
-head i temp
-tail i i
-alt i
-P i
-take nat i bool
++ nat nat nat
 
 take(0, x) = head(x)
 take(s(x), y) = take(x, tail(y))
@@ -24,16 +8,18 @@ tau(a) = 0
 tau(c) = 0
 tau(b) = 1
 tau(d) = 1
-TAU(xs) = :(tau(head(xs)), TAU(tail(xs)))
+TAU(xs) = :(tau(hd(xs)), TAU(tail(xs)))
 head(:(x, xs)) = x
 tail(:(x, xs)) = xs
-f(:(a, R)) = :(a, :(c, f(R)))
-f(:(b, R)) = :(c, :(b, f(R)))
-f(:(c, R)) = :(a, :(d, f(R)))
-f(:(d, R)) = :(c, :(d, f(R)))
+hd(::(x, xs)) = x
+tail(::(x, xs)) = xs
+f(::(a, R)) = ::(a, ::(c, f(R)))
+f(::(b, R)) = ::(c, ::(b, f(R)))
+f(::(c, R)) = ::(a, ::(d, f(R)))
+f(::(d, R)) = ::(c, ::(d, f(R)))
 P = zip(alt, P)
 head(alt) = 0
 head(tail(alt)) = 1
 tail(tail(alt)) = alt
 
-take(x, :(0, TAU(R)) = take(x, P)
+take(x, :(0, TAU(R))) = take(x, P)

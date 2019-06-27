@@ -396,21 +396,6 @@ public class Prover {
         intersection.retainAll(right);
 
         Logger.d("Checking convergence");
-
-
-        /*
-        Logger.d("Left:");
-        for (Term t : left) {
-            if (t.toString().contains("and(0, head(tail(morse)))")) {
-                Logger.e(t.toString());
-            }
-        }*/
-        /*
-        Logger.d("Right:");
-        for (Term t : right) {
-            //  core.Logger.d(t.toString());
-        }*/
-
         Logger.d("Intersection:");
         for (Term t : intersection) {
             Logger.d(t.toString());
@@ -418,10 +403,6 @@ public class Prover {
 
         if (!intersection.isEmpty()) {
             Logger.i("Found conversion");
-        }
-
-        if (intersection.size() > 1) {
-            //Logger.w("Intersection size > 1, choosing the first term");
         }
 
         return intersection.isEmpty() ? null : intersection.iterator().next();
@@ -433,11 +414,18 @@ public class Prover {
      *
      * @param terms A set of terms
      * @param term A term with 0 or more variables
-     * @return The set of terms that can be created by substituting variables in {@code term}
-     *         by any of the terms in {@code terms}, including the term itself
+     * @param subs A map that contains the current substitutions
+     * @param maxTermDepth The maximum depth a term is allowed, terms with higher depth will not be in the set that is
+     *                     returned
+     * @return A set of terms that can be created by substituting free variables (i.e. those not occuring
+     * in {@code subs}) in {@code term} by terms in the set {@code terms}
      * @see Term
+     * @see Variable
      */
-    private static Set<Term> generateTerms(Set<Term> terms, Set<Term> result, Term term, Map<Variable, Term> subs) {
+    private static Set<Term> generateTerms(Set<Term> terms, Term term, Map<Variable, Term> subs, int maxTermDepth) {
+        Set<Term> result = new HashSet<>();
+
+        // We can skip this case, if {@code term} is a variable it will not yield any terms that are not yet in {@code terms}
         if (term instanceof Variable) {
             return result;
         }
@@ -452,81 +440,53 @@ public class Prover {
                         newSubs.put(var, t);
 
                         int depth = term.applySubstitution(newSubs).subtermsAmount();
-                        if (depth > 6) {
+                        if (depth > maxTermDepth) {
                             continue;
                         }
 
-                        result.addAll(generateTerms(terms, result, term, newSubs));
+                        result.addAll(generateTerms(terms, term, newSubs, maxTermDepth));
                     }
                 }
             }
         }
 
         result.add(term.applySubstitution(subs));
-
         return result;
     }
 
-    private static List<Term> getTerms(EquationSystem system) {
+    /**
+     * Generates a set of (small) terms that can be used to generate lemmas.
+     * This is done by creating the term f(x1, ..., xn) for every f : s1, ..., sn to s in Sigma in {@code system}
+     * the variables x_i are fresh variables of sort s_i for i = 1, ..., n
+     * The term and its variables are added to a set and combined {@code k} times by substituting variables by different
+     * terms of the same sort.
+     *
+     * @param system A system of equations over a set of operators sigma, a subset of constructors C, and a
+     *               goal equation that should be proven
+     * @param maxTermDepth The maximum depth a term is allowed to have
+     * @param k The amount of times terms are combined to generate new terms
+     * @return A set of (small) terms of all functions in system.Sigma
+     * @see EquationSystem
+     */
+    private static List<Term> getTerms(EquationSystem system, int maxTermDepth, int k) {
+        Set<Term> terms = new HashSet<>();
 
         /*
-        Map<Sort, Integer> numVariables = new HashMap<>();
-        for (Function f : system.getSigma()) {
-
-            Map<Sort, Integer> numSorts = new HashMap<>(f.getInputSorts().size());
-            for (Sort s : f.getInputSorts()) {
-                int current = numSorts.get(s) == null ? 0 : numSorts.get(s);
-                numSorts.put(s, current + 1);
-            }
-
-            for (Sort s : f.getInputSorts()) {
-                int max = numVariables.get(s) == null ? 0 : numVariables.get(s);
-                if (numSorts.get(s) > max) {
-                    numVariables.put(s, numSorts.get(s));
-                }
-            }
-        }
-
-        Map<Sort, List<Term>> variables = new HashMap<>();
-        int variableCounter = 0;
-        for (Map.Entry<Sort, Integer> entry : numVariables.entrySet()) {
-            Logger.d(entry.getKey().toString() + " : " + entry.getValue());
-            variables.put(entry.getKey(), new ArrayList<>());
-
-            for (int i = 0; i < entry.getValue(); i++) {
-                Variable v = new Variable(entry.getKey(), "x" + variableCounter);
-                variables.get(entry.getKey()).add(v);
-
-                Logger.d("Generated variable: " + v.toString() + " : " + v.getSort().toString());
-
-                variableCounter++;
-            }
-        }*/
-
-        Set<Term> terms = new HashSet<>();
-        //for (Sort s : variables.keySet()) {
-            //terms.addAll(variables.get(s));
-        //}
-
+         Create the term f(x1, ..., xn) for every f : s1, ..., sn -> s in system.Sigma
+         the variables x_i are fresh variables of sort s_i for i = 1, ..., n
+         The term and its variables are added to the set terms
+        */
         int varCount = 0;
         for (Function f : system.getSigma()) {
             List<Term> inputs = new ArrayList<>();
 
-            Set<Sort> uniqueInputSorts = new HashSet<>(f.getInputSorts());
-
-            Map<Sort, Integer> indexes = new HashMap<>();
-            for (Sort s : uniqueInputSorts) {
-                indexes.put(s, 0);
-            }
-
             for (int j = 0; j < f.getInputSorts().size(); j++) {
                 Sort s = f.getInputSorts().get(j);
                 Variable var = new Variable(s, "x" + varCount);
-                //Term var = variables.get(s).get(j);
+                varCount++;
+
                 inputs.add(var);
                 terms.add(var);
-                varCount++;
-                indexes.put(s, indexes.get(s) + 1);
             }
 
             FunctionTerm term = new FunctionTerm(f, inputs);
@@ -534,25 +494,21 @@ public class Prover {
             Logger.d("TERM: " + term.toString());
         }
 
-
-        for (int i = 0; i < 2; i++) {
+        /*
+         Combine terms k times to create terms with greater depth
+         */
+        for (int i = 0; i < k; i++) {
             List<Term> temp = new ArrayList<>();
             for (Term term : terms) {
-                temp.addAll(generateTerms(terms, new HashSet<>(), term, new HashMap<>()));
+                temp.addAll(generateTerms(terms, term, new HashMap<>(), maxTermDepth));
             }
-            /*
-            for (int j = 0; j < temp.size(); j++) {
-                Term term = temp.get(j);
-                if (term.subtermsAmount() > 5) {
-                    temp.remove(j);
-                    j--;
-                }
-            }
-            */
             terms.addAll(temp);
         }
-        List<Term> temp = new ArrayList<>(terms);
 
+        /*
+         Sort the items by the weight function
+         */
+        List<Term> temp = new ArrayList<>(terms);
         temp.sort((o1, o2) -> {
             double w1 = getWeight(o1, 0.1);
             double w2 = getWeight(o2, 0.1);
@@ -564,10 +520,11 @@ public class Prover {
             Logger.d(term.toString());
         }
 
+        // Return the sorted list of terms
         return temp;
     }
 
-    public static boolean inductionLemmaSearch(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft) throws IOException {
+    public static boolean inductionLemmaSearch(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, int maxTermDepth, int combineTerms) throws IOException {
         // Try induction first
         if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
             return true;
@@ -575,7 +532,7 @@ public class Prover {
 
         outputWriter.setEnabled(false);
 
-        List<Term> terms = getTerms(system);
+        List<Term> terms = getTerms(system, maxTermDepth, combineTerms);
 
         /*
         Generate some small terms
@@ -589,7 +546,6 @@ public class Prover {
         smallTerms.put(nat, new ArrayList<>());
 
         // Nat
-
         Function zerof = new Function(nat, "0");
 
         List<Sort> inputs = new ArrayList<>();
@@ -627,7 +583,7 @@ public class Prover {
                     continue;
                 }
 
-                /*
+
                 Set<Variable> variables1 = t1.getVariables();
                 Set<Variable> variables2 = t2.getVariables();
                 if (variables1.size() != variables2.size()) {
@@ -636,7 +592,7 @@ public class Prover {
 
                 if (!(variables1.containsAll(variables2) && variables2.containsAll(variables1))) {
                     continue;
-                }*/
+                }
 
                 Equation eq = new Equation(t1, t2);
 

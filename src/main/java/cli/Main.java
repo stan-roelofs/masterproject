@@ -65,17 +65,17 @@ public class Main {
 
                 BufferedOutputWriter writer = new BufferedOutputWriter(new OutputStreamWriter(output));
 
-                int searchDepth = 14;
+                int searchDepth = 4;
                 if (commandLine.hasOption("d")) {
                     searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
                 }
 
                 boolean rewriteLeft = false;
                 if (commandLine.hasOption("rl")) {
-                    //rewriteLeft = true;
+                    rewriteLeft = true;
                 }
 
-                Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft);
+                Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft, 5, 1);
 
                 //for (Equation eq : newSystem.getEquations()) {
                 //    Logger.i(eq.toString());

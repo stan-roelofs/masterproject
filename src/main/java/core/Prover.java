@@ -524,7 +524,7 @@ public class Prover {
         return temp;
     }
 
-    public static boolean inductionLemmaSearch(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, int maxTermDepth, int combineTerms) throws IOException {
+    public static boolean inductionLemmaSearch(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, int maxTermDepth, int combineTerms, int maxLemmas) throws IOException {
         // Try induction first
         if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
             return true;
@@ -534,15 +534,16 @@ public class Prover {
 
         List<Term> terms = getTerms(system, maxTermDepth, combineTerms);
 
+        Map<Sort, List<Term>> smallTerms = new HashMap<>();
         /*
         Generate some small terms
-         */
-        //int attempts = 5;
+
+        int attempts = 5;
 
         Sort nat = new Sort("nat");
         Sort inf = new Sort("i");
 
-        Map<Sort, List<Term>> smallTerms = new HashMap<>();
+
         smallTerms.put(nat, new ArrayList<>());
 
         // Nat
@@ -565,9 +566,8 @@ public class Prover {
 
         // inf
         Function randStream = new Function(inf, "temp");
-        FunctionTerm rand = new FunctionTerm(randStream);
+        FunctionTerm rand = new FunctionTerm(randStream);*/
 
-        int totalLemmas = 1000;
         Queue<Equation> addedLemmas = new LinkedList<>();
         for (int i = 0; i < terms.size(); i++) {
             Term t1 = terms.get(i);
@@ -594,32 +594,25 @@ public class Prover {
                     continue;
                 }
 
-                Equation eq = new Equation(t1, t2);
-
-                Sort si = new Sort("i");
-                Sort snat = new Sort("nat");
-                if (eq.getSort().equals(si)) {
-                    Function take = null;
-                    for (Function fn : system.getSigma()) {
-                        if (fn.toString().contains("take") && fn.getInputSorts().size() == 2) {
-                            take = fn;
-                            break;
-                        }
+                if (proveLemma(t1, t2, system, outputWriter, searchSteps, rewriteLeft, smallTerms, addedLemmas, maxLemmas)) {
+                    outputWriter.setEnabled(true);
+                    if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+                        return true;
                     }
-                    if (take != null) {
-                        Variable y = new Variable(snat, "y");
-                        List<Term> input = new ArrayList<>();
-                        input.add(y);
-                        input.add(t1);
-                        Term tt1 = new FunctionTerm(take, input);
-                        input.clear();
-                        input.add(y);
-                        input.add(t2);
-                        Term tt2 = new FunctionTerm(take, input);
-                        eq = new Equation(tt1, tt2);
+                    outputWriter.setEnabled(false);
+                }
+
+                if (!rewriteLeft) {
+                    if (proveLemma(t2, t1, system, outputWriter, searchSteps, rewriteLeft, smallTerms, addedLemmas, maxLemmas)) {
+                        outputWriter.setEnabled(true);
+                        if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+                            return true;
+                        }
+                        outputWriter.setEnabled(false);
                     }
                 }
 
+                /*
                 boolean addLemma = true;
                 for (Equation equation : system.getEquations()) {
                     if (equation.equivalent(eq, rewriteLeft)) {
@@ -646,7 +639,7 @@ public class Prover {
                     if (induction(newSystem, outputWriter, searchSteps, rewriteLeft, 0, null)) {
                         system.getEquations().add(new Equation(t1, t2));
 
-                        if (addedLemmas.size() > totalLemmas) {
+                        if (addedLemmas.size() > maxLemmas) {
                             Equation toRemove = addedLemmas.poll();
                             system.getEquations().remove(toRemove);
 
@@ -671,13 +664,13 @@ public class Prover {
                     boolean addLemma2 = true;
                     for (Equation equation : system.getEquations()) {
                         if (equation.equivalent(eq2, rewriteLeft)) {
-                            addLemma = false;
+                            addLemma2 = false;
                             break;
                         }
                     }
 
-                    if (!addLemma) {
-                        Logger.d("Skipping lemma: " + eq.toString() + ", equation already exists");
+                    if (!addLemma2) {
+                        Logger.d("Skipping lemma: " + eq2.toString() + ", equation already exists");
                         continue;
                     }
 
@@ -694,7 +687,7 @@ public class Prover {
                         if (induction(newSystem2, outputWriter, searchSteps, rewriteLeft, 0, null)) {
                             system.getEquations().add(new Equation(t2, t1));
 
-                            if (addedLemmas.size() > totalLemmas) {
+                            if (addedLemmas.size() > maxLemmas) {
                                 Equation toRemove = addedLemmas.poll();
                                 system.getEquations().remove(toRemove);
 
@@ -712,11 +705,81 @@ public class Prover {
                             outputWriter.setEnabled(false);
                         }
                     }
-                }
+                }*/
             }
         }
 
         outputWriter.setEnabled(true);
+        return false;
+    }
+
+    private static boolean proveLemma(Term t1, Term t2, EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, Map<Sort, List<Term>> smallTerms, Queue<Equation> addedLemmas, int maxLemmas) throws IOException {
+        Equation eq = new Equation(t1, t2);
+
+        Sort si = new Sort("i");
+        Sort snat = new Sort("nat");
+        if (eq.getSort().equals(si)) {
+            Function take = null;
+            for (Function fn : system.getSigma()) {
+                if (fn.toString().contains("take") && fn.getInputSorts().size() == 2) {
+                    take = fn;
+                    break;
+                }
+            }
+            if (take != null) {
+                Variable y = new Variable(snat, "y");
+                List<Term> input = new ArrayList<>();
+                input.add(y);
+                input.add(t1);
+                Term tt1 = new FunctionTerm(take, input);
+                input.clear();
+                input.add(y);
+                input.add(t2);
+                Term tt2 = new FunctionTerm(take, input);
+                eq = new Equation(tt1, tt2);
+            }
+        }
+
+
+        boolean addLemma = true;
+        for (Equation equation : system.getEquations()) {
+            if (equation.equivalent(eq, rewriteLeft)) {
+                addLemma = false;
+                break;
+            }
+        }
+
+        if (!addLemma) {
+            Logger.d("Skipping lemma: " + eq.toString() + ", equation already exists");
+            return false;
+        }
+
+        EquationSystem newSystem = new EquationSystem(system.getEquations(), system.getSigma(), system.getC(), eq);
+
+        if (convertible(newSystem, outputWriter, searchSteps, rewriteLeft)) {
+            return false;
+        }
+
+        // Check whether the equation holds on small terms
+        if (checkLikelyEqual(newSystem, smallTerms)) {
+
+            Logger.d("Trying lemma: " + eq.toString());
+            if (induction(newSystem, outputWriter, searchSteps, rewriteLeft, 0, null)) {
+                system.getEquations().add(new Equation(t1, t2));
+
+                if (addedLemmas.size() > maxLemmas) {
+                    Equation toRemove = addedLemmas.poll();
+                    system.getEquations().remove(toRemove);
+
+                    Logger.d("Removing lemma" + toRemove.toString());
+
+                }
+                addedLemmas.offer(eq);
+
+                Logger.i("Found lemma " + eq.toString());
+                return true;
+            }
+        }
         return false;
     }
 

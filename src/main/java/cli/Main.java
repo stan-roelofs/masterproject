@@ -75,16 +75,7 @@ public class Main {
                     rewriteLeft = true;
                 }
 
-                Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft, 5, 1);
-
-                //for (Equation eq : newSystem.getEquations()) {
-                //    Logger.i(eq.toString());
-                //}
-                //newSystem.printEquations();
-
-                //if (!Prover.convertible(newSystem, writer, searchDepth, rewriteLeft)) {
-                //    Prover.induction(newSystem, writer, searchDepth, rewriteLeft, 0, null);
-                //}
+                Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft, 5, 2, 100);
                 writer.close();
 
             } catch (IOException e) {

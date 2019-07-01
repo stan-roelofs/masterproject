@@ -65,13 +65,16 @@ public class Prover {
 
         int searchDepth = 0;
         Term convergence = null;
+
+        Set<Term> leftAdded = new HashSet<>(leftTerms);
+        Set<Term> rightAdded = new HashSet<>(rightTerms);
         while (convergence == null && searchDepth < searchSteps) {
             Logger.d("Rewriting step " + searchDepth + ", using " + numThreads + " threads");
 
             RewriteThread[] rewriteThreads = new RewriteThread[numThreads];
             Thread[] threads = new Thread[numThreads];
             for (int i = 0; i < numThreads; i++) {
-                rewriteThreads[i] = new RewriteThread(i, leftTerms, rightTerms, threadEquations.get(i), leftSteps, rightSteps, true, rewriteLeft);
+                rewriteThreads[i] = new RewriteThread(i, leftAdded, rightAdded, threadEquations.get(i), leftSteps, rightSteps, true, rewriteLeft);
                 threads[i] = new Thread(rewriteThreads[i]);
                 threads[i].start();
             }
@@ -84,10 +87,16 @@ public class Prover {
                 }
             }
 
+            leftAdded.clear();
+            rightAdded.clear();
             for (int i = 0; i < numThreads; i++) {
-                leftTerms.addAll(rewriteThreads[i].getResultLeft());
-                rightTerms.addAll(rewriteThreads[i].getResultRight());
+                leftAdded.addAll(rewriteThreads[i].getResultLeft());
+                rightAdded.addAll(rewriteThreads[i].getResultRight());
             }
+
+            leftTerms.addAll(leftAdded);
+            rightTerms.addAll(rightAdded);
+
             searchDepth++;
             convergence = checkConvergence(leftTerms, rightTerms);
         }
@@ -611,101 +620,6 @@ public class Prover {
                         outputWriter.setEnabled(false);
                     }
                 }
-
-                /*
-                boolean addLemma = true;
-                for (Equation equation : system.getEquations()) {
-                    if (equation.equivalent(eq, rewriteLeft)) {
-                        addLemma = false;
-                        break;
-                    }
-                }
-
-                if (!addLemma) {
-                    Logger.d("Skipping lemma: " + eq.toString() + ", equation already exists");
-                    continue;
-                }
-
-                EquationSystem newSystem = new EquationSystem(system.getEquations(), system.getSigma(), system.getC(), eq);
-
-                if (convertible(newSystem, outputWriter, searchSteps, rewriteLeft)) {
-                    continue;
-                }
-
-                // Check whether the equation holds on small terms
-                if (checkLikelyEqual(newSystem, smallTerms)) {
-
-                    Logger.d("Trying lemma: " + eq.toString());
-                    if (induction(newSystem, outputWriter, searchSteps, rewriteLeft, 0, null)) {
-                        system.getEquations().add(new Equation(t1, t2));
-
-                        if (addedLemmas.size() > maxLemmas) {
-                            Equation toRemove = addedLemmas.poll();
-                            system.getEquations().remove(toRemove);
-
-                            Logger.d("Removing lemma" + toRemove.toString());
-
-                        }
-                        addedLemmas.offer(eq);
-
-                        Logger.i("Found lemma " + eq.toString());
-
-                        outputWriter.setEnabled(true);
-                        if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
-                            return true;
-                        }
-                        outputWriter.setEnabled(false);
-                    }
-                }
-
-                if (!rewriteLeft) {
-                    Equation eq2 = eq.reverse();
-
-                    boolean addLemma2 = true;
-                    for (Equation equation : system.getEquations()) {
-                        if (equation.equivalent(eq2, rewriteLeft)) {
-                            addLemma2 = false;
-                            break;
-                        }
-                    }
-
-                    if (!addLemma2) {
-                        Logger.d("Skipping lemma: " + eq2.toString() + ", equation already exists");
-                        continue;
-                    }
-
-                    EquationSystem newSystem2 = new EquationSystem(system.getEquations(), system.getSigma(), system.getC(), eq2);
-
-                    if (convertible(newSystem2, outputWriter, searchSteps, rewriteLeft)) {
-                        continue;
-                    }
-
-                    // Check whether the equation holds on small terms
-                    if (checkLikelyEqual(newSystem2, smallTerms)) {
-
-                        Logger.d("Trying lemma: " + eq2.toString());
-                        if (induction(newSystem2, outputWriter, searchSteps, rewriteLeft, 0, null)) {
-                            system.getEquations().add(new Equation(t2, t1));
-
-                            if (addedLemmas.size() > maxLemmas) {
-                                Equation toRemove = addedLemmas.poll();
-                                system.getEquations().remove(toRemove);
-
-                                Logger.d("Removing lemma" + toRemove.toString());
-
-                            }
-                            addedLemmas.offer(eq2);
-
-                            Logger.i("Found lemma " + eq2.toString());
-
-                            outputWriter.setEnabled(true);
-                            if (induction(system, outputWriter, searchSteps, rewriteLeft, 0, null)) {
-                                return true;
-                            }
-                            outputWriter.setEnabled(false);
-                        }
-                    }
-                }*/
             }
         }
 
@@ -771,7 +685,9 @@ public class Prover {
                     Equation toRemove = addedLemmas.poll();
                     system.getEquations().remove(toRemove);
 
-                    Logger.d("Removing lemma" + toRemove.toString());
+                    if (toRemove != null) {
+                        Logger.d("Removing lemma" + toRemove.toString());
+                    }
 
                 }
                 addedLemmas.offer(eq);

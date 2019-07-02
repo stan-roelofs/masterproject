@@ -43,8 +43,8 @@ public class Main {
                     system = InputParser.parseSystem(input);
                 } catch(ParserException e) {
                     Logger.e("Exception while parsing, quitting program");
+                    System.exit(1);
                 }
-                //system.print();
 
                 // If no output file specified, use System.out
                 OutputStream output;
@@ -72,10 +72,16 @@ public class Main {
 
                 boolean rewriteLeft = false;
                 if (commandLine.hasOption("rl")) {
-                    //rewriteLeft = true;
+                    rewriteLeft = true;
                 }
 
-                Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft, 5, 2, 100);
+                boolean result = Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft, 5, 2, 100);
+
+                if (result) {
+                    writer.write("Successfully proved goal " + system.getGoal().toString());
+                } else {
+                    writer.write("Failed to prove goal " + system.getGoal().toString());
+                }
                 writer.close();
 
             } catch (IOException e) {

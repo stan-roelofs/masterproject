@@ -21,25 +21,44 @@ class ProofPanel extends JPanel {
     private JButton proofButton;
     private JTextField searchSteps;
     private JToggleButton rewriteLeft;
+    private JButton proofLemmaButton;
+    private JTextField maxTermDepth;
+    private JTextField combineTerms;
+    private JTextField maxLemmas;
+    private JLabel maxTermDepthLabel;
+    private JLabel searchStepsLabel;
+    private JLabel combineTermsLabel;
+    private JLabel maxLemmasLabel;
 
     ProofPanel() {
-        this.setLayout(new GridLayout(0, 2));
+        this.setLayout(new BorderLayout());
 
         inputArea = new JTextArea();
         JScrollPane sp = new JScrollPane(inputArea);
-        this.add(sp);
+        sp.setPreferredSize(new Dimension(300, 400));
+        this.add(sp, BorderLayout.LINE_START);
 
         outputArea = new JTextArea();
         JScrollPane sp2 = new JScrollPane(outputArea);
-        this.add(sp2);
+        sp2.setPreferredSize(new Dimension(300, 400));
+        this.add(sp2, BorderLayout.LINE_END);
+
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new GridLayout(2, 1));
+
+        JPanel proofControlPanel = new JPanel();
+        proofControlPanel.setLayout(new FlowLayout());
+        searchStepsLabel = new JLabel("Search steps: ");
+        proofControlPanel.add(searchStepsLabel);
 
         searchSteps = new JTextField("8");
-        add(searchSteps);
+        searchSteps.setPreferredSize(new Dimension(50, 20));
+        proofControlPanel.add(searchSteps);
 
-        rewriteLeft = new JToggleButton("Rewrite both directions");
-        add(rewriteLeft);
+        rewriteLeft = new JCheckBox("Rewrite both directions");
+        proofControlPanel.add(rewriteLeft);
 
-        proofButton = new JButton("Start");
+        proofButton = new JButton("Prove");
         proofButton.addActionListener(actionEvent -> {
 
             String[] split = inputArea.getText().split("\\n");
@@ -50,12 +69,17 @@ class ProofPanel extends JPanel {
                 system = InputParser.parseSystem(input);
             } catch(ParserException e) {
                 Logger.e("Exception while parsing, quitting program");
+                return;
             }
             system.print();
 
             outputArea.setText("");
             TextAreaOutputWriter writer = new TextAreaOutputWriter(outputArea);
             int searchDepth = Integer.parseInt(searchSteps.getText());
+            if (searchDepth < 0) {
+                Logger.e("Search depth < 0, using 0 instead");
+                searchDepth = 0;
+            }
 
             try {
                 Prover.induction(system, writer, searchDepth, rewriteLeft.isSelected(),0, null);
@@ -64,7 +88,83 @@ class ProofPanel extends JPanel {
                 Logger.e("IOException: " + e.getMessage());
             }
         });
-        this.add(proofButton);
+        proofControlPanel.add(proofButton);
+        controlPanel.add(proofControlPanel);
+
+        JPanel lemmaControlPanel = new JPanel();
+        lemmaControlPanel.setLayout(new FlowLayout());
+        maxTermDepthLabel = new JLabel("Max term depth: ");
+        lemmaControlPanel.add(maxTermDepthLabel);
+
+        maxTermDepth = new JTextField("5");
+        maxTermDepth.setPreferredSize(new Dimension(50, 20));
+        lemmaControlPanel.add(maxTermDepth);
+
+        combineTermsLabel = new JLabel("Combine terms: ");
+        lemmaControlPanel.add(combineTermsLabel);
+
+        combineTerms = new JTextField("2");
+        combineTerms.setPreferredSize(new Dimension(50, 20));
+        lemmaControlPanel.add(combineTerms);
+
+        maxLemmasLabel = new JLabel("Max lemmas: ");
+        lemmaControlPanel.add(maxLemmasLabel);
+
+        maxLemmas = new JTextField("100");
+        maxLemmas.setPreferredSize(new Dimension(50, 20));
+        lemmaControlPanel.add(maxLemmas);
+
+        proofLemmaButton = new JButton("Search for lemmas and prove");
+        proofLemmaButton.addActionListener(actionEvent -> {
+            String[] split = inputArea.getText().split("\\n");
+            java.util.List<String> input = new ArrayList<>(Arrays.asList(split));
+
+            EquationSystem system = null;
+            try {
+                system = InputParser.parseSystem(input);
+            } catch(ParserException e) {
+                Logger.e("Exception while parsing, quitting program");
+                return;
+            }
+            system.print();
+
+            outputArea.setText("");
+            TextAreaOutputWriter writer = new TextAreaOutputWriter(outputArea);
+            int searchDepth = Integer.parseInt(searchSteps.getText());
+            if (searchDepth < 0) {
+                Logger.e("Search depth < 0, using 0 instead");
+                searchDepth = 0;
+            }
+
+            int maxTerm = Integer.parseInt(maxTermDepth.getText());
+            if (maxTerm < 0) {
+                Logger.e("Max term depth < 0, using 0 instead");
+                maxTerm = 0;
+            }
+
+            int combine = Integer.parseInt(combineTerms.getText());
+            if (combine < 0) {
+                Logger.e("Combine terms < 0, using 0 instead");
+                combine = 0;
+            }
+
+            int maxLemma = Integer.parseInt(maxLemmas.getText());
+            if (maxLemma < 0) {
+                Logger.e("Max lemmas < 0, using 0 instead");
+                maxLemma = 0;
+            }
+
+            try {
+                Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft.isSelected(), maxTerm, combine, maxLemma);
+                writer.close();
+            } catch (IOException e) {
+                Logger.e("IOException: " + e.getMessage());
+            }
+        });
+        lemmaControlPanel.add(proofLemmaButton);
+        controlPanel.add(lemmaControlPanel);
+
+        add(controlPanel, BorderLayout.PAGE_END);
     }
 
     void setInput(String text) {

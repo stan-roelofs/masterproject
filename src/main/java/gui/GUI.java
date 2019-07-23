@@ -14,7 +14,6 @@ class GUI extends JFrame {
 
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(300, 300);
 
         setupMenuBar();
 
@@ -22,6 +21,7 @@ class GUI extends JFrame {
         this.add(proofPanel);
 
         this.setVisible(true);
+        pack();
     }
 
     private void setupMenuBar() {

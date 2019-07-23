@@ -29,6 +29,7 @@ class ProofPanel extends JPanel {
     private JLabel searchStepsLabel;
     private JLabel combineTermsLabel;
     private JLabel maxLemmasLabel;
+    private JLabel progressLabel;
 
     ProofPanel() {
         this.setLayout(new BorderLayout());
@@ -48,6 +49,7 @@ class ProofPanel extends JPanel {
 
         JPanel proofControlPanel = new JPanel();
         proofControlPanel.setLayout(new FlowLayout());
+
         searchStepsLabel = new JLabel("Search steps: ");
         proofControlPanel.add(searchStepsLabel);
 
@@ -64,7 +66,7 @@ class ProofPanel extends JPanel {
             String[] split = inputArea.getText().split("\\n");
             java.util.List<String> input = new ArrayList<>(Arrays.asList(split));
 
-            EquationSystem system = null;
+            EquationSystem system;
             try {
                 system = InputParser.parseSystem(input);
             } catch(ParserException e) {
@@ -81,13 +83,28 @@ class ProofPanel extends JPanel {
                 searchDepth = 0;
             }
 
-            try {
-                Prover.induction(system, writer, searchDepth, rewriteLeft.isSelected(),0, null);
+            progressLabel.setVisible(true);
+            proofButton.setEnabled(false);
+            proofLemmaButton.setEnabled(false);
+            int finalSearchDepth = searchDepth;
+            new Thread(() -> {
+                try {
+                    Prover.induction(system, writer, finalSearchDepth, rewriteLeft.isSelected(),0, null);
+                    progressLabel.setVisible(false);
+                    proofButton.setEnabled(true);
+                    proofLemmaButton.setEnabled(true);
+                } catch (IOException e) {
+                    Logger.e("IOException: " + e.getMessage());
+                }
                 writer.close();
-            } catch (IOException e) {
-                Logger.e("IOException: " + e.getMessage());
-            }
+            }).start();
         });
+
+        ImageIcon loading = new ImageIcon("res/loading.gif");
+        progressLabel = new JLabel("Processing... ", loading, JLabel.CENTER);
+        progressLabel.setVisible(false);
+        proofControlPanel.add(progressLabel);
+
         proofControlPanel.add(proofButton);
         controlPanel.add(proofControlPanel);
 
@@ -119,7 +136,7 @@ class ProofPanel extends JPanel {
             String[] split = inputArea.getText().split("\\n");
             java.util.List<String> input = new ArrayList<>(Arrays.asList(split));
 
-            EquationSystem system = null;
+            EquationSystem system;
             try {
                 system = InputParser.parseSystem(input);
             } catch(ParserException e) {
@@ -154,12 +171,26 @@ class ProofPanel extends JPanel {
                 maxLemma = 0;
             }
 
-            try {
-                Prover.inductionLemmaSearch(system, writer, searchDepth, rewriteLeft.isSelected(), maxTerm, combine, maxLemma);
+            int finalSearchDepth = searchDepth;
+            int finalMaxTerm = maxTerm;
+            int finalCombine = combine;
+            int finalMaxLemma = maxLemma;
+
+            progressLabel.setVisible(true);
+            proofButton.setEnabled(false);
+            proofLemmaButton.setEnabled(false);
+            new Thread(() -> {
+                try {
+                    Prover.inductionLemmaSearch(system, writer, finalSearchDepth, rewriteLeft.isSelected(), finalMaxTerm, finalCombine, finalMaxLemma);
+                    progressLabel.setVisible(false);
+                    proofButton.setEnabled(true);
+                    proofLemmaButton.setEnabled(true);
+                } catch (IOException e) {
+                    Logger.e("IOException: " + e.getMessage());
+                }
                 writer.close();
-            } catch (IOException e) {
-                Logger.e("IOException: " + e.getMessage());
-            }
+            }).start();
+
         });
         lemmaControlPanel.add(proofLemmaButton);
         controlPanel.add(lemmaControlPanel);

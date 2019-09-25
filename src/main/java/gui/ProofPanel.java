@@ -196,6 +196,8 @@ class ProofPanel extends JPanel {
         controlPanel.add(lemmaControlPanel);
 
         add(controlPanel, BorderLayout.PAGE_END);
+
+        repaint();
     }
 
     void setInput(String text) {

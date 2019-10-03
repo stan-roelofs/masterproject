@@ -6,4 +6,4 @@
 See [thesis.pdf](thesis.pdf)
 
 ## Documentation
-(Outdated) See [https://stan-roelofs.github.io/masterproject/index](https://stan-roelofs.github.io/masterproject/index)
+See [https://stan-roelofs.github.io/masterproject/index](https://stan-roelofs.github.io/masterproject/index)

@@ -10,15 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Class with static functions that can prove an EquationSystem
  *
+ *
  * @author Stan Roelofs
  * @version 1.2
  */
 public class Prover {
+    // TODO: This class is a bit of a mess, especially lemma search code
 
-    public static String constantName = "a";
-    public static int maxDepth = 2;
+    private static String constantName = "a";
+    private static int maxDepth = 2;
 
-    public static boolean convertible(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft) throws IOException {
+    private static boolean convertible(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft) throws IOException {
         Map<Term, Term> leftSteps = new ConcurrentHashMap<>();
         Map<Term, Term> rightSteps = new ConcurrentHashMap<>();
 
@@ -32,7 +34,7 @@ public class Prover {
         return conversion != null;
     }
 
-    public static Term findConversion(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, Map<Term, Term> leftSteps, Map<Term, Term> rightSteps) throws IOException {
+    private static Term findConversion(EquationSystem system, OutputWriter outputWriter, int searchSteps, boolean rewriteLeft, Map<Term, Term> leftSteps, Map<Term, Term> rightSteps) throws IOException {
         // Do BFS for convertibility
         Set<Term> leftTerms = new HashSet<>();
         Set<Term> rightTerms = new HashSet<>();
@@ -337,7 +339,7 @@ public class Prover {
      *
      * Returns a set of terms created as a result of this procedure
      */
-    public static Set<Term> rewriteAll(Set<Term> terms, Set<Equation> allEquations, Map<Term, Term> steps, boolean rewriteRight, boolean rewriteLeft) {
+    static Set<Term> rewriteAll(Set<Term> terms, Set<Equation> allEquations, Map<Term, Term> steps, boolean rewriteRight, boolean rewriteLeft) {
         Set<Term> toAdd = new HashSet<>();
 
         for (Term term : terms) {
@@ -544,38 +546,6 @@ public class Prover {
         List<Term> terms = getTerms(system, maxTermDepth, combineTerms);
 
         Map<Sort, List<Term>> smallTerms = new HashMap<>();
-        /*
-        Generate some small terms
-
-        int attempts = 5;
-
-        Sort nat = new Sort("nat");
-        Sort inf = new Sort("i");
-
-
-        smallTerms.put(nat, new ArrayList<>());
-
-        // Nat
-        Function zerof = new Function(nat, "0");
-
-        List<Sort> inputs = new ArrayList<>();
-        inputs.add(nat);
-        Function successor = new Function(nat, inputs, "s");
-        FunctionTerm zero = new FunctionTerm(zerof);
-        smallTerms.get(nat).add(zero);
-
-        Term previous = zero;
-        for (int i = 1; i < 2; i++) {
-            List<Term> subterms = new ArrayList<>();
-            subterms.add(previous);
-            FunctionTerm newTerm = new FunctionTerm(successor, subterms);
-            previous = newTerm;
-            smallTerms.get(nat).add(newTerm);
-        }
-
-        // inf
-        Function randStream = new Function(inf, "temp");
-        FunctionTerm rand = new FunctionTerm(randStream);*/
 
         Queue<Equation> addedLemmas = new LinkedList<>();
         for (int i = 0; i < terms.size(); i++) {
@@ -654,7 +624,6 @@ public class Prover {
             }
         }
 
-
         boolean addLemma = true;
         for (Equation equation : system.getEquations()) {
             if (equation.equivalent(eq, rewriteLeft)) {
@@ -699,9 +668,13 @@ public class Prover {
         return false;
     }
 
+    /*
+     * This function should check whether a lemma is likely to be equal by inserting some small terms
+     * and checking that the lemma holds for those terms
+     */
     private static boolean checkLikelyEqual(EquationSystem system, Map<Sort, List<Term>> smallTerms) {
-        int searchDepth = 0;
-        Term convergence = null;
+        //int searchDepth = 0;
+        //Term convergence = null;
 
         return true;
         /*

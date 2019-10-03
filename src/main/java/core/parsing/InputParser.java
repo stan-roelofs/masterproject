@@ -279,7 +279,7 @@ public class InputParser {
                     subtermsStrings.add(current.toString());
 
                     if (subtermsStrings.size() != numArguments) {
-                        throw new InvalidFunctionArgumentException("Invalid number of function arguments. Actual: " + subtermsStrings.size() + ", expected: " + numArguments);
+                        throw new InvalidFunctionArgumentException("Invalid number of function arguments for function " + f.getName() + ". Actual: " + subtermsStrings.size() + ", expected: " + numArguments);
                     }
 
                     int input = 0;

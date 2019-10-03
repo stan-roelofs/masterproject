@@ -18,6 +18,10 @@ public class EquationSystem {
     private Set<Function> C;
     private Equation goal;
 
+    /**
+     * Copy constructor
+     * @param system an existing EquationSystem
+     */
     public EquationSystem(EquationSystem system) {
         this.equations = new HashSet<>(system.getEquations());
         this.sigma = new HashSet<>(system.getSigma());

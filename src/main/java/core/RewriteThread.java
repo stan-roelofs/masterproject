@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Class that implements the Runnable interface for rewriting of terms, such that this can be done in thread(s)
  *
  * @author Stan Roelofs
  * @version 1.0
@@ -43,11 +44,11 @@ class RewriteThread implements Runnable {
         //Logger.d("Thread " + threadNumber + " done");
     }
 
-    public Set<Term> getResultLeft() {
+    Set<Term> getResultLeft() {
         return resultLeft;
     }
 
-    public Set<Term> getResultRight() {
+    Set<Term> getResultRight() {
         return resultRight;
     }
 }

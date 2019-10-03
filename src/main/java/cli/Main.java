@@ -12,6 +12,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main class for CLI
+ *
+ * @author Stan Roelofs
+ * @version 1.00
+ */
 public class Main {
     public static void main(String[] args) {
         CommandLineParser parser = new DefaultParser();
@@ -65,7 +71,7 @@ public class Main {
 
                 BufferedOutputWriter writer = new BufferedOutputWriter(new OutputStreamWriter(output));
 
-                int searchDepth = 20;
+                int searchDepth = 13;
                 if (commandLine.hasOption("d")) {
                     searchDepth = Integer.parseInt(commandLine.getOptionValue("d"));
                 }

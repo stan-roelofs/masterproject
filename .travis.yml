@@ -3,4 +3,4 @@ install: gradle wrapper --gradle-version 4.2
 language: java
 
 jdk:
-  - openjkd8
+  - openjdk8

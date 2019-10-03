@@ -14,6 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Panel for prover
+ *
+ * @author Stan Roelofs
+ * @version 1.00
+ */
 class ProofPanel extends JPanel {
 
     private JTextArea inputArea;

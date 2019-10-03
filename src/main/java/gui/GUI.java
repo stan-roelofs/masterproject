@@ -8,6 +8,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main class for GUI
+ *
+ * @author Stan Roelofs
+ * @version 1.00
+ */
 class GUI extends JFrame {
 
     private ProofPanel proofPanel;
@@ -16,13 +22,7 @@ class GUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (UnsupportedLookAndFeelException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
 
@@ -39,6 +39,7 @@ class GUI extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("File");
 
+        // Saving files button
         JMenuItem save = new JMenuItem("Save");
         save.addActionListener(actionEvent -> {
             FileDialog fd = new FileDialog(this, "Save to file", FileDialog.SAVE);
@@ -63,6 +64,7 @@ class GUI extends JFrame {
         });
         menu.add(save);
 
+        // Loading files button
         JMenuItem load = new JMenuItem("Load");
         load.addActionListener(actionEvent -> {
             FileDialog fd = new FileDialog(this, "Choose a file", FileDialog.LOAD);
@@ -85,7 +87,7 @@ class GUI extends JFrame {
 
                     proofPanel.setInput(input);
                 } catch (IOException e) {
-
+                    e.printStackTrace();
                 }
             }
         });

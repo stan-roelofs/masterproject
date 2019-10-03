@@ -85,6 +85,62 @@ public class Equation {
         return result;
     }
 
+
+
+    /**
+     * Checks whether two equations are equivalent, which basically means that they are equal except for variable names
+     * e.g. x = y is considered to be equivalent to a = b
+     * @param eq2 the second equation
+     * @param bidirectional indicates whether the equation can be used in both directions, or just from left to right
+     * @return True if this equation is equivalent to {@code eq2} while taking into account {@code bidirectional},
+     * False otherwise
+     */
+    public boolean equivalent(Equation eq2, boolean bidirectional) {
+        if (bidirectional) {
+            if (checkEquivalent(this.left, this.right, eq2.getLeft(), eq2.getRight())) {
+                return true;
+            }
+
+            return checkEquivalent(this.left, this.right, eq2.getRight(), eq2.getLeft());
+
+        } else {
+            return checkEquivalent(this.left, this.right, eq2.getLeft(), eq2.getRight());
+        }
+
+    }
+
+    /*
+     * Checks whether l1 is equivalent to l2 by finding a substitution (from l1 to l2 and l2 to l1)
+     * And does the same for r1 and r2
+     * If such substitutions are found, l1 = l2 and r1 = r2 are equivalent
+     */
+    private boolean checkEquivalent(Term l1, Term r1, Term l2, Term r2) {
+        Map<Variable, Term> subs1 = l1.getSubstitution(l2, new HashMap<>());
+
+        if (subs1 != null) {
+            Map<Variable, Term> subs2 = r1.getSubstitution(r2, subs1);
+
+            if (subs2 != null) {
+                Map<Variable, Term> subs3 = l2.getSubstitution(l1, new HashMap<>());
+
+                if (subs3 != null) {
+                    Map<Variable, Term> subs4 = r2.getSubstitution(r1, subs3);
+
+                    return subs4 != null;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Reverses this equation
+     * @return a new Equation object with the left and right hand side terms of this equation swapped
+     */
+    Equation reverse() {
+        return new Equation(this.getRight(), this.getLeft());
+    }
+
     @Override
     public String toString() {
         return left.toString() + " = " + right.toString();
@@ -111,42 +167,5 @@ public class Equation {
         result = 31 * result + left.hashCode();
         result = 31 * result + right.hashCode();
         return result;
-    }
-
-    public boolean equivalent(Equation eq2, boolean bidirectional) {
-        if (bidirectional) {
-            if (checkEquivalent(this.left, this.right, eq2.getLeft(), eq2.getRight())) {
-                return true;
-            }
-
-            return checkEquivalent(this.left, this.right, eq2.getRight(), eq2.getLeft());
-
-        } else {
-            return checkEquivalent(this.left, this.right, eq2.getLeft(), eq2.getRight());
-        }
-
-    }
-
-    private boolean checkEquivalent(Term l1, Term r1, Term l2, Term r2) {
-        Map<Variable, Term> subs1 = l1.getSubstitution(l2, new HashMap<>());
-
-        if (subs1 != null) {
-            Map<Variable, Term> subs2 = r1.getSubstitution(r2, subs1);
-
-            if (subs2 != null) {
-                Map<Variable, Term> subs3 = l2.getSubstitution(l1, new HashMap<>());
-
-                if (subs3 != null) {
-                    Map<Variable, Term> subs4 = r2.getSubstitution(r1, subs3);
-
-                    return subs4 != null;
-                }
-            }
-        }
-        return false;
-    }
-
-    Equation reverse() {
-        return new Equation(this.getRight(), this.getLeft());
     }
 }
